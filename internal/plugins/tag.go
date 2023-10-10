@@ -147,6 +147,8 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 	if field.Tag == nil {
 		bf := zutils.BuffPool.Get().(*bytes.Buffer)
 		bf.Reset()
+
+		// write tags
 		bf.WriteString(" `")
 		for i, key := range t.Keys {
 			if i > 0 {

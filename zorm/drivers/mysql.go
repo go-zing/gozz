@@ -110,11 +110,13 @@ func (m Mysql) Parse(dsn, schema, table string, types map[string]string) (tables
 		return
 	}
 
-	tables = m.parseTables(columns, types)
-	return
+	return m.parseTables(db, columns, types), nil
 }
 
-const sqlStatementSelectColumns = "SELECT `%s` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = ?"
+const (
+	sqlStatementSelectColumns      = "SELECT `%s` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = ?"
+	sqlStatementSelectTableComment = "SELECT `table_comment` FROM `information_schema`.`TABLES` WHERE `TABLE_NAME` = ? AND `TABLE_SCHEMA` = ?"
+)
 
 func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns SliceMysqlColumn, err error) {
 	fields := fieldsOf(&columns)
@@ -143,7 +145,12 @@ func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns Sl
 	return
 }
 
-func (m Mysql) parseTables(columns []MysqlColumn, types map[string]string) (tables []zorm.Table) {
+func (m Mysql) parseTables(db *sql.DB, columns []MysqlColumn, types map[string]string) (tables []zorm.Table) {
+	stmt, _ := db.Prepare(sqlStatementSelectTableComment)
+	if stmt != nil {
+		defer stmt.Close()
+	}
+
 	tbs := make(map[string]*zorm.Table)
 
 	for _, column := range columns {
@@ -154,6 +161,9 @@ func (m Mysql) parseTables(columns []MysqlColumn, types map[string]string) (tabl
 				Name:   strcase.UpperCamelCase(column.TableName),
 				Table:  column.TableName,
 				Schema: column.TableSchema,
+			}
+			if stmt == nil {
+				_ = stmt.QueryRow(column.TableName, column.TableSchema).Scan(&tb.Comment)
 			}
 			tbs[column.TableName] = tb
 		}
@@ -179,17 +189,22 @@ func (m Mysql) parseTables(columns []MysqlColumn, types map[string]string) (tabl
 		c.Nullable = column.IsNullable == "YES"
 
 		// golang types match
-		matches := make([]string, 0)
+		matches := []string{column.ColumnType, column.DataType}
+
 		if c.Nullable {
-			matches = append(matches, "*"+column.ColumnType, "*"+column.DataType)
+			matches = append([]string{"*" + column.ColumnType, "*" + column.DataType}, matches...)
 		}
-		matches = append(matches, column.ColumnType, column.DataType)
 
 		// match first
 		for _, key := range matches {
 			if c.Type = types[key]; len(c.Type) > 0 {
 				break
 			}
+		}
+
+		// no type match. use interface{}
+		if len(c.Type) == 0 {
+			c.Type = "interface{}"
 		}
 
 		tb.Columns = append(tb.Columns, c)

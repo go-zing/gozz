@@ -93,9 +93,6 @@ func parseAnnotation(annotation, name string, argsCount int, extOptions map[stri
 
 func (entities DeclEntities) GroupByDir() (m map[string]DeclEntities) {
 	return entities.GroupBy(func(entity DeclEntity) string {
-		if entity.TypeSpec == nil {
-			return ""
-		}
 		return filepath.Dir(entity.File.Path)
 	})
 }
@@ -117,14 +114,10 @@ func (entity *DeclEntity) ParseFields(argsCount int, options map[string]string) 
 	return
 }
 
-func (decl *AnnotatedDecl) Typename() string {
+func (decl *AnnotatedDecl) Name() string {
 	if decl.TypeSpec != nil && decl.TypeSpec.Name != nil {
 		return decl.TypeSpec.Name.Name
 	}
-	return ""
-}
-
-func (decl *AnnotatedDecl) FuncName() string {
 	if decl.FuncDecl != nil && decl.FuncDecl.Name != nil {
 		return decl.FuncDecl.Name.Name
 	}

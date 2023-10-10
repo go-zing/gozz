@@ -41,38 +41,42 @@ type (
 		Aops    interface{}
 	}
 
-	wireDecl struct {
-		Entities zcore.DeclEntities
-		Params   zutils.KeySet
-		Binds    zutils.KeySet
-		Aops     zutils.KeySet
-		Fields   zutils.KeySet
-		Injects  zutils.KeySet
-		Provider string
-	}
-
-	wireAopMethod struct {
+	WireAopMethod struct {
 		Name    string
 		Params  []string
 		Results []string
 	}
 
-	wireAop struct {
+	WireAop struct {
 		Name      string
 		Interface string
 		Implement string
-		Methods   []wireAopMethod
+		Methods   []WireAopMethod
 	}
 
-	wireSetElement struct {
-		Path, Name string
-		Decls      []string
+	WireSetElement struct {
+		Path  string
+		Name  string
+		Decls []string
 	}
 
-	wireSet struct {
+	WireSet struct {
 		Name     string
-		Elements []wireSetElement
+		Elements []WireSetElement
 	}
+
+	wireDecl struct {
+		Entities    zcore.DeclEntities
+		Params      zutils.KeySet
+		Binds       zutils.KeySet
+		Aops        zutils.KeySet
+		Fields      zutils.KeySet
+		Injects     zutils.KeySet
+		ReferStruct bool
+		Provider    string
+	}
+
+	wireDeclSet map[*zcore.AnnotatedDecl]*wireDecl
 )
 
 const (
@@ -149,16 +153,15 @@ func (w Wire) groupByDecls(entities zcore.DeclEntities) map[*zcore.AnnotatedDecl
 	return m
 }
 
-type wireDeclSet map[*zcore.AnnotatedDecl]*wireDecl
-
 func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet) {
 	set = make(wireDeclSet)
 
-	var binds []string
-
 	for _, entity := range entities {
-		decl := set.init(entity)
-		aop := false
+		var (
+			decl  = set.init(entity)
+			aop   bool
+			binds []string
+		)
 
 		for key, value := range entity.Options {
 			values := strings.Split(value, ",")
@@ -181,6 +184,10 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet
 				}
 			case "aop":
 				aop = true
+			case "struct":
+				if entity.Type == zcore.DeclTypeRefer {
+					decl.ReferStruct = true
+				}
 			case "set":
 				continue
 			}
@@ -211,7 +218,8 @@ func (set wireDeclSet) init(entity zcore.DeclEntity) *wireDecl {
 		}
 		set[entity.AnnotatedDecl] = decl
 
-		if typename := entity.Typename(); len(typename) > 0 {
+		if entity.TypeSpec != nil {
+			typename := entity.Name()
 			// try lookup provider function named ProvideXXX and return first args is declaration type
 			if obj := entity.File.Lookup("Provide" + typename); obj != nil && obj.Decl != nil {
 				if p, o := obj.Decl.(*ast.FuncDecl); o && p.Recv == nil && len(p.Type.Results.List) > 0 {
@@ -329,7 +337,7 @@ func (w Wire) generateInject(dirSetFiles map[string]wireDeclSet, filename string
 				continue
 			}
 
-			name := decl.Typename()
+			name := decl.Name()
 			inject := &WireInject{
 				Set:    set,
 				Path:   srcImportPath,
@@ -388,7 +396,7 @@ func (w Wire) generateSets(setFiles map[string]map[string]wireDeclSet) (err erro
 	return eg.Wait()
 }
 
-func (w Wire) parseInterfaceMethods(name string, dir string, imports zutils.Imports) (methods []wireAopMethod) {
+func (w Wire) parseInterfaceMethods(name string, dir string, imports zutils.Imports) (methods []WireAopMethod) {
 	pkgPath := ""
 	dstImportPath := zutils.GetImportPath(dir)
 
@@ -427,7 +435,7 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zutils.Impo
 		if !ok {
 			continue
 		}
-		m := wireAopMethod{Name: funcName}
+		m := WireAopMethod{Name: funcName}
 		appendField(ft.Params, &m.Params)
 		appendField(ft.Results, &m.Results)
 		methods = append(methods, m)
@@ -472,19 +480,19 @@ func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *
 
 func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	var (
-		wireSets      = make([]wireSet, 0, len(sets))
+		wireSets      = make([]WireSet, 0, len(sets))
 		dstImports    = zutils.Imports{"github.com/google/wire": "wire"}
 		dstImportPath = zutils.GetImportPath(dir)
 
 		aopImports = make(zutils.Imports)
-		aopSets    = make(map[string]*wireAop)
+		aopSets    = make(map[string]*WireAop)
 	)
 
 	for set, decls := range sets {
-		ws := wireSet{Name: set}
+		ws := WireSet{Name: set}
 
 		for decl, wd := range decls {
-			el := wireSetElement{Path: zutils.GetImportPath(decl.File.Path), Name: decl.Typename()}
+			el := WireSetElement{Path: zutils.GetImportPath(decl.File.Path), Name: decl.Name()}
 			srcImports := decl.File.Imports()
 			// fix name import package selector
 			fp := func(name string) string {
@@ -517,7 +525,7 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 					interfaceName := zutils.FixPackage(bind, el.Path, dstImportPath, srcImports, aopImports)
 
 					// add aop generate entry
-					aopType = &wireAop{
+					aopType = &WireAop{
 						Name:      aopTypename,
 						Interface: interfaceName,
 						Implement: "_impl" + aopTypename,
@@ -533,10 +541,16 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 
 			switch decl.Type {
 			case zcore.DeclFunc:
-				el.Name = decl.FuncName()
 				el.Decls = append(el.Decls, fp(el.Name))
 
+			case zcore.DeclTypeRefer:
+				// struct refer type
+				if wd.ReferStruct && len(wd.Provider) == 0 {
+					zutils.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
+				}
+
 			case zcore.DeclTypeStruct:
+				// struct type
 				if len(wd.Provider) == 0 {
 					zutils.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
 				}
@@ -588,10 +602,10 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	return
 }
 
-func (w Wire) generateAops(dir, pkg string, sets map[string]*wireAop, aopImports zutils.Imports) (err error) {
+func (w Wire) generateAops(dir, pkg string, sets map[string]*WireAop, aopImports zutils.Imports) (err error) {
 	aopFilename := filepath.Join(dir, wireAopFile)
 	if _ = os.Remove(aopFilename); len(sets) > 0 {
-		wireAops := make([]wireAop, 0, len(sets))
+		wireAops := make([]WireAop, 0, len(sets))
 		for _, e := range sets {
 			e.Methods = w.parseInterfaceMethods(e.Interface, dir, aopImports)
 			wireAops = append(wireAops, *e)

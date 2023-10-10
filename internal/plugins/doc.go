@@ -35,36 +35,54 @@ type (
 		Fields []DocField
 	}
 
-	DocField struct{ Name, Docs string }
+	DocField struct {
+		Name string
+		Docs string
+	}
 
-	Doc struct{ DataTypes, Interfaces []DocType }
+	Doc struct {
+		DataTypes  []DocType
+		Interfaces []DocType
+		Values     []DocType
+	}
 )
 
 const (
 	docDefaultFilename = "zzgen.doc.go"
 
-	docTemplate = `var OpenapiDocMap = map[interface{}]map[string]string{
-     {{ range .DataTypes }} (*{{ .Name }})(nil) : _map_{{ .Name }},
-     {{ end }} {{ range .Interfaces }} (*{{ .Name }})(nil) : _map_{{ .Name }},
-     {{ end }}
-}
-
-{{ range .DataTypes }}
-var _map_{{ .Name }} = map[string]string{
-	{{ range .Fields }} "{{ .Name }}" : {{ quote .Docs }},
-	{{ end }}
-}
-
-func ({{ .Name }}) OpenapiDoc(f string) string { return _map_{{ .Name }}[f] }
-{{ end }}
-
+	docTemplate = `var (
+	_types_doc = map[interface{}]map[string]string{
+	 	{{ range .Interfaces }} (*{{ .Name }})(nil) : _doc_{{ .Name }},
+     	{{ end }} 
+     	{{ range .DataTypes }} (*{{ .Name }})(nil) : _doc_{{ .Name }},
+     	{{ end }} 
+	}
+	
+	_values_doc = map[string]map[interface{}]string{
+		{{ range .Values }} {{ quote .Name }} : map[interface{}]string{
+			{{ range .Fields }} {{ .Name }} : {{ quote .Docs }},
+			{{ end }}
+		},
+		{{ end }}
+	}
+)
 
 {{ range .Interfaces }}
-var _map_{{ .Name }} = map[string]string{
+var _doc_{{ .Name }} = map[string]string{
 	{{ range .Fields }} "{{ .Name }}" : {{ quote .Docs }},
 	{{ end }}
 }
 {{ end }}
+
+{{ range .DataTypes }}
+var _doc_{{ .Name }} = map[string]string{
+	{{ range .Fields }} "{{ .Name }}" : {{ quote .Docs }},
+	{{ end }}
+}
+
+func ({{ .Name }}) FieldDoc(f string) string { return _doc_{{ .Name }}[f] }
+{{ end }}
+
 `
 )
 
@@ -88,30 +106,54 @@ func (d Doc) GenDoc(dir string, entities zcore.DeclEntities) (err error) {
 	var (
 		dataTypes  []DocType
 		interfaces []DocType
+		values     []DocType
 	)
+
+	valuesMap := make(map[string]int)
 
 	for _, entity := range entities {
 		fields := make([]DocField, 0)
-		types := &dataTypes
 
-		if docs := zutils.JoinDocs(entity.Docs); len(docs) > 0 {
-			fields = append(fields, DocField{Docs: docs})
+		if entity.TypeSpec != nil {
+			if docs := zutils.JoinDocs(entity.Docs); len(docs) > 0 {
+				fields = append(fields, DocField{Docs: docs})
+			}
+
+			types := &dataTypes
+			switch typ := entity.TypeSpec.Type.(type) {
+			case *ast.InterfaceType:
+				types = &interfaces
+				fields = append(fields, parseFieldsDocs(typ.Methods)...)
+			case *ast.StructType:
+				fields = append(fields, parseFieldsDocs(typ.Fields)...)
+			}
+
+			if len(fields) > 0 {
+				*types = append(*types, DocType{Name: entity.Name(), Fields: fields})
+			}
 		}
 
-		switch typ := entity.TypeSpec.Type.(type) {
-		case *ast.InterfaceType:
-			types = &interfaces
-			fields = append(fields, parseFieldsDocs(typ.Methods)...)
-		case *ast.StructType:
-			fields = append(fields, parseFieldsDocs(typ.Fields)...)
-		}
+		if entity.ValueSpec != nil {
+			for _, name := range entity.ValueSpec.Names {
+				fields = append(fields, DocField{
+					Name: name.Name,
+					Docs: zutils.JoinDocs(entity.Docs),
+				})
+			}
 
-		if len(fields) > 0 {
-			*types = append(*types, DocType{Name: entity.Typename(), Fields: fields})
+			label := entity.Options.Get("label", "")
+			if _, ok := valuesMap[label]; !ok {
+				values = append(values, DocType{
+					Name: label,
+				})
+				valuesMap[label] = len(values) - 1
+			}
+
+			values[valuesMap[label]].Fields = append(values[valuesMap[label]].Fields, fields...)
 		}
 	}
 
-	if len(dataTypes)+len(interfaces) == 0 {
+	if len(dataTypes)+len(interfaces)+len(values) == 0 {
 		return
 	}
 
@@ -120,6 +162,7 @@ func (d Doc) GenDoc(dir string, entities zcore.DeclEntities) (err error) {
 	return zcore.RenderWithDefaultTemplate(&Doc{
 		DataTypes:  dataTypes,
 		Interfaces: interfaces,
+		Values:     values,
 	}, docTemplate, filename, entities[0].File.Ast.Name.Name, false)
 }
 

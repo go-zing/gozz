@@ -22,16 +22,23 @@ import (
 	"sort"
 )
 
-type mapperSlice interface {
-	Range(f func(interface{}, bool) bool)
-}
+type (
+	// ranger provide range method for slice elements range and alloc
+	ranger interface {
+		Range(f func(element interface{}, alloc bool) (next bool))
+	}
 
-type mapper interface {
-	FieldMapping() map[string]interface{}
-}
+	// mapper return mapping of struct field and column name
+	// keys represents column names
+	// values represents pointers to struct field
+	mapper interface {
+		FieldMapping() map[string]interface{}
+	}
+)
 
-func fieldsOf(ms mapperSlice) (fields []string) {
-	rangeSlice(ms, func(m mapper, b bool) bool {
+// fieldsOf extract fields from ranger slice with mapper items
+func fieldsOf(ms ranger) (fields []string) {
+	rangeMapper(ms, func(m mapper, b bool) bool {
 		for key := range m.FieldMapping() {
 			fields = append(fields, key)
 		}
@@ -41,14 +48,16 @@ func fieldsOf(ms mapperSlice) (fields []string) {
 	return
 }
 
-func rangeSlice(ms mapperSlice, f func(m mapper, b bool) bool) {
+// rangeMapper range slice and apply function receive mapper
+func rangeMapper(ms ranger, f func(m mapper, b bool) bool) {
 	ms.Range(func(v interface{}, b bool) bool { m, ok := v.(mapper); return ok && f(m, b) })
 }
 
-func scan(rows *sql.Rows, fields []string, ms mapperSlice) (err error) {
+// scan range mapper slice and scan sql.Rows values into ranger elements
+func scan(rows *sql.Rows, fields []string, ms ranger) (err error) {
 	if rows.Next() {
 		values := make([]interface{}, len(fields))
-		rangeSlice(ms, func(m mapper, b bool) bool {
+		rangeMapper(ms, func(m mapper, b bool) bool {
 			mapping := m.FieldMapping()
 			for i, field := range fields {
 				values[i] = mapping[field]

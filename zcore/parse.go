@@ -47,22 +47,25 @@ var (
 const (
 	DeclTypeInterface = iota + 1 // type T interface{}
 	DeclTypeStruct               // type T struct{}
+	DeclTypeMap                  // type T map[string]string
+	DeclTypeArray                // type T []string
+	DeclTypeFunc                 // type T func()
 	DeclTypeRefer                // type T T2  or  type T = T2
-	DeclTypeOther                // type T func() or type T []slice or type T map[key]value
 	DeclFunc                     // func Fn()
-	DeclValues                   // var variable = 1  or  const constant = 1
+	DeclValue                    // var variable = 1 or var v Type  or  const constant = 1
 )
 
 type (
 	AnnotatedDecl struct {
 		File *zutils.File
 
-		Type       int
-		ValuesDecl *ast.GenDecl
-		FuncDecl   *ast.FuncDecl
-		TypeSpec   *ast.TypeSpec
+		Type      int
+		FuncDecl  *ast.FuncDecl
+		TypeSpec  *ast.TypeSpec
+		ValueSpec *ast.ValueSpec
 
 		Docs        []string
+		GenDocs     []string
 		Annotations []string
 		Fields      []*AnnotatedField
 	}
@@ -200,20 +203,42 @@ func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 			)
 
 			// +zz:annotation:args:key=value
+			var variableC = 4
+
+			// +zz:annotation:args:key=value
 			const (
 			    constantA = 3
 			    constantB = 4
 			)
+
+			// +zz:annotation:args:key=value
+			const constantC = 4
 		*/
 		if len(genAnnotations) == 0 {
 			return
 		}
-		decls = append(decls, &AnnotatedDecl{
-			Type:        DeclValues,
-			ValuesDecl:  gen,
-			Docs:        genDocs,
-			Annotations: genAnnotations,
-		})
+
+		for _, spec := range gen.Specs {
+			vs, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				continue
+			}
+
+			docs, annotations := ParseCommentGroup(prefix, vs.Doc, vs.Comment)
+			// generic annotations would be appended to each element in merged declaration
+
+			if annotations = append(annotations, genAnnotations...); len(annotations) == 0 {
+				continue
+			}
+
+			decls = append(decls, &AnnotatedDecl{
+				ValueSpec:   vs,
+				Docs:        docs,
+				GenDocs:     genDocs,
+				Annotations: annotations,
+				Type:        DeclValue,
+			})
+		}
 
 	case token.TYPE:
 		/*
@@ -266,15 +291,14 @@ func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 			docs, annotations := ParseCommentGroup(prefix, spec.Doc, spec.Comment)
 
 			// generic annotations would be appended to each element in merged declaration
-			annotations = append(annotations, genAnnotations...)
-
-			if len(annotations) == 0 {
+			if annotations = append(annotations, genAnnotations...); len(annotations) == 0 {
 				continue
 			}
 
 			decl := &AnnotatedDecl{
 				TypeSpec:    spec,
 				Docs:        docs,
+				GenDocs:     genDocs,
 				Annotations: annotations,
 			}
 
@@ -286,10 +310,16 @@ func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 			case *ast.StructType:
 				decl.Type = DeclTypeStruct
 				decl.parseAnnotatedFields(typ.Fields, prefix)
+			case *ast.MapType:
+				decl.Type = DeclTypeMap
+			case *ast.ArrayType:
+				decl.Type = DeclTypeArray
+			case *ast.FuncType:
+				decl.Type = DeclTypeFunc
 			case *ast.Ident, *ast.SelectorExpr, *ast.StarExpr:
 				decl.Type = DeclTypeRefer
 			default:
-				decl.Type = DeclTypeOther
+				continue
 			}
 
 			decls = append(decls, decl)

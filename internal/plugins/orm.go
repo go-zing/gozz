@@ -58,17 +58,13 @@ var tables = []interface{}{
 {{ range .Tables }} {{ .Name }}{},
 {{ end }} }
 
-{{ range .Tables }}
-/*
-{{ .Schema }}.{{ .Table }} {{ if .Comment }} 
-
-{{ .Comment }} {{ end }}
-*/
+{{ range .Tables }} // {{ .Schema }}.{{ .Table }} {{ if .Comment }} 
+{{ comment .Comment }} {{ end }}
 const Table{{ .Name }} = "{{ .Table }}"
 
 type {{ .Name }} struct{ {{ range .Columns }} 
 	// {{ .Column }} {{ if .Comment }} 
-    // {{ .Comment }} {{ end }}
+    {{ comment .Comment }} {{ end }}
     {{ .Name }} {{ .Type }} {{ end }} 
 }
 
@@ -115,32 +111,35 @@ func (o Orm) Run(entities zcore.DeclEntities) (err error) {
 		return
 	}
 
-	eg := zutils.ErrGroup{}
-	for key := range group {
-		filename := key
-		pkg := zutils.GetImportName(filename)
-		eg.Go(func() error {
-			return zcore.RenderWithDefaultTemplate(Orm{Tables: group[filename]}, ormTemplateText, filename, pkg, false)
-		})
+	for filename, tables := range group {
+		if err = zcore.RenderWithDefaultTemplate(Orm{Tables: tables},
+			ormTemplateText, filename, zutils.GetImportName(filename), false); err != nil {
+			return
+		}
 	}
-	return eg.Wait()
+	return
 }
 
 func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zorm.Table, err error) {
 	opt := entity.Options
 
-	// driver
+	// get driver. default mysql
 	driverName := opt.Get("driver", "mysql")
 	driver := zorm.Get(driverName)
 	if driver == nil {
 		return nil, errors.New("unregister driver: " + driverName)
 	}
 
+	// default types
 	types := zorm.DefaultTypes()
 
+	// commands or annotations defined types
+	// extract types from options
 	zutils.SplitKVSlice2Map(strings.Split(entity.Options["types"], ","), "=", types)
 
-	return driver.Parse(fmt.Sprintf("%s:%s@tcp(%s:%s)/",
+	// parse dsn and get tables
+	return driver.Parse(fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/",
 		opt.Get("user", "root"),
 		opt.Get("password", ""),
 		opt.Get("host", "localhost"),
@@ -157,14 +156,6 @@ func (o Orm) group(entities zcore.DeclEntities) (group map[string][]zorm.Table, 
 			return
 		}
 		filename := entity.RelFilename(entity.Args[1], "zzgen.orm.go")
-
-		for i := range tables {
-			table := &tables[i]
-			for ci := range table.Columns {
-				column := &table.Columns[ci]
-				column.Comment = strings.Replace(column.Comment, "\n", "\n// ", -1)
-			}
-		}
 		group[filename] = append(group[filename], tables...)
 	}
 	return

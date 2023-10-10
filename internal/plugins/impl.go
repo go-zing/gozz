@@ -87,7 +87,7 @@ func (dst *implDstType) init(modifySet *zutils.ModifySet, key implDstKey) {
 		}
 		added[entity.TypeSpec] = struct{}{}
 
-		name := entity.Typename()
+		name := entity.Name()
 
 		// import interface package if implements in different package
 		if srcPath := zutils.GetImportPath(entity.File.Path); dstPath != srcPath {
