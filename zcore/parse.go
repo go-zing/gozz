@@ -65,7 +65,6 @@ type (
 		ValueSpec *ast.ValueSpec
 
 		Docs        []string
-		GenDocs     []string
 		Annotations []string
 		Fields      []*AnnotatedField
 	}
@@ -191,6 +190,8 @@ func parseFileDecls(file *zutils.File, prefix string) (decls AnnotatedDecls) {
 func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 	genDocs, genAnnotations := ParseCommentGroup(prefix, gen.Doc)
 
+	single := !gen.Lparen.IsValid() || len(gen.Specs) == 1
+
 	switch gen.Tok {
 	case token.CONST, token.VAR:
 		/*
@@ -214,10 +215,6 @@ func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 			// +zz:annotation:args:key=value
 			const constantC = 4
 		*/
-		if len(genAnnotations) == 0 {
-			return
-		}
-
 		for _, spec := range gen.Specs {
 			vs, ok := spec.(*ast.ValueSpec)
 			if !ok {
@@ -227,14 +224,17 @@ func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 			docs, annotations := ParseCommentGroup(prefix, vs.Doc, vs.Comment)
 			// generic annotations would be appended to each element in merged declaration
 
-			if annotations = append(annotations, genAnnotations...); len(annotations) == 0 {
+			if annotations = append(genAnnotations, annotations...); len(annotations) == 0 {
 				continue
+			}
+
+			if single {
+				docs = append(genDocs, docs...)
 			}
 
 			decls = append(decls, &AnnotatedDecl{
 				ValueSpec:   vs,
 				Docs:        docs,
-				GenDocs:     genDocs,
 				Annotations: annotations,
 				Type:        DeclValue,
 			})
@@ -295,10 +295,13 @@ func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 				continue
 			}
 
+			if single {
+				docs = append(genDocs, docs...)
+			}
+
 			decl := &AnnotatedDecl{
 				TypeSpec:    spec,
 				Docs:        docs,
-				GenDocs:     genDocs,
 				Annotations: annotations,
 			}
 
@@ -388,7 +391,7 @@ func ParseCommentGroup(prefix string, cg ...*ast.CommentGroup) (docs, annotation
 		if g == nil {
 			continue
 		}
-		docs = append(docs, strings.Split(g.Text(), "\n")...)
+		docs = append(docs, strings.Split(strings.TrimSpace(g.Text()), "\n")...)
 	}
 
 	// no prefix provided. return all comment lines as doc
