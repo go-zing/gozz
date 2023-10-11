@@ -141,7 +141,17 @@ func(i _impl{{ $n }}){{ .Name }}({{ range $i,$v := $p }}p{{ $i }} {{ $v }},{{ en
 
 func (w Wire) Name() string { return wireName }
 
-func (w Wire) Args() ([]string, map[string]string) { return nil, nil }
+func (w Wire) Args() ([]string, map[string]string) {
+	return nil,
+		map[string]string{
+			"aop":    "",
+			"struct": "",
+			"bind":   "",
+			"field":  "",
+			"param":  "",
+			"inject": "",
+		}
+}
 
 func (w Wire) Description() string { return "" }
 

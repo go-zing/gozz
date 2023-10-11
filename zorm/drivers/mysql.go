@@ -178,6 +178,7 @@ func (m Mysql) parseTables(db *sql.DB, columns []MysqlColumn, types map[string]s
 			Column:  column.ColumnName,
 			Type:    column.ColumnType,
 			Comment: column.ColumnComment,
+			Ext:     column,
 		}
 
 		// max length

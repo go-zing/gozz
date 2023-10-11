@@ -63,9 +63,9 @@ var tables = []interface{}{
 const Table{{ .Name }} = "{{ .Table }}"
 
 type {{ .Name }} struct{ {{ range .Columns }} 
-	// {{ .Column }} {{ if .Comment }} 
+	// {{ .Column }} : {{ if .Nullable }}NULLABLE {{ end }}{{ if .Ext }}{{ .Ext.ColumnType }} {{ end }}{{ if .Comment }}
     {{ comment .Comment }} {{ end }}
-    {{ .Name }} {{ .Type }} {{ end }} 
+    {{ .Name }} {{ .Type }} {{ end }}
 }
 
 func ({{ .Name }}) TableName() string { return Table{{ .Name }} } 
@@ -100,7 +100,7 @@ func (s *Slice{{ .Name }}) Range(f func(interface{}, bool) bool) {
 func (o Orm) Name() string { return "orm" }
 
 func (o Orm) Args() ([]string, map[string]string) {
-	return []string{"schema", "filename"}, nil
+	return []string{"filename", "schema"}, map[string]string{"type": "", "table": ""}
 }
 
 func (o Orm) Description() string { return "" }
@@ -135,7 +135,11 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zorm.Table, err erro
 
 	// commands or annotations defined types
 	// extract types from options
-	zutils.SplitKVSlice2Map(strings.Split(entity.Options["types"], ","), "=", types)
+	extTypes := make(map[string]string)
+	zutils.SplitKVSlice2Map(strings.Split(entity.Options["type"], ","), "=", extTypes)
+	for key, value := range extTypes {
+		types[key] = value
+	}
 
 	// parse dsn and get tables
 	return driver.Parse(fmt.Sprintf(
@@ -144,19 +148,18 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zorm.Table, err erro
 		opt.Get("password", ""),
 		opt.Get("host", "localhost"),
 		opt.Get("port", "3306"),
-	), entity.Args[0], opt.Get("table", "*"), types)
+	), entity.Args[1], opt.Get("table", "*"), types)
 }
 
-func (o Orm) group(entities zcore.DeclEntities) (group map[string][]zorm.Table, err error) {
-	group = make(map[string][]zorm.Table)
-
+func (o Orm) group(entities zcore.DeclEntities) (map[string][]zorm.Table, error) {
+	group := make(map[string][]zorm.Table)
 	for _, entity := range entities {
-		var tables []zorm.Table
-		if tables, err = o.parseTables(entity); err != nil {
-			return
+		tables, e := o.parseTables(entity)
+		if e != nil {
+			return nil, e
 		}
-		filename := entity.RelFilename(entity.Args[1], "zzgen.orm.go")
+		filename := entity.RelFilename(entity.Args[0], "zzgen.orm.go")
 		group[filename] = append(group[filename], tables...)
 	}
-	return
+	return group, nil
 }

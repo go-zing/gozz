@@ -39,7 +39,11 @@ func SplitKV(str string, sep string) (key, value string) {
 func SplitKV2Map(str string, sep string, dst map[string]string) {
 	if len(str) > 0 {
 		k, v := SplitKV(str, sep)
-		dst[k] = v
+		if _, ok := dst[k]; ok {
+			dst[k] += "," + v
+		} else {
+			dst[k] = v
+		}
 	}
 }
 

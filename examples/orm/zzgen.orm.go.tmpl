@@ -1,0 +1,54 @@
+import (
+	"context"
+	"time"
+	"encoding/json"
+	"database/sql"
+)
+
+var (
+	_ = (*context.Context)(nil)
+    _ = (*json.RawMessage)(nil)
+    _ = (*time.Time)(nil)
+    _ = (*sql.NullString)(nil)
+)
+
+var tables = []interface{}{
+{{ range .Tables }} {{ .Name }}{},
+{{ end }} }
+
+{{ range .Tables }} // {{ .Schema }}.{{ .Table }} {{ if .Comment }} 
+{{ comment .Comment }} {{ end }}
+const Table{{ .Name }} = "{{ .Table }}"
+
+type {{ .Name }} struct{ {{ range .Columns }} 
+	// {{ .Column }} : {{ if .Nullable }}NULLABLE {{ end }}{{ if .Ext }}{{ .Ext.ColumnType }} {{ end }}{{ if .Comment }}
+    {{ comment .Comment }} {{ end }}
+    {{ .Name }} {{ .Type }} {{ end }}
+}
+
+func ({{ .Name }}) TableName() string { return Table{{ .Name }} } 
+
+func (m *{{ .Name }}) FieldMapping() (map[string]interface{}){
+    return map[string]interface{}{ 
+		{{ range .Columns }} {{ quote .Column }}: &m.{{ .Name }},
+		{{ end }} }
+}
+
+type Slice{{ .Name }} []{{ .Name }}
+
+func (s *Slice{{ .Name }}) Range(f func(interface{}, bool) bool) {
+	for i := 0; ; i++ {
+		if c := i >= len(*s); !c {
+			if !f(&(*s)[i], c) {
+				return
+			}
+		} else if n := append(*s, {{ .Name }}{}); f(&n[i], c) {
+			*s = n
+		} else {
+			*s = n[:i]
+			return
+		}
+	}
+}
+
+{{ end }}

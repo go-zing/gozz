@@ -86,7 +86,11 @@ func RenderTemplate(plugin Plugin, templateText string, pkg string, editable boo
 		return
 	}
 
-	return format.Source(bf.Bytes())
+	if data, err = format.Source(bf.Bytes()); err != nil {
+		fmt.Printf("%s\n", bf.Bytes())
+		return
+	}
+	return
 }
 
 // getTemplate parse text as *template.Template
