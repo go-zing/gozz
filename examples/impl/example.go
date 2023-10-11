@@ -36,4 +36,7 @@ type Interface interface {
 	Api2(ctx context.Context, param Param) []Result
 	Api3(ctx context.Context, param Param) (r []Result, err error)
 	Api4(ctx context.Context, param Param) (r map[*context.Context]Result, err error)
+	Api5(ctx context.Context) (fn func(ctx context.Context) interface {
+		Foo(param Param) (Result, error)
+	})
 }

@@ -27,3 +27,9 @@ func (t *T) Api3(ctx context.Context, param Param) (r []Result, err error) {
 func (t *T) Api4(ctx context.Context, param Param) (r map[*context.Context]Result, err error) {
 	panic("not implemented")
 }
+
+func (t *T) Api5(ctx context.Context) (fn func(ctx context.Context) interface {
+	Foo(param Param) (Result, error)
+}) {
+	panic("not implemented")
+}
