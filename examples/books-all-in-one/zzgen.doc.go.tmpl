@@ -1,0 +1,33 @@
+var (
+	_types_doc = map[interface{}]map[string]string{
+	 	{{ range .Interfaces }} (*{{ .Name }})(nil) : _doc_{{ .Name }},
+     	{{ end }} 
+     	{{ range .DataTypes }} (*{{ .Name }})(nil) : _doc_{{ .Name }},
+     	{{ end }} 
+	}
+	
+	_values_doc = map[string]map[interface{}]string{
+		{{ range .Values }} {{ quote .Name }} : map[interface{}]string{
+			{{ range .Fields }} {{ .Name }} : {{ quote .Docs }},
+			{{ end }}
+		},
+		{{ end }}
+	}
+)
+
+{{ range .Interfaces }}
+var _doc_{{ .Name }} = map[string]string{
+	{{ range .Fields }} "{{ .Name }}" : {{ quote .Docs }},
+	{{ end }}
+}
+{{ end }}
+
+{{ range .DataTypes }}
+var _doc_{{ .Name }} = map[string]string{
+	{{ range .Fields }} "{{ .Name }}" : {{ quote .Docs }},
+	{{ end }}
+}
+
+func ({{ .Name }}) FieldDoc(f string) string { return _doc_{{ .Name }}[f] }
+{{ end }}
+
