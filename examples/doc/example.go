@@ -32,6 +32,17 @@ type T struct {
 }
 
 // +zz:doc
+// this is another struct type
+/*
+	multi lines comments
+*/
+type T1 struct {
+	// comment on
+	// another comment line
+	Field string // comment after field
+}
+
+// +zz:doc
 type (
 	// this is another struct type declared in group
 	T2 struct {

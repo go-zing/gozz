@@ -83,9 +83,9 @@ type Apis struct {
     {{ end }}
 }
 
-func (apis Apis) Range(fn func(interface{},[]map[string]interface{})){
+func (s Apis) Range(fn func(interface{},[]map[string]interface{})){
 	for _,f:=range []func()(interface{},[]map[string]interface{}){
-		{{ range .Interfaces }} apis._{{ .FieldName }},
+		{{ range .Interfaces }} s._{{ .FieldName }},
 		{{ end }}
 	}{
 		fn(f())
@@ -93,8 +93,8 @@ func (apis Apis) Range(fn func(interface{},[]map[string]interface{})){
 }
 
 {{ range .Interfaces }} 
-func (apis Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
-	t := apis.{{ .FieldName }}
+func (s Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
+	t := s.{{ .FieldName }}
 	return t,[]map[string]interface{}{	{{ range  .Handlers }}
 		{	
 			"doc": {{ quote .Doc }}, 

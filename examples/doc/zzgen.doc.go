@@ -7,6 +7,7 @@ var (
 		(*T3)(nil): _doc_T3,
 
 		(*T)(nil):  _doc_T,
+		(*T1)(nil): _doc_T1,
 		(*T2)(nil): _doc_T2,
 		(*T4)(nil): _doc_T4,
 		(*T5)(nil): _doc_T5,
@@ -45,6 +46,13 @@ var _doc_T = map[string]string{
 }
 
 func (T) FieldDoc(f string) string { return _doc_T[f] }
+
+var _doc_T1 = map[string]string{
+	"":      "this is another struct type\n\n\tmulti lines comments",
+	"Field": "comment on\nanother comment line\ncomment after field",
+}
+
+func (T1) FieldDoc(f string) string { return _doc_T1[f] }
 
 var _doc_T2 = map[string]string{
 	"":       "this is another struct type declared in group",
