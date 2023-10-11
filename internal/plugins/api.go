@@ -38,12 +38,11 @@ type (
 	}
 
 	ApiHandler struct {
-		Doc      string
+		Name     string
 		Method   string
 		Resource string
-		Name     string
-		Invoke   string
 		Options  map[string]string
+		Invoke   string
 	}
 
 	ApiInterface struct {
@@ -95,12 +94,11 @@ func (s Apis) Range(fn func(interface{},[]map[string]interface{})){
 {{ range .Interfaces }} 
 func (s Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
 	t := s.{{ .FieldName }}
-	return t,[]map[string]interface{}{	{{ range  .Handlers }}
-		{	
-			"doc": {{ quote .Doc }}, 
+	return &t,[]map[string]interface{}{	{{ range  .Handlers }}
+		{
+			"name": "{{ .Name }}",
 			"method": "{{ .Method }}",
 			"resource": "{{ .Resource }}",
-			"name": "{{ .Name }}",
 			"options": map[string]string{   {{ range $key,$value := .Options }}
 			{{ quote $key }} : {{ quote $value }}, {{ end }}
 			},  {{ if .Invoke }} 
@@ -182,10 +180,9 @@ func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEnt
 			}
 
 			handler := ApiHandler{
-				Doc:      zutils.JoinDocs(field.Docs),
+				Name:     funcName,
 				Method:   field.Args[0],
 				Resource: field.Args[1],
-				Name:     funcName,
 				Options:  field.Options,
 			}
 

@@ -22,12 +22,11 @@ func (s Apis) Range(fn func(interface{}, []map[string]interface{})) {
 
 func (s Apis) _BookService() (interface{}, []map[string]interface{}) {
 	t := s.BookService
-	return t, []map[string]interface{}{
+	return &t, []map[string]interface{}{
 		{
-			"doc":      "List all books. return ListBook",
+			"name":     "List",
 			"method":   "get",
 			"resource": "",
-			"name":     "List",
 			"options": map[string]string{
 				"prefix": "books",
 			},
@@ -40,10 +39,9 @@ func (s Apis) _BookService() (interface{}, []map[string]interface{}) {
 			},
 		},
 		{
-			"doc":      "Get book by book id. returns DataBook",
+			"name":     "Get",
 			"method":   "get",
 			"resource": "{id}",
-			"name":     "Get",
 			"options": map[string]string{
 				"prefix": "books",
 			},
@@ -56,10 +54,9 @@ func (s Apis) _BookService() (interface{}, []map[string]interface{}) {
 			},
 		},
 		{
-			"doc":      "Create new book from FormBook. returns DataBook created",
+			"name":     "Create",
 			"method":   "post",
 			"resource": "",
-			"name":     "Create",
 			"options": map[string]string{
 				"prefix": "books",
 			},
@@ -72,10 +69,9 @@ func (s Apis) _BookService() (interface{}, []map[string]interface{}) {
 			},
 		},
 		{
-			"doc":      "Edit book by id from FormBook. returns DataBook edited",
+			"name":     "Edit",
 			"method":   "put",
 			"resource": "{id}",
-			"name":     "Edit",
 			"options": map[string]string{
 				"prefix": "books",
 			},

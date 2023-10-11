@@ -121,6 +121,9 @@ func (decl *AnnotatedDecl) Name() string {
 	if decl.FuncDecl != nil && decl.FuncDecl.Name != nil {
 		return decl.FuncDecl.Name.Name
 	}
+	if decl.ValueSpec != nil && len(decl.ValueSpec.Names) == 1 {
+		return decl.ValueSpec.Names[0].Name
+	}
 	return ""
 }
 
@@ -128,11 +131,19 @@ func (decl *AnnotatedDecl) RelFilename(filename string, defaultName string) (ret
 	if !strings.HasSuffix(filename, ".go") {
 		filename = filepath.Join(filename, defaultName)
 	}
+
 	if dir := filepath.Dir(decl.File.Path); filepath.IsAbs(filename) {
-		return filepath.Join(filepath.Dir(zutils.GetModFile(dir)), filename)
+		ret = filepath.Join(filepath.Dir(zutils.GetModFile(dir)), filename)
 	} else {
-		return filepath.Join(dir, filename)
+		ret = filepath.Join(dir, filename)
 	}
+
+	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
+		if str := (&strings.Builder{}); ExecuteTemplate(decl, ret, str) == nil {
+			ret = str.String()
+		}
+	}
+	return
 }
 
 func (decls AnnotatedDecls) Parse(plugin Plugin, extOptions map[string]string) (entities DeclEntities) {

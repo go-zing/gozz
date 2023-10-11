@@ -22,12 +22,11 @@ func (s Apis) Range(fn func(interface{},[]map[string]interface{})){
 {{ range .Interfaces }} 
 func (s Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
 	t := s.{{ .FieldName }}
-	return t,[]map[string]interface{}{	{{ range  .Handlers }}
-		{	
-			"doc": {{ quote .Doc }}, 
+	return &t,[]map[string]interface{}{	{{ range  .Handlers }}
+		{
+			"name": "{{ .Name }}",
 			"method": "{{ .Method }}",
 			"resource": "{{ .Resource }}",
-			"name": "{{ .Name }}",
 			"options": map[string]string{   {{ range $key,$value := .Options }}
 			{{ quote $key }} : {{ quote $value }}, {{ end }}
 			},  {{ if .Invoke }} 
