@@ -3,7 +3,7 @@
 package inject
 
 import (
-	context "context"
+	"context"
 	booksallinone "github.com/Just-maple/gozz/examples/books-all-in-one"
 )
 

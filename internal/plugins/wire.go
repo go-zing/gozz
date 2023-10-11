@@ -604,23 +604,24 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 
 func (w Wire) generateAops(dir, pkg string, sets map[string]*WireAop, aopImports zutils.Imports) (err error) {
 	aopFilename := filepath.Join(dir, wireAopFile)
-	if _ = os.Remove(aopFilename); len(sets) > 0 {
-		wireAops := make([]WireAop, 0, len(sets))
-		for _, e := range sets {
-			e.Methods = w.parseInterfaceMethods(e.Interface, dir, aopImports)
-			wireAops = append(wireAops, *e)
-		}
-
-		sort.Slice(wireAops, func(i, j int) bool { return wireAops[i].Name < wireAops[j].Name })
-
-		if err = zcore.RenderWithDefaultTemplate(Wire{
-			Imports: aopImports.List(),
-			Aops:    wireAops,
-		}, wireAopTemplate, aopFilename, pkg, false); err != nil {
-			return
-		}
+	_ = os.Remove(aopFilename)
+	if len(sets) == 0 {
+		return
 	}
-	return
+
+	wireAops := make([]WireAop, 0, len(sets))
+
+	for _, e := range sets {
+		e.Methods = w.parseInterfaceMethods(e.Interface, dir, aopImports)
+		wireAops = append(wireAops, *e)
+	}
+
+	sort.Slice(wireAops, func(i, j int) bool { return wireAops[i].Name < wireAops[j].Name })
+
+	return zcore.RenderWithDefaultTemplate(Wire{
+		Imports: aopImports.List(),
+		Aops:    wireAops,
+	}, wireAopTemplate, aopFilename, pkg, false)
 }
 
 func (w Wire) parseEntities(entities zcore.DeclEntities) map[string]wireDeclSet {

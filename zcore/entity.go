@@ -19,6 +19,7 @@ package zcore
 
 import (
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/Just-maple/gozz/zutils"
@@ -52,6 +53,14 @@ func (opt Options) Get(key string, def string) string {
 		return v
 	}
 	return def
+}
+
+func (opt Options) Exist(key string) bool {
+	if v, ok := opt[key]; ok {
+		ok2, _ := strconv.ParseBool(v)
+		return len(v) == 0 || ok2
+	}
+	return false
 }
 
 // parseAnnotation parse annotation string

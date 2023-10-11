@@ -31,7 +31,7 @@ type Application struct {
 
 // +zz:api:./:prefix=books
 // +zz:doc
-// +zz:impl:./impls:wire
+// +zz:impl:./impls:wire:aop
 // BookService provide book management services
 type BookService interface {
 	// +zz:api:get:

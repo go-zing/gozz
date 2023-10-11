@@ -22,7 +22,7 @@ import (
 	"go/ast"
 	"go/token"
 	"path/filepath"
-	"strconv"
+	"sort"
 	"strings"
 
 	"github.com/stoewer/go-strcase"
@@ -38,7 +38,7 @@ func init() {
 const (
 	implMethodTemplate  = "func(%s %s)%s%s{\npanic(\"not implemented\")}"
 	implTypeAssert      = "_ %s = (*%s)(nil)"
-	implWireAnnotation  = "// %s%s:bind=%s\n"
+	implWireAnnotation  = "// %s%s:bind=%s%s\n"
 	implTypeDeclaration = "var ( %s )\n\n%stype %s struct{}"
 )
 
@@ -63,6 +63,7 @@ type (
 		SrcType  *ast.FuncType
 		DstFile  *zutils.File
 		DstType  *ast.FuncType
+		Order    int
 	}
 )
 
@@ -100,10 +101,12 @@ func (dst *implDstType) init(modifySet *zutils.ModifySet, key implDstKey) {
 		zutils.Appendf(&impls, implTypeAssert, name, key.Typename)
 
 		// add wire annotations
-		if opt, ok := entity.Options["wire"]; ok {
-			if ok2, _ := strconv.ParseBool(opt); len(opt) == 0 || ok2 {
-				zutils.Appendf(&wires, implWireAnnotation, zcore.AnnotationPrefix, wireName, name)
+		if entity.Options.Exist("wire") {
+			aop := ""
+			if entity.Options.Exist("aop") {
+				aop = ":aop"
 			}
+			zutils.Appendf(&wires, implWireAnnotation, zcore.AnnotationPrefix, wireName, name, aop)
 		}
 	}
 
@@ -164,8 +167,16 @@ func (dst *implDstType) apply(set *zutils.ModifySet, key implDstKey) (err error)
 		recName = strings.ToLower(sp[len(sp)-1])
 	}
 
+	// sort by order
+	names := make([]string, 0, len(dst.Methods))
+	for name := range dst.Methods {
+		names = append(names, name)
+	}
+	sort.Slice(names, func(i, j int) bool { return dst.Methods[names[i]].Order < dst.Methods[names[j]].Order })
+
 	// implement methods
-	for name, method := range dst.Methods {
+	for _, name := range names {
+		method := dst.Methods[name]
 		if f, ok := files[method.Filename]; ok && method.DstFile == nil {
 			method.DstFile = f
 		}
@@ -272,6 +283,7 @@ func (i Impl) group(entities zcore.DeclEntities) map[implDstKey]*implDstType {
 				Filename: filename,
 				SrcFile:  entity.File,
 				SrcType:  ft,
+				Order:    len(dst.Methods),
 			}
 		}
 	}

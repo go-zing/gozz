@@ -220,6 +220,9 @@ func (imps Imports) Which(name string) (path string) {
 func (imps Imports) List() []Import {
 	list := make([]Import, 0, len(imps))
 	for p, name := range imps {
+		if IsStandardImportPath(p) && path.Base(p) == name {
+			name = ""
+		}
 		list = append(list, Import{
 			Name: name,
 			Path: p,
@@ -291,7 +294,7 @@ func (m *Modify) applyImports(data []byte) (ret []byte, err error) {
 			continue
 		}
 		// add import if not exist
-		if IsStandardImportPath(imp.Path) && path.Base(imp.Path) == imp.Name {
+		if len(imp.Name) == 0 {
 			astutil.AddImport(fileSet, fileAst, imp.Path)
 		} else {
 			astutil.AddNamedImport(fileSet, fileAst, imp.Name, imp.Path)

@@ -3,7 +3,7 @@
 package wire
 
 import (
-	context "context"
+	"context"
 )
 
 type _aop_interceptor interface {

@@ -10,7 +10,7 @@ var (
 	_ booksallinone.BookService = (*BookServiceImpl)(nil)
 )
 
-// +zz:wire:bind=booksallinone.BookService
+// +zz:wire:bind=booksallinone.BookService:aop
 type BookServiceImpl struct{}
 
 func (impl *BookServiceImpl) List(ctx context.Context, query booksallinone.QueryBook) (ret booksallinone.ListBook, err error) {
