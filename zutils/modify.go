@@ -28,6 +28,7 @@ import (
 	"path"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 
 	"golang.org/x/tools/go/ast/astutil"
@@ -173,9 +174,11 @@ func LoadImports(f *ast.File) (imps Imports) {
 		}
 
 		if len(name) == 0 {
-			// no import name specified
-			// default import name from GetImportName
-			if name = GetImportName(p); len(name) == 0 {
+			if IsStandardImportPath(p) {
+				name = path.Base(p)
+			} else if name = GetImportName(p); len(name) == 0 {
+				// no import name specified
+				// default import name from GetImportName
 				// or use base path
 				name = path.Base(p)
 			}
@@ -198,8 +201,10 @@ func (imps Imports) Add(p string) (name string) {
 	if n, exist := imps[p]; exist {
 		return n
 	}
-	return imps.add(p, path.Base(p))
+	return imps.add(p, importNameReplacer.Replace(path.Base(p)))
 }
+
+var importNameReplacer = strings.NewReplacer("-", "", ".", "")
 
 // Which check import name exist and return import path
 func (imps Imports) Which(name string) (path string) {

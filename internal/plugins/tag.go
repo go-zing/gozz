@@ -39,8 +39,7 @@ type (
 		Tags      map[string]string
 		FieldTags map[string]string
 		Keys      []string
-		Entity    zcore.DeclEntity
-		Fields    zcore.FieldEntities
+		Decl      *zcore.AnnotatedDecl
 	}
 )
 
@@ -51,26 +50,29 @@ func (t *Tag) Args() ([]string, map[string]string) { return []string{"tag", "tem
 func (t *Tag) Description() string { return "" }
 
 func (t *Tag) Run(entities zcore.DeclEntities) (err error) {
-	t.ModifySet = &zutils.ModifySet{}
-	t.Tags = make(map[string]string)
-	t.FieldTags = make(map[string]string)
+	group := make(map[*zcore.AnnotatedDecl]zcore.DeclEntities)
 
-	for _, t.Entity = range entities {
-		if t.Entity.TypeSpec == nil {
+	for _, entity := range entities {
+		if entity.TypeSpec == nil {
 			continue
 		}
+		group[entity.AnnotatedDecl] = append(group[entity.AnnotatedDecl], entity)
+	}
 
-		t.Fields = t.Entity.ParseFields(2, nil)
+	t.ModifySet = &zutils.ModifySet{}
+	t.FieldTags = make(map[string]string)
+	t.Tags = make(map[string]string)
 
+	for t.Decl, entities = range group {
+		for _, entity := range entities {
+			for _, tag := range strings.Split(entity.Args[0], ",") {
+				t.Tags[tag] = entity.Args[1]
+			}
+		}
+		ast.Walk(t, t.Decl.TypeSpec.Type)
 		for k := range t.Tags {
 			delete(t.Tags, k)
 		}
-
-		for _, tag := range strings.Split(t.Entity.Args[0], ",") {
-			t.Tags[tag] = t.Entity.Args[1]
-		}
-
-		ast.Walk(t, t.Entity.TypeSpec.Type)
 	}
 
 	return t.ModifySet.Apply()
@@ -91,7 +93,7 @@ func (t *Tag) reset() {
 func tagKV(key, v string) string { return key + ":" + strconv.Quote(v) }
 
 func (t *Tag) modifyNode(tag *ast.BasicLit, data []byte) {
-	t.ModifySet.Add(t.Entity.File.Path).Nodes[tag] = data
+	t.ModifySet.Add(t.Decl.File.Path).Nodes[tag] = data
 }
 
 func (t *Tag) modifyField(field *ast.Field, name string) {
@@ -99,7 +101,7 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 
 	// parse fields tags extra annotations
 	docs, annotations := zcore.ParseCommentGroup(zcore.AnnotationPrefix, field.Doc, field.Comment)
-	for _, entity := range (&zcore.AnnotatedField{Annotations: annotations}).Parse(t.Entity.Plugin, 2, nil) {
+	for _, entity := range (&zcore.AnnotatedField{Annotations: annotations}).Parse(t.Name(), 2, nil) {
 		for _, key := range strings.Split(entity.Args[0], ",") {
 			if tag, ok := zutils.TrimPrefix(key, "+"); ok {
 				// if field annotation starts with "+"

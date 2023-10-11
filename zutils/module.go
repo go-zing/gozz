@@ -65,20 +65,29 @@ func GetModFile(dir string) string {
 	})
 }
 
+func IsStandardImportPath(path string) bool {
+	i := strings.Index(path, "/")
+	if i < 0 {
+		i = len(path)
+	}
+	elem := path[:i]
+	return !strings.Contains(elem, ".")
+}
+
 // GetImportName get filename or directory module import name
 // if file is not exist then return a relative calculated result from module environments
 func GetImportName(filename string) string {
 	return loadWithStore(filename, importNameCache, func() (name string) {
-		name, dir := executeWithDir(filename, "go list -f {{.Name}}")
+		name, dir := executeWithDir(filename, `go list -f "{{.Name}}"`)
 		if len(dir) == 0 || len(name) > 0 {
 			return
 		}
 		// use import path base
 		if p := GetImportPath(dir); len(p) > 0 {
-			return path.Base(p)
+			return importNameReplacer.Replace(path.Base(p))
 		}
 		// use directory base
-		return filepath.Base(dir)
+		return importNameReplacer.Replace(filepath.Base(dir))
 	})
 }
 
@@ -86,7 +95,7 @@ func GetImportName(filename string) string {
 // if file is not exist then return a relative calculated result from module environments
 func GetImportPath(filename string) string {
 	return loadWithStore(filename, importPathCache, func() (p string) {
-		p, dir := executeWithDir(filename, "go list -f {{.ImportPath}}")
+		p, dir := executeWithDir(filename, `go list -f "{{.ImportPath}}"`)
 		if len(dir) == 0 || len(p) > 0 {
 			return
 		}
@@ -123,16 +132,15 @@ func executeWithDir(filename string, command string) (ret, dir string) {
 	if err != nil {
 		return
 	}
-	dir = filepath.Dir(filename)
+
 	// check file exist and is directory
-	if st, e := os.Stat(filename); e == nil {
-		if st.IsDir() {
-			dir = filename
-		}
-		ret, _ = ExecCommand(command+" "+dir, dir)
-	} else if !strings.HasSuffix(filename, ".go") {
+	if st, e := os.Stat(filename); (e == nil && st.IsDir()) || !strings.HasSuffix(filename, ".go") {
 		dir = filename
+	} else {
+		dir = filepath.Dir(filename)
 	}
+
+	ret, _ = ExecCommand(command+" "+dir, dir)
 	return
 }
 

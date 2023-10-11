@@ -291,7 +291,7 @@ func ParseGenericDecl(gen *ast.GenDecl, prefix string) (decls AnnotatedDecls) {
 			docs, annotations := ParseCommentGroup(prefix, spec.Doc, spec.Comment)
 
 			// generic annotations would be appended to each element in merged declaration
-			if annotations = append(annotations, genAnnotations...); len(annotations) == 0 {
+			if annotations = append(genAnnotations, annotations...); len(annotations) == 0 {
 				continue
 			}
 

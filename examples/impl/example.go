@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-package api
+package impl
 
 import (
 	"context"
 )
 
-//go:generate gozz run -p "api" ./
+//go:generate gozz run -p "impl" ./
 
 type (
-	QueryBook struct{}
-	FormBook  struct{}
-	DataBook  struct{}
-	ListBook  struct{}
+	Param  struct{}
+	Result struct{}
 )
 
-// +zz:api:./:prefix=books
-type BookService interface {
-	// +zz:api:get:
-	List(ctx context.Context, query QueryBook) (ret ListBook, err error)
-	// +zz:api:get:{id}
-	Get(ctx context.Context, book QueryBook) (data DataBook, err error)
-	// +zz:api:post:
-	Create(ctx context.Context, book FormBook) (data DataBook, err error)
-	// +zz:api:put:{id}
-	Edit(ctx context.Context, book FormBook) (data DataBook, err error)
+// +zz:impl:./impl.go:*Impl
+// +zz:impl:./pkg/impl.go:*Impl
+type Interface interface {
+	Api()
+	Api1(ctx context.Context, param Param) Result
+	Api2(ctx context.Context, param Param) []Result
+	Api3(ctx context.Context, param Param) (r []Result, err error)
+	Api4(ctx context.Context, param Param) (r map[*context.Context]Result, err error)
 }
