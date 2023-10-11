@@ -15,12 +15,9 @@ import (
 
 // github.com/Just-maple/gozz/examples/books-all-in-one.Application
 func Initialize_booksallinone_Application() (*books_all_in_one.Application, func(), error) {
-	bookImpl := &impls.BookImpl{}
-	inject_impl_aop_booksallinone_BookService := &_impl_aop_booksallinone_BookService{
-		_aop_booksallinone_BookService: bookImpl,
-	}
+	bookServiceImpl := &impls.BookServiceImpl{}
 	apis := books_all_in_one.Apis{
-		BookService: inject_impl_aop_booksallinone_BookService,
+		BookService: bookServiceImpl,
 	}
 	application := &books_all_in_one.Application{
 		Apis: apis,

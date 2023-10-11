@@ -25,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/stoewer/go-strcase"
+
 	"github.com/Just-maple/gozz/zcore"
 	"github.com/Just-maple/gozz/zutils"
 )
@@ -67,7 +69,7 @@ type (
 func (i Impl) Name() string { return "impl" }
 
 func (i Impl) Args() ([]string, map[string]string) {
-	return []string{"filename", "typename"}, nil
+	return []string{"filename"}, nil
 }
 
 func (i Impl) Description() string { return "" }
@@ -158,7 +160,8 @@ func (dst *implDstType) apply(set *zutils.ModifySet, key implDstKey) (err error)
 
 	// no exist receiver name found use lower case typename
 	if len(recName) == 0 {
-		recName = strings.ToLower(key.Typename)
+		sp := strings.Split(strcase.SnakeCase(key.Typename), "_")
+		recName = strings.ToLower(sp[len(sp)-1])
 	}
 
 	// implement methods
@@ -227,7 +230,7 @@ func (i Impl) group(entities zcore.DeclEntities) map[implDstKey]*implDstType {
 		}
 
 		filename := entity.RelFilename(entity.Args[0], "impl.go")
-		typename, ptr := zutils.TrimPrefix(entity.Args[1], "*")
+		typename, ptr := zutils.TrimPrefix(entity.Options.Get("type", "*"+entity.Name()+"Impl"), "*")
 
 		// group by package directory and type
 		key := implDstKey{Typename: typename, Package: filepath.Dir(filename)}

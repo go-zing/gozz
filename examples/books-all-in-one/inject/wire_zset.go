@@ -19,10 +19,8 @@ var (
 		// github.com/Just-maple/gozz/examples/books-all-in-one.Application
 		wire.Struct(new(booksallinone.Application), "*"),
 
-		// github.com/Just-maple/gozz/examples/books-all-in-one/impls.BookImpl
-		wire.Bind(new(_aop_booksallinone_BookService), new(*impls.BookImpl)),
-		wire.Struct(new(_impl_aop_booksallinone_BookService), "*"),
-		wire.Bind(new(booksallinone.BookService), new(*_impl_aop_booksallinone_BookService)),
-		wire.Struct(new(impls.BookImpl), "*"),
+		// github.com/Just-maple/gozz/examples/books-all-in-one/impls.BookServiceImpl
+		wire.Bind(new(booksallinone.BookService), new(*impls.BookServiceImpl)),
+		wire.Struct(new(impls.BookServiceImpl), "*"),
 	)
 )

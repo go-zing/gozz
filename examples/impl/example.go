@@ -28,8 +28,8 @@ type (
 	Result struct{}
 )
 
-// +zz:impl:./impl.go:*Impl
-// +zz:impl:./pkg/impl.go:*Impl
+// +zz:impl:./impl.go:type=*T
+// +zz:impl:./pkg/impl.go
 type Interface interface {
 	Api()
 	Api1(ctx context.Context, param Param) Result
