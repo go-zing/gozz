@@ -291,7 +291,11 @@ func (m *Modify) applyImports(data []byte) (ret []byte, err error) {
 			continue
 		}
 		// add import if not exist
-		astutil.AddNamedImport(fileSet, fileAst, imp.Name, imp.Path)
+		if IsStandardImportPath(imp.Path) && path.Base(imp.Path) == imp.Name {
+			astutil.AddImport(fileSet, fileAst, imp.Path)
+		} else {
+			astutil.AddNamedImport(fileSet, fileAst, imp.Name, imp.Path)
+		}
 	}
 
 	bf := BuffPool.Get().(*bytes.Buffer)
