@@ -130,17 +130,26 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 	}
 
 	// render fields
-	for key := range t.FieldTags {
+	for key, value := range t.FieldTags {
 		if len(key) == 0 {
 			continue
 		}
 
-		// render tag string
-		if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
-			FieldName string
-			Docs      string
-		}{FieldName: name, Docs: zcore.JoinDocs(docs)}, t.FieldTags[key], str) == nil && str.Len() > 0 {
-			t.FieldTags[key] = str.String()
+		if strings.Contains(value, "{{") && strings.Contains(value, "}}") {
+			// render tag template string
+			if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
+				FieldName string
+				Docs      string
+			}{
+				FieldName: name,
+				Docs:      zcore.JoinDocs(docs),
+			}, value, str) == nil {
+				value = str.String()
+				t.FieldTags[key] = value
+			}
+		}
+
+		if len(value) > 0 {
 			t.Keys = append(t.Keys, key)
 		}
 	}
@@ -180,13 +189,14 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 
 	// replace existing keys or append
 	for _, key := range t.Keys {
+		value := t.FieldTags[key]
 		if exist, ok := st.Lookup(key); !ok {
 			// append
-			str = strings.TrimSpace(str) + " " + tagKV(key, t.FieldTags[key])
+			str = strings.TrimSpace(str) + " " + tagKV(key, value)
 			updated = true
-		} else if exist != t.FieldTags[key] {
+		} else if exist != value {
 			// replace
-			str = strings.Replace(str, tagKV(key, exist), tagKV(key, t.FieldTags[key]), 1)
+			str = strings.Replace(str, tagKV(key, exist), tagKV(key, value), 1)
 			updated = true
 		}
 	}

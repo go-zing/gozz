@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package drivers
+package ormdrivers
 
 import (
 	"database/sql"
@@ -32,7 +32,7 @@ func init() { zcore.RegisterSchemaDriver(Mysql{}) }
 type (
 	Mysql struct{}
 
-	Column struct {
+	MysqlColumn struct {
 		zcore.SqlColumn
 
 		ColumnType    string
@@ -40,7 +40,7 @@ type (
 		ColumnKey     *string
 	}
 
-	SliceMysqlColumn []Column
+	SliceMysqlColumn []MysqlColumn
 )
 
 func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
@@ -49,7 +49,7 @@ func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
 			if !f(&(*s)[i], c) {
 				return
 			}
-		} else if n := append(*s, Column{}); f(&n[i], c) {
+		} else if n := append(*s, MysqlColumn{}); f(&n[i], c) {
 			*s = n
 		} else {
 			*s = n[:i]
@@ -58,7 +58,7 @@ func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
 	}
 }
 
-func (column *Column) FieldMapping() map[string]interface{} {
+func (column *MysqlColumn) FieldMapping() map[string]interface{} {
 	m := column.SqlColumn.FieldMapping()
 	m["column_type"] = &column.ColumnType
 	m["column_key"] = &column.ColumnKey
@@ -115,7 +115,7 @@ func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns Sl
 	return
 }
 
-func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string) (tables []zcore.OrmTable) {
+func (m Mysql) parseTables(db *sql.DB, columns []MysqlColumn, types map[string]string) (tables []zcore.OrmTable) {
 	stmt, _ := db.Prepare(sqlStatementSelectTableComment)
 	if stmt != nil {
 		defer stmt.Close()
@@ -127,18 +127,20 @@ func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string
 		// init table
 		index, ok := tbs[column.TableName]
 		if !ok {
-			tables = append(tables, zcore.OrmTable{
+			table := zcore.OrmTable{
 				Name:   zcore.UpperCamelCase(column.TableName),
 				Table:  column.TableName,
 				Schema: column.TableSchema,
-			})
-			index = len(tables) - 1
-			tbs[column.TableName] = index
+			}
 
 			// get table comment
 			if stmt != nil {
-				_ = stmt.QueryRow(column.TableName, column.TableSchema).Scan(&tables[index].Comment)
+				_ = stmt.QueryRow(column.TableName, column.TableSchema).Scan(&table.Comment)
 			}
+
+			tables = append(tables, table)
+			index = len(tables) - 1
+			tbs[column.TableName] = index
 		}
 
 		table := &tables[index]

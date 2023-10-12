@@ -64,7 +64,7 @@ func main() {
 			// register method handler
 			v[method] = func(writer http.ResponseWriter, request *http.Request) {
 				if r, e := invoke(request.Context(), func(interface{}) error {
-					// TODO: encode params from request
+					// TODO: decode params from *http.Request
 					return nil
 				}); e != nil {
 					writer.WriteHeader(http.StatusInternalServerError)

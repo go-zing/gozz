@@ -24,7 +24,7 @@ import (
 
 	zcore "github.com/go-zing/gozz-core"
 
-	_ "github.com/go-zing/gozz/internal/drivers"
+	_ "github.com/go-zing/gozz/internal/ormdrivers"
 )
 
 func init() {
