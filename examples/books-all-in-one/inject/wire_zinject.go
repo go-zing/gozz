@@ -6,11 +6,11 @@
 package inject
 
 import (
-	booksallinone "github.com/Just-maple/gozz/examples/books-all-in-one"
+	booksallinone "github.com/go-zing/gozz/examples/books-all-in-one"
 	wire "github.com/google/wire"
 )
 
-// github.com/Just-maple/gozz/examples/books-all-in-one.Application
+// github.com/go-zing/gozz/examples/books-all-in-one.Application
 func Initialize_booksallinone_Application() (*booksallinone.Application, func(), error) {
 	panic(wire.Build(_Set))
 }

@@ -1,4 +1,4 @@
-module github.com/Just-maple/gozz/examples/books-all-in-one
+module github.com/go-zing/gozz/examples/books-all-in-one
 
 go 1.16
 

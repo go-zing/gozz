@@ -8,7 +8,7 @@ package wire
 
 // Injectors from wire_zinject.go:
 
-// github.com/Just-maple/gozz/examples/wire.Application
+// github.com/go-zing/gozz/examples/wire.Application
 func Initialize_Application() (*Application, func(), error) {
 	db, err := ProvideSql()
 	if err != nil {

@@ -6,20 +6,20 @@
 package inject
 
 import (
-	booksallinone "github.com/Just-maple/gozz/examples/books-all-in-one"
-	impls "github.com/Just-maple/gozz/examples/books-all-in-one/impls"
+	booksallinone "github.com/go-zing/gozz/examples/books-all-in-one"
+	impls "github.com/go-zing/gozz/examples/books-all-in-one/impls"
 	wire "github.com/google/wire"
 )
 
 var (
 	_Set = wire.NewSet(
-		// github.com/Just-maple/gozz/examples/books-all-in-one.Apis
+		// github.com/go-zing/gozz/examples/books-all-in-one.Apis
 		wire.Struct(new(booksallinone.Apis), "*"),
 
-		// github.com/Just-maple/gozz/examples/books-all-in-one.Application
+		// github.com/go-zing/gozz/examples/books-all-in-one.Application
 		wire.Struct(new(booksallinone.Application), "*"),
 
-		// github.com/Just-maple/gozz/examples/books-all-in-one/impls.BookServiceImpl
+		// github.com/go-zing/gozz/examples/books-all-in-one/impls.BookServiceImpl
 		wire.Bind(new(_aop_booksallinone_BookService), new(*impls.BookServiceImpl)),
 		wire.Struct(new(_impl_aop_booksallinone_BookService), "*"),
 		wire.Bind(new(booksallinone.BookService), new(*_impl_aop_booksallinone_BookService)),

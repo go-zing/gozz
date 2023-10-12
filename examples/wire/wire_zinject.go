@@ -9,7 +9,7 @@ import (
 	wire "github.com/google/wire"
 )
 
-// github.com/Just-maple/gozz/examples/wire.Application
+// github.com/go-zing/gozz/examples/wire.Application
 func Initialize_Application() (*Application, func(), error) {
 	panic(wire.Build(_Set))
 }

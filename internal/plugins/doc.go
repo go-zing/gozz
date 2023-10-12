@@ -21,8 +21,8 @@ import (
 	"go/ast"
 	"path/filepath"
 
-	"github.com/Just-maple/gozz/zcore"
-	"github.com/Just-maple/gozz/zutils"
+	"github.com/go-zing/gozz/zcore"
+	"github.com/go-zing/gozz/zutils"
 )
 
 func init() {

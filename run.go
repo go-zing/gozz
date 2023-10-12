@@ -26,8 +26,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Just-maple/gozz/zcore"
-	"github.com/Just-maple/gozz/zutils"
+	"github.com/go-zing/gozz/zcore"
+	"github.com/go-zing/gozz/zutils"
 )
 
 var (

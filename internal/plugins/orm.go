@@ -22,11 +22,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Just-maple/gozz/zcore"
-	"github.com/Just-maple/gozz/zorm"
-	"github.com/Just-maple/gozz/zutils"
-
-	_ "github.com/Just-maple/gozz/zorm/drivers"
+	"github.com/go-zing/gozz/zcore"
+	"github.com/go-zing/gozz/zorm"
+	"github.com/go-zing/gozz/zutils"
 )
 
 func init() {

@@ -26,8 +26,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Just-maple/gozz/internal/ztore"
-	"github.com/Just-maple/gozz/zutils"
+	"github.com/go-zing/gozz/internal/ztore"
+	"github.com/go-zing/gozz/zutils"
 )
 
 var (

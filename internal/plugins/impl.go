@@ -27,8 +27,8 @@ import (
 
 	"github.com/stoewer/go-strcase"
 
-	"github.com/Just-maple/gozz/zcore"
-	"github.com/Just-maple/gozz/zutils"
+	"github.com/go-zing/gozz/zcore"
+	"github.com/go-zing/gozz/zutils"
 )
 
 func init() {

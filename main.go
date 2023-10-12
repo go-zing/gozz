@@ -22,8 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	_ "github.com/Just-maple/gozz/internal/plugins"
-	"github.com/Just-maple/gozz/zcore"
+	_ "github.com/go-zing/gozz/internal/plugins"
+	"github.com/go-zing/gozz/zcore"
 )
 
 var (

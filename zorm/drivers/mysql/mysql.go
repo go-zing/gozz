@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package drivers
+package main
 
 import (
 	"database/sql"
@@ -24,10 +24,8 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-
+	"github.com/go-zing/gozz/zorm"
 	"github.com/stoewer/go-strcase"
-
-	"github.com/Just-maple/gozz/zorm"
 )
 
 func init() { zorm.Register(Mysql{}) }
@@ -35,27 +33,15 @@ func init() { zorm.Register(Mysql{}) }
 type (
 	Mysql struct{}
 
-	SqlColumn struct {
-		TableSchema            string
-		TableName              string
-		ColumnName             string
-		OrdinalPosition        int
-		IsNullable             string
-		DataType               string
-		CharacterSetName       *string
-		CollationName          *string
-		NumericPrecision       *int64
-		CharacterMaximumLength *int64
-	}
+	Column struct {
+		zorm.SqlColumn
 
-	MysqlColumn struct {
-		SqlColumn
 		ColumnType    string
 		ColumnComment string
 		ColumnKey     *string
 	}
 
-	SliceMysqlColumn []MysqlColumn
+	SliceMysqlColumn []Column
 )
 
 func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
@@ -64,7 +50,7 @@ func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
 			if !f(&(*s)[i], c) {
 				return
 			}
-		} else if n := append(*s, MysqlColumn{}); f(&n[i], c) {
+		} else if n := append(*s, Column{}); f(&n[i], c) {
 			*s = n
 		} else {
 			*s = n[:i]
@@ -73,27 +59,12 @@ func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
 	}
 }
 
-func (column *MysqlColumn) FieldMapping() map[string]interface{} {
+func (column *Column) FieldMapping() map[string]interface{} {
 	m := column.SqlColumn.FieldMapping()
 	m["column_type"] = &column.ColumnType
 	m["column_key"] = &column.ColumnKey
 	m["column_comment"] = &column.ColumnComment
 	return m
-}
-
-func (column *SqlColumn) FieldMapping() map[string]interface{} {
-	return map[string]interface{}{
-		"table_schema":             &column.TableSchema,
-		"table_name":               &column.TableName,
-		"column_name":              &column.ColumnName,
-		"ordinal_position":         &column.OrdinalPosition,
-		"is_nullable":              &column.IsNullable,
-		"data_type":                &column.DataType,
-		"character_set_Name":       &column.CharacterSetName,
-		"collation_name":           &column.CollationName,
-		"numeric_precision":        &column.NumericPrecision,
-		"character_maximum_length": &column.CharacterMaximumLength,
-	}
 }
 
 func (m Mysql) Name() string { return "mysql" }
@@ -119,7 +90,7 @@ const (
 )
 
 func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns SliceMysqlColumn, err error) {
-	fields := fieldsOf(&columns)
+	fields := zorm.FieldsOf(&columns)
 	args := []interface{}{schema}
 	statement := &strings.Builder{}
 	_, _ = fmt.Fprintf(statement, sqlStatementSelectColumns, strings.Join(fields, "`,`"))
@@ -141,32 +112,37 @@ func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns Sl
 		return
 	}
 	defer rows.Close()
-	err = scan(rows, fields, &columns)
+	err = zorm.Scan(rows, fields, &columns)
 	return
 }
 
-func (m Mysql) parseTables(db *sql.DB, columns []MysqlColumn, types map[string]string) (tables []zorm.Table) {
+func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string) (tables []zorm.Table) {
 	stmt, _ := db.Prepare(sqlStatementSelectTableComment)
 	if stmt != nil {
 		defer stmt.Close()
 	}
 
-	tbs := make(map[string]*zorm.Table)
+	tbs := make(map[string]int)
 
 	for _, column := range columns {
 		// init table
-		tb, ok := tbs[column.TableName]
+		index, ok := tbs[column.TableName]
 		if !ok {
-			tb = &zorm.Table{
+			tables = append(tables, zorm.Table{
 				Name:   strcase.UpperCamelCase(column.TableName),
 				Table:  column.TableName,
 				Schema: column.TableSchema,
+			})
+			index = len(tables) - 1
+			tbs[column.TableName] = index
+
+			// get table comment
+			if stmt != nil {
+				_ = stmt.QueryRow(column.TableName, column.TableSchema).Scan(&tables[index].Comment)
 			}
-			if stmt == nil {
-				_ = stmt.QueryRow(column.TableName, column.TableSchema).Scan(&tb.Comment)
-			}
-			tbs[column.TableName] = tb
 		}
+
+		tb := &tables[index]
 
 		// table primary key
 		if column.ColumnKey != nil && *column.ColumnKey == "PRI" {
@@ -209,10 +185,6 @@ func (m Mysql) parseTables(db *sql.DB, columns []MysqlColumn, types map[string]s
 		}
 
 		tb.Columns = append(tb.Columns, c)
-	}
-
-	for _, tb := range tbs {
-		tables = append(tables, *tb)
 	}
 
 	sort.Slice(tables, func(i, j int) bool { return tables[i].Name < tables[j].Name })

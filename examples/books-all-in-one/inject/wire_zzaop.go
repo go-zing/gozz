@@ -4,7 +4,7 @@ package inject
 
 import (
 	"context"
-	booksallinone "github.com/Just-maple/gozz/examples/books-all-in-one"
+	booksallinone "github.com/go-zing/gozz/examples/books-all-in-one"
 )
 
 type _aop_interceptor interface {

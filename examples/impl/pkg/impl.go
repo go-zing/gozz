@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"context"
-	impl "github.com/Just-maple/gozz/examples/impl"
+	impl "github.com/go-zing/gozz/examples/impl"
 )
 
 var (

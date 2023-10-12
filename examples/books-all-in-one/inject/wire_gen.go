@@ -7,13 +7,13 @@
 package inject
 
 import (
-	"github.com/Just-maple/gozz/examples/books-all-in-one"
-	"github.com/Just-maple/gozz/examples/books-all-in-one/impls"
+	"github.com/go-zing/gozz/examples/books-all-in-one"
+	"github.com/go-zing/gozz/examples/books-all-in-one/impls"
 )
 
 // Injectors from wire_zinject.go:
 
-// github.com/Just-maple/gozz/examples/books-all-in-one.Application
+// github.com/go-zing/gozz/examples/books-all-in-one.Application
 func Initialize_booksallinone_Application() (*books_all_in_one.Application, func(), error) {
 	bookServiceImpl := &impls.BookServiceImpl{}
 	inject_impl_aop_booksallinone_BookService := &_impl_aop_booksallinone_BookService{

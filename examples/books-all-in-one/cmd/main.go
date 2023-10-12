@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Just-maple/gozz/examples/books-all-in-one/inject"
+	"github.com/go-zing/gozz/examples/books-all-in-one/inject"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/Just-maple/gozz/examples/wire
+module github.com/go-zing/gozz/examples/wire
 
 go 1.16
 

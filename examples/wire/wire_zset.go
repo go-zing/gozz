@@ -11,16 +11,16 @@ import (
 
 var (
 	_Set = wire.NewSet(
-		// github.com/Just-maple/gozz/examples/wire.Application
+		// github.com/go-zing/gozz/examples/wire.Application
 		wire.Struct(new(Application), "*"),
 
-		// github.com/Just-maple/gozz/examples/wire.Database
+		// github.com/go-zing/gozz/examples/wire.Database
 		wire.Struct(new(Database), "*"),
 
-		// github.com/Just-maple/gozz/examples/wire.ProvideSql
+		// github.com/go-zing/gozz/examples/wire.ProvideSql
 		ProvideSql,
 
-		// github.com/Just-maple/gozz/examples/wire.ServiceImpl
+		// github.com/go-zing/gozz/examples/wire.ServiceImpl
 		wire.Bind(new(_aop_Service), new(*ServiceImpl)),
 		wire.Struct(new(_impl_aop_Service), "*"),
 		wire.Bind(new(Service), new(*_impl_aop_Service)),

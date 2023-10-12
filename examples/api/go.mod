@@ -1,3 +1,3 @@
-module github.com/Just-maple/gozz/examples/api
+module github.com/go-zing/gozz/examples/api
 
 go 1.16

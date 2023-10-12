@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Just-maple/gozz/zutils"
+	"github.com/go-zing/gozz/zutils"
 )
 
 type (
