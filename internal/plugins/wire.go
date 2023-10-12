@@ -156,14 +156,6 @@ func (w Wire) Description() string {
 	return "collect and generate wire sets / injectors / aop proxy stubs files."
 }
 
-func (w Wire) groupByDecls(entities zcore.DeclEntities) map[*zcore.AnnotatedDecl]zcore.DeclEntities {
-	m := make(map[*zcore.AnnotatedDecl]zcore.DeclEntities)
-	for _, entity := range entities {
-		m[entity.AnnotatedDecl] = append(m[entity.AnnotatedDecl], entity)
-	}
-	return m
-}
-
 func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet) {
 	set = make(wireDeclSet)
 

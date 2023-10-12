@@ -27,7 +27,7 @@ import (
 	zcore "github.com/go-zing/gozz-core"
 )
 
-func init() { zcore.RegisterSchemaDriver(Mysql{}) }
+func init() { zcore.RegisterOrmSchemaDriver(Mysql{}) }
 
 type (
 	Mysql struct{}
@@ -89,7 +89,15 @@ const (
 )
 
 func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns SliceMysqlColumn, err error) {
-	fields := zcore.FieldsOf(&columns)
+	fields := make([]string, 0)
+	zcore.IterateOrmFieldMapper(&columns, func(m zcore.OrmFieldMapper, b bool) bool {
+		for key := range m.FieldMapping() {
+			fields = append(fields, key)
+		}
+		return false
+	})
+	sort.Strings(fields)
+
 	args := []interface{}{schema}
 	statement := &strings.Builder{}
 	_, _ = fmt.Fprintf(statement, sqlStatementSelectColumns, strings.Join(fields, "`,`"))
@@ -111,7 +119,7 @@ func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns Sl
 		return
 	}
 	defer rows.Close()
-	err = zcore.Scan(rows, fields, &columns)
+	err = zcore.ScanSqlRows(rows, fields, &columns)
 	return
 }
 

@@ -149,9 +149,7 @@ func (a Api) group(entities zcore.DeclEntities) (group map[string]map[*ast.TypeS
 			group[filename] = make(map[*ast.TypeSpec]zcore.FieldEntities)
 		}
 
-		for _, fe := range entity.ParseFields(2, entity.Options) {
-			group[filename][entity.TypeSpec] = append(group[filename][entity.TypeSpec], fe)
-		}
+		group[filename][entity.TypeSpec] = append(group[filename][entity.TypeSpec], entity.ParseFields(2, entity.Options)...)
 	}
 	return
 }

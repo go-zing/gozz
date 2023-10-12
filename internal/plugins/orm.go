@@ -104,7 +104,7 @@ func (o Orm) Args() ([]string, map[string]string) {
 		},
 		map[string]string{
 			"driver": fmt.Sprintf("specify databases schema driver. default: mysql. available drivers: [ %s ]",
-				strings.Join(zcore.GetSchemaDrivers(), ",")),
+				strings.Join(zcore.GetOrmSchemaDrivers(), ",")),
 			"type":     `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
 			"table":    `specify table names to load. default: * (load all tables).use "," to split if multi. example: [ table=user,book,order ]`,
 			"user":     "user in sql default format dsn. default: root",
@@ -148,13 +148,13 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zcore.OrmTable, err 
 
 	// get driver. default mysql
 	driverName := opt.Get("driver", "mysql")
-	driver := zcore.GetSchemaDriver(driverName)
+	driver := zcore.GetOrmSchemaDriver(driverName)
 	if driver == nil {
 		return nil, errors.New("unregister driver: " + driverName)
 	}
 
 	// default types
-	types := zcore.DefaultTypes()
+	types := zcore.OrmTypeMapping()
 
 	// commands or annotations defined types
 	// extract types from options
