@@ -23,8 +23,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
 )
 
 func init() {
@@ -33,7 +32,7 @@ func init() {
 
 type (
 	Api struct {
-		Imports    []zutils.Import
+		Imports    []zcore.Import
 		Interfaces []ApiInterface
 	}
 
@@ -128,7 +127,7 @@ func (a Api) Run(entities zcore.DeclEntities) (err error) {
 	if err != nil {
 		return
 	}
-	eg := new(zutils.ErrGroup)
+	eg := new(zcore.ErrGroup)
 	for key := range group {
 		filename := key
 		eg.Go(func() error { return a.generateApi(filename, group[filename]) })
@@ -159,8 +158,8 @@ func (a Api) group(entities zcore.DeclEntities) (group map[string]map[*ast.TypeS
 
 func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEntities) (err error) {
 	var (
-		imports       = zutils.Imports{"context": "context"}
-		dstImportPath = zutils.GetImportPath(filename)
+		imports       = zcore.Imports{"context": "context"}
+		dstImportPath = zcore.GetImportPath(filename)
 		interfaces    = make([]ApiInterface, 0)
 	)
 
@@ -169,12 +168,12 @@ func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEnt
 
 		for i, field := range fields {
 			if i == 0 {
-				if srcImportPath := zutils.GetImportPath(field.Decl.File.Path); srcImportPath != dstImportPath {
+				if srcImportPath := zcore.GetImportPath(field.Decl.File.Path); srcImportPath != dstImportPath {
 					api.Package = imports.Add(srcImportPath)
 				}
 			}
 
-			funcName, ft, ok := zutils.AssertFuncType(field.Field)
+			funcName, ft, ok := zcore.AssertFuncType(field.Field)
 			if !ok {
 				continue
 			}
@@ -191,7 +190,7 @@ func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEnt
 				// render invoke template
 				if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct{ Name, Param string }{
 					Name:  funcName,
-					Param: zutils.UnsafeBytes2String(field.Decl.File.ReplacePackages(pt, filename, imports)),
+					Param: zcore.UnsafeBytes2String(field.Decl.File.ReplacePackages(pt, filename, imports)),
 				}, tmpl, str) == nil {
 					handler.Invoke = str.String()
 				}
@@ -216,7 +215,7 @@ func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEnt
 	return zcore.RenderWithDefaultTemplate(&Api{
 		Imports:    imports.List(),
 		Interfaces: interfaces,
-	}, apiTemplateText, filename, zutils.GetImportName(filename), false)
+	}, apiTemplateText, filename, zcore.GetImportName(filename), false)
 }
 
 type funcType ast.FuncType

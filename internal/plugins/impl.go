@@ -27,8 +27,7 @@ import (
 
 	"github.com/stoewer/go-strcase"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
 )
 
 func init() {
@@ -59,9 +58,9 @@ type (
 	ImplMethod struct {
 		Ptr      bool
 		Filename string
-		SrcFile  *zutils.File
+		SrcFile  *zcore.File
 		SrcType  *ast.FuncType
-		DstFile  *zutils.File
+		DstFile  *zcore.File
 		DstType  *ast.FuncType
 		Order    int
 	}
@@ -82,13 +81,13 @@ func (i Impl) Description() string {
 	return "generate and sync interface functions type signature to target implement type."
 }
 
-func (dst *implDstType) init(modifySet *zutils.ModifySet, key implDstKey) {
+func (dst *implDstType) init(modifySet *zcore.ModifySet, key implDstKey) {
 	var (
 		wires   = make([]string, 0)
 		impls   = make([]string, 0)
 		added   = make(map[*ast.TypeSpec]struct{})
 		modify  = modifySet.Add(dst.Filename)
-		dstPath = zutils.GetImportPath(dst.Filename)
+		dstPath = zcore.GetImportPath(dst.Filename)
 	)
 
 	for _, entity := range dst.Entities {
@@ -100,12 +99,12 @@ func (dst *implDstType) init(modifySet *zutils.ModifySet, key implDstKey) {
 		name := entity.Name()
 
 		// import interface package if implements in different package
-		if srcPath := zutils.GetImportPath(entity.File.Path); dstPath != srcPath {
+		if srcPath := zcore.GetImportPath(entity.File.Path); dstPath != srcPath {
 			name = modify.Imports.Add(srcPath) + "." + name
 		}
 
 		// add type implement
-		zutils.Appendf(&impls, implTypeAssert, name, key.Typename)
+		zcore.Appendf(&impls, implTypeAssert, name, key.Typename)
 
 		// add wire annotations
 		if entity.Options.Exist("wire") {
@@ -113,21 +112,21 @@ func (dst *implDstType) init(modifySet *zutils.ModifySet, key implDstKey) {
 			if entity.Options.Exist("aop") {
 				aop = ":aop"
 			}
-			zutils.Appendf(&wires, implWireAnnotation, zcore.AnnotationPrefix, wireName, name, aop)
+			zcore.Appendf(&wires, implWireAnnotation, zcore.AnnotationPrefix, wireName, name, aop)
 		}
 	}
 
 	// append type defines
 	modify.Appends = append(modify.Appends,
-		zutils.Bytesf(implTypeDeclaration, strings.Join(impls, ";"), strings.Join(wires, ""), key.Typename))
+		zcore.Bytesf(implTypeDeclaration, strings.Join(impls, ";"), strings.Join(wires, ""), key.Typename))
 }
 
-func (dst *implDstType) apply(set *zutils.ModifySet, key implDstKey) (err error) {
+func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) {
 	recName := ""
 	typeDecl := false
 
 	// parse package type methods
-	files, err := zutils.WalkPackage(key.Package, func(file *zutils.File) (err error) {
+	files, err := zcore.WalkPackage(key.Package, func(file *zcore.File) (err error) {
 		// check implement type declared
 		typeDecl = typeDecl || file.Lookup(key.Typename) != nil
 
@@ -205,7 +204,7 @@ func (dst *implDstType) apply(set *zutils.ModifySet, key implDstKey) (err error)
 				// pointer receiver
 				typename = "*" + typename
 			}
-			file.Appends = append(file.Appends, zutils.Bytesf(implMethodTemplate, recName, typename, name, sign))
+			file.Appends = append(file.Appends, zcore.Bytesf(implMethodTemplate, recName, typename, name, sign))
 		} else if ft := (&ast.FuncType{
 			Func:    token.NoPos,            // must unset func position to adjust func type offset
 			Params:  method.DstType.Params,  // params types
@@ -220,8 +219,8 @@ func (dst *implDstType) apply(set *zutils.ModifySet, key implDstKey) (err error)
 
 func (i Impl) Run(entities zcore.DeclEntities) (err error) {
 	group := i.group(entities)
-	set := new(zutils.ModifySet)
-	eg := new(zutils.ErrGroup)
+	set := new(zcore.ModifySet)
+	eg := new(zcore.ErrGroup)
 
 	for k := range group {
 		key := k
@@ -248,7 +247,7 @@ func (i Impl) group(entities zcore.DeclEntities) map[implDstKey]*implDstType {
 		}
 
 		filename := entity.RelFilename(entity.Args[0], "impl.go")
-		typename, ptr := zutils.TrimPrefix(entity.Options.Get("type", "*"+entity.Name()+"Impl"), "*")
+		typename, ptr := zcore.TrimPrefix(entity.Options.Get("type", "*"+entity.Name()+"Impl"), "*")
 
 		// group by package directory and type
 		key := implDstKey{Typename: typename, Package: filepath.Dir(filename)}
@@ -265,14 +264,14 @@ func (i Impl) group(entities zcore.DeclEntities) map[implDstKey]*implDstType {
 		// parse annotated fields entities
 		fieldEntities := make(map[string]zcore.FieldEntity)
 		for _, field := range entity.ParseFields(1, nil) {
-			if name, _, ok := zutils.AssertFuncType(field.Field); ok {
+			if name, _, ok := zcore.AssertFuncType(field.Field); ok {
 				fieldEntities[name] = field
 			}
 		}
 
 		// register method types
 		for _, method := range it.Methods.List {
-			name, ft, ok := zutils.AssertFuncType(method)
+			name, ft, ok := zcore.AssertFuncType(method)
 			if !ok {
 				continue
 			}

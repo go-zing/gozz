@@ -21,8 +21,7 @@ import (
 	"go/ast"
 	"path/filepath"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
 )
 
 func init() {
@@ -96,7 +95,7 @@ func (d Doc) Description() string {
 
 func (d Doc) Run(entities zcore.DeclEntities) (err error) {
 	group := entities.GroupByDir()
-	eg := new(zutils.ErrGroup)
+	eg := new(zcore.ErrGroup)
 	for key := range group {
 		dir := key
 		eg.Go(func() error { return d.GenDoc(dir, group[dir]) })
@@ -117,7 +116,7 @@ func (d Doc) GenDoc(dir string, entities zcore.DeclEntities) (err error) {
 		fields := make([]DocField, 0)
 
 		if entity.TypeSpec != nil {
-			if docs := zutils.JoinDocs(entity.Docs); len(docs) > 0 {
+			if docs := zcore.JoinDocs(entity.Docs); len(docs) > 0 {
 				fields = append(fields, DocField{Docs: docs})
 			}
 
@@ -139,7 +138,7 @@ func (d Doc) GenDoc(dir string, entities zcore.DeclEntities) (err error) {
 			for _, name := range entity.ValueSpec.Names {
 				fields = append(fields, DocField{
 					Name: name.Name,
-					Docs: zutils.JoinDocs(entity.Docs),
+					Docs: zcore.JoinDocs(entity.Docs),
 				})
 			}
 
@@ -171,7 +170,7 @@ func (d Doc) GenDoc(dir string, entities zcore.DeclEntities) (err error) {
 func parseFieldsDocs(fields *ast.FieldList) (fs []DocField) {
 	for _, field := range fields.List {
 		docs, _ := zcore.ParseCommentGroup(zcore.AnnotationPrefix, field.Doc, field.Comment)
-		content := zutils.JoinDocs(docs)
+		content := zcore.JoinDocs(docs)
 		if len(content) == 0 {
 			continue
 		}

@@ -25,8 +25,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
 )
 
 func init() {
@@ -35,7 +34,7 @@ func init() {
 
 type (
 	Wire struct {
-		Imports []zutils.Import
+		Imports []zcore.Import
 		Sets    interface{}
 		Injects interface{}
 		Aops    interface{}
@@ -67,11 +66,11 @@ type (
 
 	wireDecl struct {
 		Entities    zcore.DeclEntities
-		Params      zutils.KeySet
-		Binds       zutils.KeySet
-		Aops        zutils.KeySet
-		Fields      zutils.KeySet
-		Injects     zutils.KeySet
+		Params      zcore.KeySet
+		Binds       zcore.KeySet
+		Aops        zcore.KeySet
+		Fields      zcore.KeySet
+		Injects     zcore.KeySet
 		ReferStruct bool
 		Provider    string
 	}
@@ -190,7 +189,7 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet
 				if entity.Type != zcore.DeclTypeStruct {
 					continue
 				} else if value == "*" {
-					decl.Fields.Add(zutils.StructFields(entity.TypeSpec.Type.(*ast.StructType)))
+					decl.Fields.Add(zcore.StructFields(entity.TypeSpec.Type.(*ast.StructType)))
 				} else {
 					decl.Fields.Add(values)
 				}
@@ -222,11 +221,11 @@ func (set wireDeclSet) init(entity zcore.DeclEntity) *wireDecl {
 	decl, ok := set[entity.AnnotatedDecl]
 	if !ok {
 		decl = &wireDecl{
-			Params:  make(zutils.KeySet),
-			Binds:   make(zutils.KeySet),
-			Fields:  make(zutils.KeySet),
-			Injects: make(zutils.KeySet),
-			Aops:    make(zutils.KeySet),
+			Params:  make(zcore.KeySet),
+			Binds:   make(zcore.KeySet),
+			Fields:  make(zcore.KeySet),
+			Injects: make(zcore.KeySet),
+			Aops:    make(zcore.KeySet),
 		}
 		set[entity.AnnotatedDecl] = decl
 
@@ -294,12 +293,12 @@ func (w Wire) Run(es zcore.DeclEntities) (err error) {
 		_ = os.Remove(filepath.Join(dir, "wire_gen.go"))
 
 		// check wire imported or try go get wire
-		if _, err = zutils.ExecCommand(fmt.Sprintf("go list -m %s || go get %s", wireImportPath, wireImportPath), dir); err != nil {
+		if _, err = zcore.ExecCommand(fmt.Sprintf("go list -m %s || go get %s", wireImportPath, wireImportPath), dir); err != nil {
 			return
 		}
 
 		// run wire
-		if _, err = zutils.ExecCommand("wire", dir); err != nil {
+		if _, err = zcore.ExecCommand("wire", dir); err != nil {
 			return
 		}
 	}
@@ -307,7 +306,7 @@ func (w Wire) Run(es zcore.DeclEntities) (err error) {
 }
 
 func (w Wire) generateInjects(setFiles map[string]map[string]wireDeclSet, injectFiles map[string]map[string]zcore.AnnotatedDecls) (err error) {
-	eg := new(zutils.ErrGroup)
+	eg := new(zcore.ErrGroup)
 	for key := range injectFiles {
 		filename := key
 		eg.Go(func() error {
@@ -328,9 +327,9 @@ func (w Wire) generateInject(dirSetFiles map[string]wireDeclSet, filename string
 	}
 
 	var (
-		dstImportPath = zutils.GetImportPath(filename)
-		dstImportName = zutils.GetImportName(filename)
-		dstImports    = zutils.Imports{"github.com/google/wire": "wire"}
+		dstImportPath = zcore.GetImportPath(filename)
+		dstImportName = zcore.GetImportName(filename)
+		dstImports    = zcore.Imports{"github.com/google/wire": "wire"}
 
 		wireInjects []*WireInject
 	)
@@ -338,10 +337,10 @@ func (w Wire) generateInject(dirSetFiles map[string]wireDeclSet, filename string
 	for set, decls := range injects {
 		for _, decl := range decls {
 			srcImports := decl.File.Imports()
-			srcImportPath := zutils.GetImportPath(decl.File.Path)
+			srcImportPath := zcore.GetImportPath(decl.File.Path)
 
 			fp := func(name string) string {
-				return zutils.FixPackage(name, srcImportPath, dstImportPath, srcImports, dstImports)
+				return zcore.FixPackage(name, srcImportPath, dstImportPath, srcImports, dstImports)
 			}
 
 			wd, ok := dirSetFiles[set][decl]
@@ -400,7 +399,7 @@ func (w Wire) generateInject(dirSetFiles map[string]wireDeclSet, filename string
 }
 
 func (w Wire) generateSets(setFiles map[string]map[string]wireDeclSet) (err error) {
-	eg := new(zutils.ErrGroup)
+	eg := new(zcore.ErrGroup)
 	for key := range setFiles {
 		dir := key
 		eg.Go(func() error { return w.generateSet(dir, setFiles[dir]) })
@@ -408,9 +407,9 @@ func (w Wire) generateSets(setFiles map[string]map[string]wireDeclSet) (err erro
 	return eg.Wait()
 }
 
-func (w Wire) parseInterfaceMethods(name string, dir string, imports zutils.Imports) (methods []WireAopMethod) {
+func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Imports) (methods []WireAopMethod) {
 	pkgPath := ""
-	dstImportPath := zutils.GetImportPath(dir)
+	dstImportPath := zcore.GetImportPath(dir)
 
 	if strings.Contains(name, ".") {
 		sp := strings.Split(name, ".")
@@ -429,7 +428,7 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zutils.Impo
 			for _, params := range fl.List {
 				l := len(params.Names)
 				for i := 0; i < l || (i == 0 && i == l); i++ {
-					*dst = append(*dst, zutils.UnsafeBytes2String(srcFile.ReplacePackages(params.Type, dir, imports)))
+					*dst = append(*dst, zcore.UnsafeBytes2String(srcFile.ReplacePackages(params.Type, dir, imports)))
 				}
 			}
 
@@ -443,7 +442,7 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zutils.Impo
 	}
 
 	for _, f := range fl.List {
-		funcName, ft, ok := zutils.AssertFuncType(f)
+		funcName, ft, ok := zcore.AssertFuncType(f)
 		if !ok {
 			continue
 		}
@@ -455,13 +454,13 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zutils.Impo
 	return
 }
 
-func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *zutils.File) {
-	pkgDir, err := zutils.ExecCommand(`go list -f "{{ .Dir }} " `+pkgPath, dir)
+func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *zcore.File) {
+	pkgDir, err := zcore.ExecCommand(`go list -f "{{ .Dir }} " `+pkgPath, dir)
 	if err != nil {
 		return
 	}
 
-	_, _ = zutils.WalkPackage(pkgDir, func(file *zutils.File) (err error) {
+	_, _ = zcore.WalkPackage(pkgDir, func(file *zcore.File) (err error) {
 		object := file.Lookup(name)
 		if object == nil || object.Kind != ast.Typ || object.Decl == nil {
 			return
@@ -477,7 +476,7 @@ func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *
 			fl = typ.Methods
 			srcFile = file
 		case *ast.SelectorExpr:
-			if pkgPath = file.Imports().Which(zutils.UnsafeBytes2String(file.Node(typ.X))); len(pkgPath) > 0 {
+			if pkgPath = file.Imports().Which(zcore.UnsafeBytes2String(file.Node(typ.X))); len(pkgPath) > 0 {
 				fl, srcFile = getInterfaceFields(typ.Sel.Name, dir, pkgPath)
 			}
 			return filepath.SkipDir
@@ -493,10 +492,10 @@ func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *
 func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	var (
 		wireSets      = make([]WireSet, 0, len(sets))
-		dstImports    = zutils.Imports{"github.com/google/wire": "wire"}
-		dstImportPath = zutils.GetImportPath(dir)
+		dstImports    = zcore.Imports{"github.com/google/wire": "wire"}
+		dstImportPath = zcore.GetImportPath(dir)
 
-		aopImports = make(zutils.Imports)
+		aopImports = make(zcore.Imports)
 		aopSets    = make(map[string]*WireAop)
 	)
 
@@ -504,11 +503,11 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 		ws := WireSet{Name: set}
 
 		for decl, wd := range decls {
-			el := WireSetElement{Path: zutils.GetImportPath(decl.File.Path), Name: decl.Name()}
+			el := WireSetElement{Path: zcore.GetImportPath(decl.File.Path), Name: decl.Name()}
 			srcImports := decl.File.Imports()
 			// fix name import package selector
 			fp := func(name string) string {
-				return zutils.FixPackage(name, el.Path, dstImportPath, srcImports, dstImports)
+				return zcore.FixPackage(name, el.Path, dstImportPath, srcImports, dstImports)
 			}
 
 			// has provider
@@ -523,7 +522,7 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 
 				if _, aop := wd.Aops[bind]; !aop {
 					// direct interface type binding
-					zutils.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, bindType, implType)
+					zcore.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, bindType, implType)
 					continue
 				}
 
@@ -534,7 +533,7 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 				aopType, ok := aopSets[aopTypename]
 				if !ok {
 					// aop interface type
-					interfaceName := zutils.FixPackage(bind, el.Path, dstImportPath, srcImports, aopImports)
+					interfaceName := zcore.FixPackage(bind, el.Path, dstImportPath, srcImports, aopImports)
 
 					// add aop generate entry
 					aopType = &WireAop{
@@ -546,9 +545,9 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 				}
 
 				// aop type bindings
-				zutils.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, aopTypename, implType)
-				zutils.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, aopType.Implement)
-				zutils.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, bindType, aopType.Implement)
+				zcore.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, aopTypename, implType)
+				zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, aopType.Implement)
+				zcore.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, bindType, aopType.Implement)
 			}
 
 			switch decl.Type {
@@ -558,18 +557,18 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 			case zcore.DeclTypeRefer:
 				// struct refer type
 				if wd.ReferStruct && len(wd.Provider) == 0 {
-					zutils.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
+					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
 				}
 
 			case zcore.DeclTypeStruct:
 				// struct type
 				if len(wd.Provider) == 0 {
-					zutils.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
+					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
 				}
 
 				// add fields of
 				if fields := strings.Join(wd.Fields.Keys(), `","`); len(fields) > 0 {
-					zutils.Appendf(&el.Decls, `wire.FieldsOf(new(%s), "%s")`, fp(el.Name), fields)
+					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(%s), "%s")`, fp(el.Name), fields)
 				}
 			}
 
@@ -592,7 +591,7 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	}
 
 	// package name
-	pkg := zutils.GetImportName(dir)
+	pkg := zcore.GetImportName(dir)
 
 	// sort by sets name
 	sort.Slice(wireSets, func(i, j int) bool { return wireSets[i].Name < wireSets[j].Name })
@@ -614,7 +613,7 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	return
 }
 
-func (w Wire) generateAops(dir, pkg string, sets map[string]*WireAop, aopImports zutils.Imports) (err error) {
+func (w Wire) generateAops(dir, pkg string, sets map[string]*WireAop, aopImports zcore.Imports) (err error) {
 	aopFilename := filepath.Join(dir, wireAopFile)
 	_ = os.Remove(aopFilename)
 	if len(sets) == 0 {
@@ -643,7 +642,7 @@ func (w Wire) parseEntities(entities zcore.DeclEntities) map[string]wireDeclSet 
 
 	for index, entity := range entities {
 		for _, set := range strings.Split(entity.Options["set"], ",") {
-			if exclude, has := zutils.TrimPrefix(set, "!"); has {
+			if exclude, has := zcore.TrimPrefix(set, "!"); has {
 				if excludes[index] == nil {
 					excludes[index] = make(map[string]struct{})
 				}

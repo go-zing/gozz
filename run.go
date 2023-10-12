@@ -26,8 +26,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
 )
 
 var (
@@ -84,7 +83,7 @@ func Run(_ *cobra.Command, args []string) (err error) {
 		})
 
 		// parse entity options
-		zutils.SplitKVSlice2Map(commands[1:], "=", entities[i].Options)
+		zcore.SplitKVSlice2Map(commands[1:], "=", entities[i].Options)
 	}
 
 	if err = entities.Run(filename); err != nil {

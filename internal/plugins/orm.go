@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zorm"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
+
+	_ "github.com/go-zing/gozz/internal/drivers"
 )
 
 func init() {
@@ -33,7 +33,7 @@ func init() {
 
 type (
 	Orm struct {
-		Tables []zorm.Table
+		Tables []zcore.OrmTable
 	}
 )
 
@@ -98,15 +98,20 @@ func (s *Slice{{ .Name }}) Range(f func(interface{}, bool) bool) {
 func (o Orm) Name() string { return "orm" }
 
 func (o Orm) Args() ([]string, map[string]string) {
-	drivers := zorm.GetAllDrivers()
 	return []string{
 			"filename:specify which file to generate orm types and template files",
 			"schema:specify databases schema to load tables",
 		},
 		map[string]string{
-			"driver": "specify databases schema driver. default: mysql. drivers registered: [ " + strings.Join(drivers, ",") + " ]",
-			"type":   `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
-			"table":  `specify table names to load. default: * (load all tables).use "," to split if multi. example: [ table=user,book,order ]`,
+			"driver": fmt.Sprintf("specify databases schema driver. default: mysql. available drivers: [ %s ]",
+				strings.Join(zcore.GetSchemaDrivers(), ",")),
+			"type":     `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
+			"table":    `specify table names to load. default: * (load all tables).use "," to split if multi. example: [ table=user,book,order ]`,
+			"user":     "user in sql default format dsn. default: root",
+			"host":     "host in sql default format dsn. default: localhost",
+			"port":     "port in sql default format dns. default: 3306",
+			"password": "password in default format sql dsn",
+			"dsn":      "specify sql dsn to load schema. other options to format dsn would be ignored if provide. default: [ ${user}:${password}@tpc(${host}:${port})/ ]",
 		}
 }
 
@@ -131,46 +136,51 @@ func (o Orm) Run(entities zcore.DeclEntities) (err error) {
 			}
 		}
 		if err = zcore.RenderWithDefaultTemplate(Orm{Tables: tables},
-			ormTemplateText, filename, zutils.GetImportName(filename), false); err != nil {
+			ormTemplateText, filename, zcore.GetImportName(filename), false); err != nil {
 			return
 		}
 	}
 	return
 }
 
-func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zorm.Table, err error) {
+func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zcore.OrmTable, err error) {
 	opt := entity.Options
 
 	// get driver. default mysql
 	driverName := opt.Get("driver", "mysql")
-	driver := zorm.GetDriver(driverName)
+	driver := zcore.GetSchemaDriver(driverName)
 	if driver == nil {
 		return nil, errors.New("unregister driver: " + driverName)
 	}
 
 	// default types
-	types := zorm.DefaultTypes()
+	types := zcore.DefaultTypes()
 
 	// commands or annotations defined types
 	// extract types from options
 	extTypes := make(map[string]string)
-	zutils.SplitKVSlice2Map(strings.Split(entity.Options["type"], ","), "=", extTypes)
+	zcore.SplitKVSlice2Map(strings.Split(entity.Options["type"], ","), "=", extTypes)
 	for key, value := range extTypes {
 		types[key] = value
 	}
 
+	dsn := opt.Get("dsn", "")
+	if len(dsn) == 0 {
+		dsn = fmt.Sprintf(
+			"%s:%s@tcp(%s:%s)/",
+			opt.Get("user", "root"),
+			opt.Get("password", ""),
+			opt.Get("host", "localhost"),
+			opt.Get("port", "3306"),
+		)
+	}
+
 	// parse dsn and get tables
-	return driver.Parse(fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/",
-		opt.Get("user", "root"),
-		opt.Get("password", ""),
-		opt.Get("host", "localhost"),
-		opt.Get("port", "3306"),
-	), entity.Args[1], opt.Get("table", "*"), types)
+	return driver.Parse(dsn, entity.Args[1], opt.Get("table", "*"), types)
 }
 
-func (o Orm) group(entities zcore.DeclEntities) (map[string][]zorm.Table, error) {
-	group := make(map[string][]zorm.Table)
+func (o Orm) group(entities zcore.DeclEntities) (map[string][]zcore.OrmTable, error) {
+	group := make(map[string][]zcore.OrmTable)
 	for _, entity := range entities {
 		tables, e := o.parseTables(entity)
 		if e != nil {

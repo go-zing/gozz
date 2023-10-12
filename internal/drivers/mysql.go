@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package main
+package drivers
 
 import (
 	"database/sql"
@@ -26,14 +26,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stoewer/go-strcase"
 
-	"github.com/go-zing/gozz/zorm"
+	zcore "github.com/go-zing/gozz-core"
 )
+
+func init() { zcore.RegisterSchemaDriver(Mysql{}) }
 
 type (
 	Mysql struct{}
 
 	Column struct {
-		zorm.SqlColumn
+		zcore.SqlColumn
 
 		ColumnType    string
 		ColumnComment string
@@ -42,8 +44,6 @@ type (
 
 	SliceMysqlColumn []Column
 )
-
-var Z = Mysql{}
 
 func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
 	for i := 0; ; i++ {
@@ -70,7 +70,7 @@ func (column *Column) FieldMapping() map[string]interface{} {
 
 func (m Mysql) Name() string { return "mysql" }
 
-func (m Mysql) Parse(dsn, schema, table string, types map[string]string) (tables []zorm.Table, err error) {
+func (m Mysql) Parse(dsn, schema, table string, types map[string]string) (tables []zcore.OrmTable, err error) {
 	db, err := sql.Open(m.Name(), dsn)
 	if err != nil {
 		return
@@ -91,7 +91,7 @@ const (
 )
 
 func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns SliceMysqlColumn, err error) {
-	fields := zorm.FieldsOf(&columns)
+	fields := zcore.FieldsOf(&columns)
 	args := []interface{}{schema}
 	statement := &strings.Builder{}
 	_, _ = fmt.Fprintf(statement, sqlStatementSelectColumns, strings.Join(fields, "`,`"))
@@ -113,11 +113,11 @@ func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns Sl
 		return
 	}
 	defer rows.Close()
-	err = zorm.Scan(rows, fields, &columns)
+	err = zcore.Scan(rows, fields, &columns)
 	return
 }
 
-func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string) (tables []zorm.Table) {
+func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string) (tables []zcore.OrmTable) {
 	stmt, _ := db.Prepare(sqlStatementSelectTableComment)
 	if stmt != nil {
 		defer stmt.Close()
@@ -129,7 +129,7 @@ func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string
 		// init table
 		index, ok := tbs[column.TableName]
 		if !ok {
-			tables = append(tables, zorm.Table{
+			tables = append(tables, zcore.OrmTable{
 				Name:   strcase.UpperCamelCase(column.TableName),
 				Table:  column.TableName,
 				Schema: column.TableSchema,
@@ -150,7 +150,7 @@ func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string
 			table.Primary = column.ColumnName
 		}
 
-		c := zorm.Column{
+		c := zcore.OrmColumn{
 			Name:    strcase.UpperCamelCase(column.ColumnName),
 			Column:  column.ColumnName,
 			Type:    column.ColumnType,

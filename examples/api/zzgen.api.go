@@ -3,7 +3,7 @@
 package api
 
 import (
-	context "context"
+	"context"
 )
 
 var _ = context.Context(nil)

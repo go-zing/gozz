@@ -24,8 +24,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
 )
 
 var list = &cobra.Command{
@@ -38,7 +37,7 @@ var list = &cobra.Command{
 			names = append(names, name)
 		}
 		sort.Strings(names)
-		fmt.Printf("total %d plugins avaiable:\n", len(names))
+		fmt.Printf("totally %d plugins avaiable:\n", len(names))
 
 		for _, name := range names {
 			p := registry[name]
@@ -47,15 +46,15 @@ var list = &cobra.Command{
 			args, options := p.Args()
 
 			usage := zcore.AnnotationPrefix + name
-			argsHelp := ""
+			argsHelp := &strings.Builder{}
 
 			for i, arg := range args {
-				arg, help := zutils.SplitKV(arg, ":")
+				arg, help := zcore.SplitKV(arg, ":")
 				if i == 0 {
-					argsHelp += "\n\targs:"
+					argsHelp.WriteString("\n\targs:")
 				}
 				usage += ":[" + arg + "]"
-				argsHelp += "\n\t\t" + arg + ": " + help
+				argsHelp.WriteString("\n\t\t" + arg + ": " + help)
 			}
 
 			var keys []string
@@ -66,10 +65,10 @@ var list = &cobra.Command{
 
 			for i, key := range keys {
 				if i == 0 {
-					argsHelp += "\n\toptions:"
+					argsHelp.WriteString("\n\toptions:")
 					usage += ":[options...]"
 				}
-				argsHelp += "\n\t\t" + key + ": " + options[key]
+				argsHelp.WriteString("\n\t\t" + key + ": " + options[key])
 			}
 
 			str := fmt.Sprintf("\n%s: %s\n\t%s%s\n", name, usage, desc, argsHelp)

@@ -25,8 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-zing/gozz/zcore"
-	"github.com/go-zing/gozz/zutils"
+	zcore "github.com/go-zing/gozz-core"
 )
 
 func init() {
@@ -35,7 +34,7 @@ func init() {
 
 type (
 	Tag struct {
-		ModifySet *zutils.ModifySet
+		ModifySet *zcore.ModifySet
 		Tags      map[string]string
 		FieldTags map[string]string
 		Keys      []string
@@ -66,7 +65,7 @@ func (t *Tag) Run(entities zcore.DeclEntities) (err error) {
 		group[entity.AnnotatedDecl] = append(group[entity.AnnotatedDecl], entity)
 	}
 
-	t.ModifySet = &zutils.ModifySet{}
+	t.ModifySet = &zcore.ModifySet{}
 	t.FieldTags = make(map[string]string)
 	t.Tags = make(map[string]string)
 
@@ -110,7 +109,7 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 	docs, annotations := zcore.ParseCommentGroup(zcore.AnnotationPrefix, field.Doc, field.Comment)
 	for _, entity := range (&zcore.AnnotatedField{Annotations: annotations}).Parse(t.Name(), 2, nil) {
 		for _, key := range strings.Split(entity.Args[0], ",") {
-			if tag, ok := zutils.TrimPrefix(key, "+"); ok {
+			if tag, ok := zcore.TrimPrefix(key, "+"); ok {
 				// if field annotation starts with "+"
 				// $field_tag = $struct_tag + $field_tag
 				//
@@ -140,7 +139,7 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 		if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
 			FieldName string
 			Docs      string
-		}{FieldName: name, Docs: zutils.JoinDocs(docs)}, t.FieldTags[key], str) == nil && str.Len() > 0 {
+		}{FieldName: name, Docs: zcore.JoinDocs(docs)}, t.FieldTags[key], str) == nil && str.Len() > 0 {
 			t.FieldTags[key] = str.String()
 			t.Keys = append(t.Keys, key)
 		}
@@ -154,7 +153,7 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 
 	// check field tag exists
 	if field.Tag == nil {
-		bf := zutils.BuffPool.Get().(*bytes.Buffer)
+		bf := zcore.BuffPool.Get().(*bytes.Buffer)
 		bf.Reset()
 
 		// write tags
@@ -194,7 +193,7 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 
 	// add tag node modify
 	if updated {
-		bf := zutils.BuffPool.Get().(*bytes.Buffer)
+		bf := zcore.BuffPool.Get().(*bytes.Buffer)
 		bf.Reset()
 		bf.WriteRune('`')
 		bf.WriteString(strings.TrimSpace(str))
