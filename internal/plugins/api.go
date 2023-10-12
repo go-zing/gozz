@@ -116,11 +116,11 @@ func (s Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
 func (a Api) Name() string { return "api" }
 
 func (a Api) Args() ([]string, map[string]string) {
-	return []string{"filename"}, nil
+	return []string{"filename:specify filename to generate api stubs and template files"}, nil
 }
 
 func (a Api) Description() string {
-	return ""
+	return "generate api specification stubs from interface declarations with template."
 }
 
 func (a Api) Run(entities zcore.DeclEntities) (err error) {

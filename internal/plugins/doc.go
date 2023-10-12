@@ -90,7 +90,9 @@ func (d Doc) Name() string { return "doc" }
 
 func (d Doc) Args() ([]string, map[string]string) { return nil, nil }
 
-func (d Doc) Description() string { return "" }
+func (d Doc) Description() string {
+	return "generate types and type fields (struct fields or interface methods) description text map from comments with template."
+}
 
 func (d Doc) Run(entities zcore.DeclEntities) (err error) {
 	group := entities.GroupByDir()

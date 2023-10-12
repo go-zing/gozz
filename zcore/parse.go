@@ -26,7 +26,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-zing/gozz/internal/ztore"
 	"github.com/go-zing/gozz/zutils"
 )
 
@@ -40,7 +39,7 @@ var (
 
 	// declParsedStore to cached parsed AnnotatedDecls from *ast.File
 	// same *ast.File always has same parsed results
-	declParsedStore = new(ztore.VersionStore)
+	declParsedStore = new(zutils.VersionStore)
 )
 
 // Types of annotated declaration

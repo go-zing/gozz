@@ -17,11 +17,23 @@
 
 package zorm
 
+import (
+	"sort"
+)
+
 var driverRegistry = make(map[string]SchemaDriver)
 
-func Register(driver SchemaDriver) { driverRegistry[driver.Name()] = driver }
+func RegisterDriver(driver SchemaDriver) { driverRegistry[driver.Name()] = driver }
 
-func Get(name string) SchemaDriver { return driverRegistry[name] }
+func GetDriver(name string) SchemaDriver { return driverRegistry[name] }
+
+func GetAllDrivers() (names []string) {
+	for name := range driverRegistry {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return
+}
 
 type (
 	SchemaDriver interface {

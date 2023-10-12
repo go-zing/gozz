@@ -62,6 +62,7 @@ func Run(_ *cobra.Command, args []string) (err error) {
 
 	// parse plugin entity with key-value options
 	entities := make(zcore.PluginEntities, 0, len(plugins))
+	registry := zcore.PluginRegistry()
 
 	for i, plugin := range plugins {
 		// split plugin name and options string

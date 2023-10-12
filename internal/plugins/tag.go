@@ -45,9 +45,16 @@ type (
 
 func (t *Tag) Name() string { return "tag" }
 
-func (t *Tag) Args() ([]string, map[string]string) { return []string{"tag", "template"}, nil }
+func (t *Tag) Args() ([]string, map[string]string) {
+	return []string{
+		`tag:specify tag key on field. use "," to separate multiple keys. use "+" prefix for additional prefix on field.`,
+		"format:template format of generate tag value. using golang template syntax. example: [ json:{{ .FieldName }} ]",
+	}, nil
+}
 
-func (t *Tag) Description() string { return "" }
+func (t *Tag) Description() string {
+	return "add or modify struct field tags from format templates."
+}
 
 func (t *Tag) Run(entities zcore.DeclEntities) (err error) {
 	group := make(map[*zcore.AnnotatedDecl]zcore.DeclEntities)

@@ -24,11 +24,10 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-zing/gozz/zorm"
 	"github.com/stoewer/go-strcase"
-)
 
-func init() { zorm.Register(Mysql{}) }
+	"github.com/go-zing/gozz/zorm"
+)
 
 type (
 	Mysql struct{}
@@ -43,6 +42,8 @@ type (
 
 	SliceMysqlColumn []Column
 )
+
+var Z = Mysql{}
 
 func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
 	for i := 0; ; i++ {
@@ -142,11 +143,11 @@ func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string
 			}
 		}
 
-		tb := &tables[index]
+		table := &tables[index]
 
 		// table primary key
 		if column.ColumnKey != nil && *column.ColumnKey == "PRI" {
-			tb.Primary = column.ColumnName
+			table.Primary = column.ColumnName
 		}
 
 		c := zorm.Column{
@@ -179,12 +180,7 @@ func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string
 			}
 		}
 
-		// no type match. use interface{}
-		if len(c.Type) == 0 {
-			c.Type = "interface{}"
-		}
-
-		tb.Columns = append(tb.Columns, c)
+		table.Columns = append(table.Columns, c)
 	}
 
 	sort.Slice(tables, func(i, j int) bool { return tables[i].Name < tables[j].Name })

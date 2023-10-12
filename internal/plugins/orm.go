@@ -98,10 +98,21 @@ func (s *Slice{{ .Name }}) Range(f func(interface{}, bool) bool) {
 func (o Orm) Name() string { return "orm" }
 
 func (o Orm) Args() ([]string, map[string]string) {
-	return []string{"filename", "schema"}, map[string]string{"type": "", "table": ""}
+	drivers := zorm.GetAllDrivers()
+	return []string{
+			"filename:specify which file to generate orm types and template files",
+			"schema:specify databases schema to load tables",
+		},
+		map[string]string{
+			"driver": "specify databases schema driver. default: mysql. drivers registered: [ " + strings.Join(drivers, ",") + " ]",
+			"type":   `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
+			"table":  `specify table names to load. default: * (load all tables).use "," to split if multi. example: [ table=user,book,order ]`,
+		}
 }
 
-func (o Orm) Description() string { return "" }
+func (o Orm) Description() string {
+	return "generate type struct field relation mapping from databases schema."
+}
 
 func (o Orm) Run(entities zcore.DeclEntities) (err error) {
 	group, err := o.group(entities)
@@ -110,6 +121,15 @@ func (o Orm) Run(entities zcore.DeclEntities) (err error) {
 	}
 
 	for filename, tables := range group {
+		for i := range tables {
+			table := &tables[i]
+			for ci := range table.Columns {
+				column := &table.Columns[ci]
+				if len(column.Type) == 0 {
+					column.Type = "interface{}"
+				}
+			}
+		}
 		if err = zcore.RenderWithDefaultTemplate(Orm{Tables: tables},
 			ormTemplateText, filename, zutils.GetImportName(filename), false); err != nil {
 			return
@@ -123,7 +143,7 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zorm.Table, err erro
 
 	// get driver. default mysql
 	driverName := opt.Get("driver", "mysql")
-	driver := zorm.Get(driverName)
+	driver := zorm.GetDriver(driverName)
 	if driver == nil {
 		return nil, errors.New("unregister driver: " + driverName)
 	}

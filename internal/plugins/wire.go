@@ -142,18 +142,20 @@ func(i _impl{{ $n }}){{ .Name }}({{ range $i,$v := $p }}p{{ $i }} {{ $v }},{{ en
 func (w Wire) Name() string { return wireName }
 
 func (w Wire) Args() ([]string, map[string]string) {
-	return nil,
-		map[string]string{
-			"aop":    "",
-			"struct": "",
-			"bind":   "",
-			"field":  "",
-			"param":  "",
-			"inject": "",
-		}
+	return nil, map[string]string{
+		"aop":    "generate aop proxy type wrapper for interface binding. bool flag option",
+		"struct": "refer type as struct type. only works for type reference declaration. bool flag option",
+		"bind":   "bind type with interface. refer to wire.Bind. example: [ bind=io.Writer ]",
+		"field":  `provide fields of struct for injects. use "*" to provide all fields for injects. refer to wire.FieldsOf. example: [ field=* ]`,
+		"param":  "specify param types for injectors function. example: [ param=context.Context ]",
+		"inject": "generate type initialization function in provide filename as injector entries. example: [ inject=./ ]",
+		"set":    "specify wire set to provide feature of multi inject namespace. example: [ set=mock ]",
+	}
 }
 
-func (w Wire) Description() string { return "" }
+func (w Wire) Description() string {
+	return "collect and generate wire sets / injectors / aop proxy stubs files."
+}
 
 func (w Wire) groupByDecls(entities zcore.DeclEntities) map[*zcore.AnnotatedDecl]zcore.DeclEntities {
 	m := make(map[*zcore.AnnotatedDecl]zcore.DeclEntities)

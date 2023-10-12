@@ -19,30 +19,78 @@ package main
 
 import (
 	"os"
+	"path/filepath"
+	"plugin"
+	"strings"
 
 	"github.com/spf13/cobra"
 
 	_ "github.com/go-zing/gozz/internal/plugins"
 	"github.com/go-zing/gozz/zcore"
+	"github.com/go-zing/gozz/zorm"
 )
 
 var (
+	extensions []string
+
 	cmd = cobra.Command{
 		Use:          zcore.ExecName,
 		SilenceUsage: true,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
+			for _, ex := range extensions {
+				if err = loadExtension(ex); err != nil {
+					return
+				}
+			}
+			return
+		},
 	}
-
-	registry = zcore.PluginRegistry()
 )
 
-func init() {
-	cmd.AddCommand(
-		run,
-		listCmd,
-	)
+func loadExtension(name string) (err error) {
+	name = strings.TrimSuffix(name, ".so") + ".so"
+
+	tryPaths := []string{name}
+
+	if homeDir, e := os.UserHomeDir(); e == nil {
+		tryPaths = append(tryPaths, filepath.Join(homeDir, ".gozz", "extensions", name))
+	}
+
+	if gopath := os.Getenv("GOPATH"); len(gopath) > 0 {
+		tryPaths = append(tryPaths, filepath.Join(gopath, "bin", name))
+	}
+
+	var p *plugin.Plugin
+	for _, path := range tryPaths {
+		if _, e := os.Stat(path); e == nil {
+			if p, err = plugin.Open(path); err == nil {
+				break
+			}
+		}
+	}
+	if err != nil {
+		return
+	}
+
+	// lookup symbol
+	symbol, err := p.Lookup("Z")
+	if err != nil {
+		return
+	}
+
+	// register symbol type
+	switch v := symbol.(type) {
+	case zcore.Plugin:
+		zcore.RegisterPlugin(v)
+	case zorm.SchemaDriver:
+		zorm.RegisterDriver(v)
+	}
+	return
 }
 
 func main() {
+	cmd.AddCommand(run, list)
+	cmd.PersistentFlags().StringArrayVarP(&extensions, "extension", "x", nil, "extension .so plugin to load")
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

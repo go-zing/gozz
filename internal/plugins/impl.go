@@ -70,10 +70,17 @@ type (
 func (i Impl) Name() string { return "impl" }
 
 func (i Impl) Args() ([]string, map[string]string) {
-	return []string{"filename"}, nil
+	return []string{"filename:specify which file to generate implements type and method if not exist"},
+		map[string]string{
+			"aop":  "add aop wire options when generate implements type declaration. bool flag option",
+			"wire": "add wire annotation when generate implements type declaration. bool flag option",
+			"type": "specify implement typename. add * as prefix if use pointer type receiver. example: [ type=*T ]",
+		}
 }
 
-func (i Impl) Description() string { return "" }
+func (i Impl) Description() string {
+	return "generate and sync interface functions type signature to target implement type."
+}
 
 func (dst *implDstType) init(modifySet *zutils.ModifySet, key implDstKey) {
 	var (

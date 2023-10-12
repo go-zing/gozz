@@ -17,7 +17,7 @@
 
 package orm
 
-//go:generate gozz run -p "orm:password=**" ./
+//go:generate gozz -x "mysql.so" run  -p "orm:password=***" ./
 
 // +zz:orm:./:information_schema:table=events,schemata:type=*timestamp=*time.Time,int unsigned=uint:type=*varchar=*string
 type _ struct{}

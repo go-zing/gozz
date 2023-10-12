@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package ztore
+package zutils
 
 import (
 	"sync"

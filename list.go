@@ -20,24 +20,60 @@ package main
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/spf13/cobra"
+
+	"github.com/go-zing/gozz/zcore"
+	"github.com/go-zing/gozz/zutils"
 )
 
-var listCmd = &cobra.Command{
+var list = &cobra.Command{
 	Use:   "list",
 	Short: "list all registered plugins",
 	Run: func(cmd *cobra.Command, args []string) {
+		registry := zcore.PluginRegistry()
 		names := make([]string, 0)
 		for name := range registry {
 			names = append(names, name)
 		}
 		sort.Strings(names)
+		fmt.Printf("total %d plugins avaiable:\n", len(names))
+
 		for _, name := range names {
 			p := registry[name]
 			name := p.Name()
 			desc := p.Description()
-			fmt.Printf("%s:\n\t%s\n", name, desc)
+			args, options := p.Args()
+
+			usage := zcore.AnnotationPrefix + name
+			argsHelp := ""
+
+			for i, arg := range args {
+				arg, help := zutils.SplitKV(arg, ":")
+				if i == 0 {
+					argsHelp += "\n\targs:"
+				}
+				usage += ":[" + arg + "]"
+				argsHelp += "\n\t\t" + arg + ": " + help
+			}
+
+			var keys []string
+			for k := range options {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
+
+			for i, key := range keys {
+				if i == 0 {
+					argsHelp += "\n\toptions:"
+					usage += ":[options...]"
+				}
+				argsHelp += "\n\t\t" + key + ": " + options[key]
+			}
+
+			str := fmt.Sprintf("\n%s: %s\n\t%s%s\n", name, usage, desc, argsHelp)
+			fmt.Print(strings.Replace(str, "\t", "    ", -1))
 		}
 	},
 }

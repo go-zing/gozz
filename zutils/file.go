@@ -29,15 +29,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/go-zing/gozz/internal/ztore"
 )
 
 var (
 	// file store cached opened file bytes with version key consists of size and modify time
-	fileStore = new(ztore.VersionStore)
+	fileStore = new(VersionStore)
 	// ast store cached parsed file *ast.File with version key consists of size and modify time
-	astStore = new(ztore.VersionStore)
+	astStore = new(VersionStore)
 )
 
 // fileVersion return file version key consists of size and modify time
