@@ -20,7 +20,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"plugin"
 
 	"github.com/spf13/cobra"
 
@@ -37,15 +36,14 @@ var (
 		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
 			for _, name := range extensions {
-				if err = loadExtension(name); err != nil {
+				if err = zcore.LoadExtension(name); err != nil {
 					return
 				}
 			}
-
 			// load extension in ~/.gozz/extensions
 			if homeDir, _ := os.UserHomeDir(); len(homeDir) > 0 {
 				_ = zcore.WalkDir(filepath.Join(homeDir, ".gozz", "extensions"), func(name string) error {
-					_ = loadExtension(name)
+					_ = zcore.LoadExtension(name)
 					return nil
 				})
 			}
@@ -56,28 +54,8 @@ var (
 
 func main() {
 	cmd.AddCommand(run, list)
-	cmd.PersistentFlags().StringArrayVarP(&extensions, "extension", "x", nil, "extension .so plugin to load")
+	cmd.PersistentFlags().StringArrayVarP(&extensions, "extension", "x", nil, "extra .so extensions plugin to load")
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func loadExtension(name string) (err error) {
-	p, err := plugin.Open(name)
-	if err != nil {
-		return
-	}
-	// lookup symbol
-	symbol, err := p.Lookup("Z")
-	if err != nil {
-		return
-	}
-	// register symbol type
-	switch v := symbol.(type) {
-	case zcore.Plugin:
-		zcore.RegisterPlugin(v)
-	case zcore.SchemaDriver:
-		zcore.RegisterSchemaDriver(v)
-	}
-	return
 }

@@ -25,8 +25,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/stoewer/go-strcase"
-
 	zcore "github.com/go-zing/gozz-core"
 )
 
@@ -169,7 +167,7 @@ func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) 
 
 	// no exist receiver name found use lower case typename
 	if len(recName) == 0 {
-		sp := strings.Split(strcase.SnakeCase(key.Typename), "_")
+		sp := strings.Split(zcore.SnakeCase(key.Typename), "_")
 		recName = strings.ToLower(sp[len(sp)-1])
 	}
 

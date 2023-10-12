@@ -24,8 +24,6 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/stoewer/go-strcase"
-
 	zcore "github.com/go-zing/gozz-core"
 )
 
@@ -130,7 +128,7 @@ func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string
 		index, ok := tbs[column.TableName]
 		if !ok {
 			tables = append(tables, zcore.OrmTable{
-				Name:   strcase.UpperCamelCase(column.TableName),
+				Name:   zcore.UpperCamelCase(column.TableName),
 				Table:  column.TableName,
 				Schema: column.TableSchema,
 			})
@@ -151,7 +149,7 @@ func (m Mysql) parseTables(db *sql.DB, columns []Column, types map[string]string
 		}
 
 		c := zcore.OrmColumn{
-			Name:    strcase.UpperCamelCase(column.ColumnName),
+			Name:    zcore.UpperCamelCase(column.ColumnName),
 			Column:  column.ColumnName,
 			Type:    column.ColumnType,
 			Comment: column.ColumnComment,
