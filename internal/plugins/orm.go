@@ -175,7 +175,7 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zcore.OrmTable, err 
 	}
 
 	// parse dsn and get tables
-	return driver.Parse(dsn, entity.Args[1], opt.Get("table", "*"), types)
+	return driver.Parse(dsn, entity.Args[0], opt.Get("table", "*"), types)
 }
 
 func (o Orm) group(entities zcore.DeclEntities) (map[string][]zcore.OrmTable, error) {
