@@ -633,7 +633,7 @@ func (w Wire) parseEntities(entities zcore.DeclEntities) map[string]wireDeclSet 
 	excludes := make(map[int]map[string]struct{})
 
 	for index, entity := range entities {
-		for _, set := range strings.Split(entity.Options["set"], ",") {
+		for _, set := range strings.Split(entity.Options.Get("set", ""), ",") {
 			if exclude, has := zcore.TrimPrefix(set, "!"); has {
 				if excludes[index] == nil {
 					excludes[index] = make(map[string]struct{})

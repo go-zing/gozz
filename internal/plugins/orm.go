@@ -99,10 +99,10 @@ func (o Orm) Name() string { return "orm" }
 
 func (o Orm) Args() ([]string, map[string]string) {
 	return []string{
-			"filename:specify which file to generate orm types and template files",
 			"schema:specify databases schema to load tables",
 		},
 		map[string]string{
+			"filename": "specify which file to generate orm types and template files. default: ./zzgen.orm.go",
 			"driver": fmt.Sprintf("specify databases schema driver. default: mysql. available drivers: [ %s ]",
 				strings.Join(zcore.GetOrmSchemaDrivers(), ",")),
 			"type":     `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
@@ -186,7 +186,7 @@ func (o Orm) group(entities zcore.DeclEntities) (map[string][]zcore.OrmTable, er
 		if e != nil {
 			return nil, e
 		}
-		filename := entity.RelFilename(entity.Args[0], "zzgen.orm.go")
+		filename := entity.RelFilename(entity.Options.Get("filename", "./"), "zzgen.orm.go")
 		group[filename] = append(group[filename], tables...)
 	}
 	return group, nil
