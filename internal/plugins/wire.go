@@ -181,7 +181,7 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet
 				if entity.Type != zcore.DeclTypeStruct {
 					continue
 				} else if value == "*" {
-					decl.Fields.Add(zcore.StructFields(entity.TypeSpec.Type.(*ast.StructType)))
+					decl.Fields.Add(zcore.ExtractStructFieldsNames(entity.TypeSpec.Type.(*ast.StructType)))
 				} else {
 					decl.Fields.Add(values)
 				}

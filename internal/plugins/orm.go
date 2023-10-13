@@ -103,8 +103,7 @@ func (o Orm) Args() ([]string, map[string]string) {
 		},
 		map[string]string{
 			"filename": "specify which file to generate orm types and template files. default: ./zzgen.orm.go",
-			"driver": fmt.Sprintf("specify databases schema driver. default: mysql. available drivers: [ %s ]",
-				strings.Join(zcore.GetOrmSchemaDrivers(), ",")),
+			"driver":   "specify databases schema driver. default: mysql.",
 			"type":     `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
 			"table":    `specify table names to load. default: * (load all tables).use "," to split if multi. example: [ table=user,book,order ]`,
 			"user":     "user in sql default format dsn. default: root",
