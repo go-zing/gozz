@@ -33,10 +33,14 @@ var (
 	run = &cobra.Command{
 		Use:     "run",
 		Short:   "run annotations analysis and use plugins to do awesome things",
-		Long:    "",
-		Example: zcore.ExecName + ` run -p "api" -p "enum" -p "sql:dsn=${SQL_DSN}" ./...`,
+		Example: zcore.ExecName + ` run -p "api" [ -p "plugin:options" ...] ./`,
 		Args:    cobra.ExactArgs(1),
-		RunE:    Run,
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := Run(args); err != nil {
+				_, _ = fmt.Fprint(os.Stderr, err.Error()+"\n")
+				os.Exit(2)
+			}
+		},
 	}
 
 	plugins = make([]string, 0)
@@ -47,7 +51,7 @@ func init() {
 	flags.StringArrayVarP(&plugins, "plugin", "p", nil, "plugins to run")
 }
 
-func Run(_ *cobra.Command, args []string) (err error) {
+func Run(args []string) (err error) {
 	//  get analysis path absolute
 	filename, err := filepath.Abs(args[0])
 	if err != nil {
@@ -73,7 +77,7 @@ func Run(_ *cobra.Command, args []string) (err error) {
 		// get registry plugin entity
 		entity, ok := registry[name]
 		if !ok {
-			return errors.New("unregistered plugin name: " + name)
+			return fmt.Errorf(`unregistered plugin name: %s. use "%s list" to get registered plugins`, name, zcore.ExecName)
 		}
 
 		// append entities
@@ -86,9 +90,5 @@ func Run(_ *cobra.Command, args []string) (err error) {
 		zcore.SplitKVSlice2Map(commands[1:], "=", entities[i].Options)
 	}
 
-	if err = entities.Run(filename); err != nil {
-		_, _ = fmt.Fprint(os.Stderr, err.Error()+"\n")
-		os.Exit(2)
-	}
-	return nil
+	return entities.Run(filename)
 }

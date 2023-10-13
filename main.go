@@ -32,8 +32,7 @@ var (
 	extensions []string
 
 	cmd = cobra.Command{
-		Use:          zcore.ExecName,
-		SilenceUsage: true,
+		Use: zcore.ExecName,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
 			for _, name := range extensions {
 				if err = zcore.LoadExtension(name); err != nil {
