@@ -31,6 +31,15 @@ import (
 var (
 	extensions []string
 
+	pluginDir = func() string {
+		if dir := os.Getenv("GOZZ_PLUGINS_DIR"); len(dir) > 0 {
+			return dir
+		} else if homeDir, _ := os.UserHomeDir(); len(homeDir) > 0 {
+			return filepath.Join(homeDir, ".gozz", "extensions")
+		}
+		return ""
+	}()
+
 	cmd = cobra.Command{
 		Use: zcore.ExecName,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -39,9 +48,9 @@ var (
 					return
 				}
 			}
-			// load extension in ~/.gozz/extensions
-			if homeDir, _ := os.UserHomeDir(); len(homeDir) > 0 {
-				_ = zcore.WalkDir(filepath.Join(homeDir, ".gozz", "extensions"), func(name string) error {
+
+			if len(pluginDir) > 0 {
+				_ = zcore.WalkDir(pluginDir, func(name string) error {
 					_ = zcore.LoadExtension(name)
 					return nil
 				})
