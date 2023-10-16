@@ -17,34 +17,16 @@
 
 package option
 
-import (
-	"context"
-	"io"
-	"net/http"
-)
-
 //go:generate gozz run -p "option" ./
 
 // +zz:option
-type Request struct {
-	// add request header
-	Header http.Header
-	Host   func(closer struct {
-		s io.Closer
-		context.Context
-		dd map[string]interface {
-			http.Handler
-		}
-	})
-	Port     string
-	User     string
-	Password string
-}
-
-// +zz:option
-type Client struct {
-	// add request header
-	Header http.Header
-	// some host
+type Config struct {
+	// connect host
 	Host string
+	// connect port
+	Port string
+	// database username
+	Username string
+	// database password
+	Password string
 }
