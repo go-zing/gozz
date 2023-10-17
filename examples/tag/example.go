@@ -17,50 +17,60 @@
 
 package tag
 
-//go:generate gozz run -p "tag" ./
-
-// +zz:tag:json:{{ snake .FieldName }}
-type (
-	T struct {
-		FieldA string `json:"field_a"`
-		FieldB string `json:"field_b"`
-		FieldC string `json:"field_c"`
-	}
-
-	// +zz:tag:json:{{ camel .FieldName }}
-	T2 struct {
-		FieldA string `json:"fieldA"`
-		FieldB string `json:"fieldB"`
-		FieldC string `json:"fieldC"`
-	}
-
-	// +zz:tag:json:{{ kebab .FieldName }}
-	T3 struct {
-		// +zz:tag:json:{{ camel .FieldName }}
-		FieldA     string `json:"fieldA"`
-		FieldB     string `json:"field-b"`
-		FieldInner []map[struct {
-			// +zz:tag:+json:,omitempty
-			FieldA string `json:"field-a,omitempty"`
-			FieldB string `json:"field-b"`
-		}]func() struct {
-			FieldC string `json:"field-c"`
-			FieldD string `json:"field-d"`
-		} `json:"field-inner"`
-	}
+import (
+	"time"
 )
 
-// +zz:tag:json:{{ snake .FieldName }}
-type T4 map[string]struct {
-	FieldA string `json:"field_a"`
-	FieldB string `json:"field_b"`
-	FieldC string `json:"field_c"`
-}
+//go:generate gozz run -p "tag" ./
 
-// +zz:tag:json:{{ snake .FieldName }}
-type T5 func() map[string]struct {
-	// +zz:tag:json:{{ camel .FieldName }}
-	FieldA string `json:"fieldA"`
-	FieldB string `json:"field_b"`
-	FieldC string `json:"field_c"`
-}
+// +zz:tag:json,bson:{{ snake .FieldName }}
+type (
+	UserStruct struct {
+		Id        string    `bson:"id" json:"id"`
+		Name      string    `bson:"name" json:"name"`
+		Address   string    `bson:"address" json:"address"`
+		CreatedAt time.Time `bson:"created_at" json:"created_at"`
+		UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
+		Friends   []struct {
+			Id        string    `bson:"id" json:"id"`
+			Name      string    `bson:"name" json:"name"`
+			Address   string    `bson:"address" json:"address"`
+			CreatedAt time.Time `bson:"created_at" json:"created_at"`
+			UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
+		} `bson:"friends" json:"friends"`
+	}
+
+	UserMap map[string]struct {
+		Id        string    `bson:"id" json:"id"`
+		Name      string    `bson:"name" json:"name"`
+		Address   string    `bson:"address" json:"address"`
+		CreatedAt time.Time `bson:"created_at" json:"created_at"`
+		UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
+	}
+
+	UserSlice []struct {
+		Id        string    `bson:"id" json:"id"`
+		Name      string    `bson:"name" json:"name"`
+		Address   string    `bson:"address" json:"address"`
+		CreatedAt time.Time `bson:"created_at" json:"created_at"`
+		UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
+	}
+
+	UserInterface interface {
+		User() struct {
+			Id        string    `bson:"id" json:"id"`
+			Name      string    `bson:"name" json:"name"`
+			Address   string    `bson:"address" json:"address"`
+			CreatedAt time.Time `bson:"created_at" json:"created_at"`
+			UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
+		}
+	}
+
+	UserFunc func(struct {
+		Id        string    `bson:"id" json:"id"`
+		Name      string    `bson:"name" json:"name"`
+		Address   string    `bson:"address" json:"address"`
+		CreatedAt time.Time `bson:"created_at" json:"created_at"`
+		UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
+	})
+)

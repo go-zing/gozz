@@ -17,89 +17,31 @@
 
 package doc
 
-import (
-	"io"
-	"net/http"
-)
-
 //go:generate gozz run -p "doc" ./
 
 // +zz:doc
-// this is a struct type
-type T struct {
-	// this is a struct field
-	Field string
-}
-
-// +zz:doc
-// this is another struct type
-/*
-	multi lines comments
-*/
-type T1 struct {
-	// comment on
-	// another comment line
-	Field string // comment after field
-}
-
-// +zz:doc
 type (
-	// this is another struct type declared in group
-	T2 struct {
-		// this is a struct field
-		Field string // this is a struct field comment
-		// this is another struct field
-		Field2 string
+	// abstract type of entity
+	Entity interface {
+		// get entity uuid
+		Id() string
+		// get entity name
+		Name() string
 	}
 
-	// this is an interface type
-	T3 interface {
-		// this is an interface method
-		Method()
-		// this is a refer anonymous interface
-		io.Closer
+	// entity for users
+	User struct {
+		// user uuid
+		Id string
+		// user name
+		Name string
 	}
 
-	// this is a refer type
-	T4 http.Client
-
-	// this is a map type
-	T5 map[string][]string
-
-	// this is an array type
-	T6 []string
+	// entity for books
+	Book struct {
+		// book uuid
+		Id string
+		// book name
+		Name string
+	}
 )
-
-// +zz:doc
-// this is another array type
-type T7 []string // this type has extra comments
-
-// +zz:doc:label=variable
-var (
-	// this is a string value
-	ValueString = ""
-	// this is an int value
-	ValueInt = 0
-	// this is a struct value
-	ValueStruct = struct{}{}
-	// this is a pointer value
-	ValuePointer = &struct{}{}
-	// they are inline declaration value
-	ValueInlineA, ValueInlineB = "a", "b"
-	// they are inline type declaration value
-	ValueInlineC, ValueInlineD int
-)
-
-// +zz:doc:label=const
-const (
-	// this is a constant string
-	ConstantString = ""
-	// this is a constant int
-	ConstantInt1 = 1
-	// this is another constant int
-	ConstantInt2 = 2
-)
-
-// +zz:doc:label=const
-// this is a single declared constant
-const ConstantString2 = "2"
