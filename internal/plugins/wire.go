@@ -65,14 +65,14 @@ type (
 	}
 
 	wireDecl struct {
-		Entities    zcore.DeclEntities
-		Params      zcore.KeySet
-		Binds       zcore.KeySet
-		Aops        zcore.KeySet
-		Fields      zcore.KeySet
-		Injects     zcore.KeySet
-		ReferStruct bool
-		Provider    string
+		Entities zcore.DeclEntities
+		Params   zcore.KeySet
+		Binds    zcore.KeySet
+		Aops     zcore.KeySet
+		Fields   zcore.KeySet
+		Injects  zcore.KeySet
+		Value    bool
+		Provider string
 	}
 
 	wireDeclSet struct {
@@ -147,7 +147,6 @@ func (w Wire) Name() string { return wireName }
 func (w Wire) Args() ([]string, map[string]string) {
 	return nil, map[string]string{
 		"aop":    "generate aop proxy type wrapper for interface binding. bool flag option",
-		"struct": "refer type as struct type. only works for type reference declaration. bool flag option",
 		"bind":   "bind type with interface. refer to wire.Bind. example: [ bind=io.Writer ]",
 		"field":  `provide fields of struct for injects. use "*" to provide all fields for injects. refer to wire.FieldsOf. example: [ field=* ]`,
 		"param":  "specify param types for injectors function. example: [ param=context.Context ]",
@@ -174,7 +173,9 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set *wireDeclSe
 			values := strings.Split(value, ",")
 			switch key {
 			case "bind":
-				binds = values
+				if entity.Type != zcore.DeclFunc {
+					binds = values
+				}
 			case "param":
 				decl.Params.Add(values)
 			case "inject":
@@ -191,21 +192,19 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set *wireDeclSe
 				}
 			case "aop":
 				aop = true
-			case "struct":
-				if entity.Type == zcore.DeclTypeRefer {
-					decl.ReferStruct = true
-				}
 			case "set":
 				continue
 			}
 		}
 
-		// add binds
-		decl.Binds.Add(binds)
-
-		// add aop
-		if aop {
-			decl.Aops.Add(binds)
+		if len(binds) > 0 {
+			// add binds and aop
+			if decl.Binds.Add(binds); aop {
+				decl.Aops.Add(binds)
+			}
+		} else if entity.ValueSpec != nil {
+			// add as value
+			decl.Value = true
 		}
 	}
 	return
@@ -416,8 +415,9 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Impor
 		pkgPath = dstImportPath
 	}
 
-	fl, srcFile := getInterfaceFields(name, dir, pkgPath)
-	if fl == nil {
+	expr, srcFile := lookupTypSpec(name, dir, pkgPath)
+	it, ok := expr.(*ast.InterfaceType)
+	if !ok {
 		return
 	}
 
@@ -439,7 +439,7 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Impor
 		}
 	}
 
-	for _, f := range fl.List {
+	for _, f := range it.Methods.List {
 		funcName, ft, ok := zcore.AssertFuncType(f)
 		if !ok {
 			continue
@@ -452,7 +452,7 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Impor
 	return
 }
 
-func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *zcore.File) {
+func lookupTypSpec(name, dir, pkgPath string) (expr ast.Expr, srcFile *zcore.File) {
 	pkgDir, err := zcore.ExecCommand(`go list -f "{{ .Dir }} " `+pkgPath, dir)
 	if err != nil {
 		return
@@ -460,29 +460,28 @@ func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *
 
 	_, _ = zcore.WalkPackage(pkgDir, func(file *zcore.File) (err error) {
 		object := file.Lookup(name)
-		if object == nil || object.Kind != ast.Typ || object.Decl == nil {
+		if object == nil || object.Decl == nil {
 			return
 		}
 
 		spec, ok := object.Decl.(*ast.TypeSpec)
 		if !ok {
-			return
+			return filepath.SkipDir
 		}
 
 		switch typ := spec.Type.(type) {
-		case *ast.InterfaceType:
-			fl = typ.Methods
+		default:
+			expr = typ
 			srcFile = file
 		case *ast.SelectorExpr:
 			if pkgPath = file.Imports().Which(zcore.UnsafeBytes2String(file.Node(typ.X))); len(pkgPath) > 0 {
-				fl, srcFile = getInterfaceFields(typ.Sel.Name, dir, pkgPath)
+				expr, srcFile = lookupTypSpec(typ.Sel.Name, dir, pkgPath)
 			}
-			return filepath.SkipDir
 		case *ast.Ident:
-			fl, srcFile = getInterfaceFields(typ.Name, dir, pkgPath)
-			return filepath.SkipDir
+			expr, srcFile = lookupTypSpec(typ.Name, dir, pkgPath)
 		}
-		return
+
+		return filepath.SkipDir
 	})
 	return
 }
@@ -564,17 +563,19 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 
 			switch decl.Type {
 			case zcore.DeclValue:
-				if len(wd.Binds) == 0 {
+				if wd.Value {
 					zcore.Appendf(&el.Decls, `wire.Value(%s)`, name)
 				}
-
 			case zcore.DeclFunc:
 				el.Decls = append(el.Decls, name)
 
 			case zcore.DeclTypeRefer:
-				// struct refer type
-				if wd.ReferStruct && len(wd.Provider) == 0 {
-					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
+				// referenced type
+				if len(wd.Provider) == 0 {
+					expr, _ := lookupTypSpec(name, filepath.Dir(decl.File.Path), el.Path)
+					if _, ok := expr.(*ast.StructType); ok {
+						zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
+					}
 				}
 
 			case zcore.DeclTypeStruct:
