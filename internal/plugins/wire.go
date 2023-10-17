@@ -579,14 +579,11 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 				}
 
 			case zcore.DeclTypeStruct:
-				// struct type
-				if len(wd.Provider) == 0 {
-					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
-				}
-
 				// add fields of
 				if fields := strings.Join(wd.Fields.Keys(), `","`); len(fields) > 0 {
 					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(%s), "%s")`, name, fields)
+				} else if len(wd.Provider) == 0 {
+					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
 				}
 			}
 
