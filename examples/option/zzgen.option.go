@@ -4,23 +4,23 @@ package option
 
 import ()
 
-type Option func(*Config)
+type ConfigOption func(*Config)
 
 // apply functional options for *Config
-func (o *Config) applyOptions(opts ...Option) {
+func (o *Config) applyOptions(opts ...ConfigOption) {
 	for _, opt := range opts {
 		opt(o)
 	}
 }
 
 // connect host
-func WithHost(v string) Option { return func(o *Config) { o.Host = v } }
+func WithHost(v string) ConfigOption { return func(o *Config) { o.Host = v } }
 
 // connect port
-func WithPort(v string) Option { return func(o *Config) { o.Port = v } }
+func WithPort(v string) ConfigOption { return func(o *Config) { o.Port = v } }
 
 // database username
-func WithUsername(v string) Option { return func(o *Config) { o.Username = v } }
+func WithUsername(v string) ConfigOption { return func(o *Config) { o.Username = v } }
 
 // database password
-func WithPassword(v string) Option { return func(o *Config) { o.Password = v } }
+func WithPassword(v string) ConfigOption { return func(o *Config) { o.Password = v } }
