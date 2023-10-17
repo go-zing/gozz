@@ -4,30 +4,14 @@ package doc
 
 var (
 	_types_doc = map[interface{}]map[string]string{
-		(*Entity)(nil): _doc_Entity,
-		(*User)(nil):   _doc_User,
-		(*Book)(nil):   _doc_Book,
+		(*T)(nil): _doc_T,
 	}
 
-	_doc_Entity = map[string]string{
-		"":     "abstract type of entity",
-		"Id":   "get entity uuid",
-		"Name": "get entity name",
-	}
-
-	_doc_User = map[string]string{
-		"":     "entity for users",
-		"Id":   "user uuid",
-		"Name": "user name",
-	}
-
-	_doc_Book = map[string]string{
-		"":     "entity for books",
-		"Id":   "book uuid",
-		"Name": "book name",
+	_doc_T = map[string]string{
+		"":       "1\n2\n\n3\n4\n17",
+		"Field":  "6\n\t\t7\n\n8\n9\n10",
+		"Field2": "13\n14",
 	}
 )
 
-func (User) FieldDoc(f string) string { return _doc_User[f] }
-
-func (Book) FieldDoc(f string) string { return _doc_Book[f] }
+func (T) FieldDoc(f string) string { return _doc_T[f] }

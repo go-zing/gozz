@@ -19,29 +19,32 @@ package doc
 
 //go:generate gozz run -p "doc" ./
 
+/*
+1
+2
+*/
 // +zz:doc
-type (
-	// abstract type of entity
-	Entity interface {
-		// get entity uuid
-		Id() string
-		// get entity name
-		Name() string
-	}
+// 3
+// 4
+type T struct {
+	// 5
 
-	// entity for users
-	User struct {
-		// user uuid
-		Id string
-		// user name
-		Name string
-	}
+	/*
+		6
+		7
+	*/
+	// 8
+	// 9
+	Field string // 10
+	// 11
 
-	// entity for books
-	Book struct {
-		// book uuid
-		Id string
-		// book name
-		Name string
-	}
-)
+	// 12
+
+	// 13
+	Field2 string // 14
+	// 15
+
+	// 16
+} // 17
+// 18
+

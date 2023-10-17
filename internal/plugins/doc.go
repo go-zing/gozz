@@ -52,7 +52,8 @@ const (
 	docTemplate = `var ( {{ if .Types }}
 	_types_doc = map[interface{}]map[string]string{ {{ range .Types }} 
 		(*{{ .Name }})(nil) : _doc_{{ .Name }}, {{ end }}
-	}  {{ end }} {{ if .Values }}
+	}  
+	{{ end }} {{ if .Values }}
 	_values_doc = map[string]map[interface{}]string{
 		{{ range .Values }} {{ quote .Name }} : map[interface{}]string{  {{ range .Fields }} 
 			{{ .Name }} : {{ quote .Docs }}, {{ end }}

@@ -19,7 +19,7 @@ package option
 
 //go:generate gozz run -p "option" ./
 
-// +zz:option
+// +zz:option:type=Option
 type Config struct {
 	// connect host
 	Host string

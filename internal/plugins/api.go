@@ -98,7 +98,7 @@ func (s Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
 			"name": "{{ .Name }}",
 			"method": "{{ .Method }}",
 			"resource": "{{ .Resource }}",
-			"options": map[string]string{   {{ range $key,$value := .Options }}
+			"options": map[string]string{ {{ range $key,$value := .Options }}
 			{{ quote $key }} : {{ quote $value }}, {{ end }}
 			},  {{ if .Invoke }} 
 			"invoke": {{ .Invoke }}, {{ end }}

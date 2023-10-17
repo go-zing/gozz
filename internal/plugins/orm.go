@@ -106,8 +106,9 @@ func (o Orm) Args() ([]string, map[string]string) {
 			"driver":   "specify databases schema driver. default: mysql.",
 			"type":     `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
 			"table":    `specify table names to load. default: * (load all tables).use "," to split if multi. example: [ table=user,book,order ]`,
+			"network":  "network in sql default format dsn. default: tcp",
 			"user":     "user in sql default format dsn. default: root",
-			"host":     "host in sql default format dsn. default: localhost",
+			"address":  "host in sql default format dsn. default: localhost",
 			"port":     "port in sql default format dns. default: 3306",
 			"password": "password in default format sql dsn",
 			"dsn":      "specify sql dsn to load schema. other options to format dsn would be ignored if provide. default: [ ${user}:${password}@tpc(${host}:${port})/ ]",
@@ -166,9 +167,10 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zcore.OrmTable, err 
 	dsn := opt.Get("dsn", "")
 	if len(dsn) == 0 {
 		dsn = fmt.Sprintf(
-			"%s:%s@tcp(%s:%s)/",
+			"%s:%s@%s(%s:%s)/",
 			opt.Get("user", "root"),
 			opt.Get("password", ""),
+			opt.Get("network", "tcp"),
 			opt.Get("host", "localhost"),
 			opt.Get("port", "3306"),
 		)

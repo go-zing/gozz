@@ -135,18 +135,16 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 			continue
 		}
 
-		if strings.Contains(value, "{{") && strings.Contains(value, "}}") {
-			// render tag template string
-			if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
-				FieldName string
-				Docs      string
-			}{
-				FieldName: name,
-				Docs:      zcore.JoinDocs(docs),
-			}, value, str) == nil {
-				value = str.String()
-				t.FieldTags[key] = value
-			}
+		// render tag template string
+		if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
+			FieldName string
+			Docs      string
+		}{
+			FieldName: name,
+			Docs:      zcore.JoinDocs(docs),
+		}, value, str) == nil {
+			value = str.String()
+			t.FieldTags[key] = value
 		}
 
 		if len(value) > 0 {

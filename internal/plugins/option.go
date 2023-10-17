@@ -18,9 +18,11 @@
 package plugins
 
 import (
+	"fmt"
 	"go/ast"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	zcore "github.com/go-zing/gozz-core"
 )
@@ -36,8 +38,9 @@ type (
 	}
 
 	optionType struct {
-		Name   string
-		Fields []optionField
+		Typename string
+		Name     string
+		Fields   []optionField
 	}
 
 	optionField struct {
@@ -48,9 +51,19 @@ type (
 	}
 )
 
+func (ot optionType) Type() string {
+	if len(ot.Typename) > 0 {
+		return ot.Typename
+	} else {
+		return fmt.Sprintf(`func(*%s)`, ot.Name)
+	}
+}
+
 func (o Option) Name() string { return "option" }
 
-func (o Option) Args() ([]string, map[string]string) { return nil, nil }
+func (o Option) Args() ([]string, map[string]string) {
+	return nil, map[string]string{"type": "define a function type to replace func(*{{ .Name }})"}
+}
 
 func (o Option) Description() string {
 	return "generate functional options from option struct."
@@ -61,13 +74,15 @@ const optionTemplate = `import  (
 	{{ end }}
 )
 
-{{ range .Types }} {{ $n  := .Name }}
+{{ range .Types }} {{ $n  := .Name }} {{ $t := .Type }} {{ if .Typename }} 
+type {{ .Typename }} func(*{{ .Name }})
+{{ end }}
 // apply functional options for *{{ $n }}
-func (o *{{ $n }}) applyOptions(opts ...func(*{{ $n }})){ for _,opt :=range opts{	opt(o) } }
+func (o *{{ $n }}) applyOptions(opts ...{{ $t }}){ for _,opt :=range opts{	opt(o) } }
 
 {{ range .Fields }} {{ if .Doc }}
 {{ comment .Doc }} {{ end }}
-func {{ .Func }}(v {{ .Type }}) func(*{{ $n }}) { return func(o *{{ $n }}){ o.{{ .Name }} = v	} }
+func {{ .Func }}(v {{ .Type }}) {{ $t }} { return func(o *{{ $n }}){ o.{{ .Name }} = v	} }
 {{ end }} {{ end }}
 `
 
@@ -107,6 +122,14 @@ func (o Option) run(dir string, entities zcore.DeclEntities) (err error) {
 
 	for _, decl := range decls {
 		option := optionType{Name: decl.Name()}
+		for _, index := range group[decl] {
+			entity := entities[index]
+			if typename := entities[index].Options.Get("type", ""); len(typename) > 0 {
+				if str := (&strings.Builder{}); zcore.ExecuteTemplate(entity, typename, str) == nil {
+					option.Typename = str.String()
+				}
+			}
+		}
 
 		for _, field := range decl.TypeSpec.Type.(*ast.StructType).Fields.List {
 			docs, _ := zcore.ParseCommentGroup(zcore.AnnotationPrefix, field.Doc, field.Comment)
@@ -136,5 +159,5 @@ func (o Option) run(dir string, entities zcore.DeclEntities) (err error) {
 		return
 	}
 
-	return zcore.RenderWrite(Option{Types: types, Imports: imports.List()}, optionTemplate, filename, pkg, false)
+	return zcore.RenderWithDefaultTemplate(Option{Types: types, Imports: imports.List()}, optionTemplate, filename, pkg, false)
 }
