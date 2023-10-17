@@ -75,16 +75,20 @@ type (
 		Provider    string
 	}
 
-	wireDeclSet map[*zcore.AnnotatedDecl]*wireDecl
+	wireDeclSet struct {
+		m    map[*zcore.AnnotatedDecl]*wireDecl
+		keys []*zcore.AnnotatedDecl
+	}
 )
 
 const (
-	wireName       = "wire"
-	wireInjectFile = "wire_zinject.go"
-	wireSetFile    = "wire_zset.go"
-	wireAopFile    = "wire_zzaop.go"
-	wireImportPath = "github.com/google/wire"
-	wireBuildFlag  = "//go:build wireinject\n// +build wireinject"
+	wireName               = "wire"
+	wireInjectFile         = "wire_zinject.go"
+	wireSetFile            = "wire_zset.go"
+	wireAopFile            = "wire_zzaop.go"
+	wireImportPath         = "github.com/google/wire"
+	wireBuildFlag          = "//go:build wireinject\n// +build wireinject"
+	wireStructBindTemplate = "wire.Bind(new(%s), new(*%s))"
 
 	wireImportTemplate = `import  (
 	{{ range .Imports }} {{ .Name }} "{{ .Path }}"
@@ -156,8 +160,8 @@ func (w Wire) Description() string {
 	return "collect and generate wire sets / injectors / aop proxy stubs files."
 }
 
-func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet) {
-	set = make(wireDeclSet)
+func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set *wireDeclSet) {
+	set = new(wireDeclSet)
 
 	for _, entity := range entities {
 		var (
@@ -197,9 +201,7 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet
 		}
 
 		// add binds
-		if entity.TypeSpec != nil {
-			decl.Binds.Add(binds)
-		}
+		decl.Binds.Add(binds)
 
 		// add aop
 		if aop {
@@ -209,8 +211,8 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set wireDeclSet
 	return
 }
 
-func (set wireDeclSet) init(entity zcore.DeclEntity) *wireDecl {
-	decl, ok := set[entity.AnnotatedDecl]
+func (set *wireDeclSet) init(entity zcore.DeclEntity) *wireDecl {
+	decl, ok := set.m[entity.AnnotatedDecl]
 	if !ok {
 		decl = &wireDecl{
 			Params:  make(zcore.KeySet),
@@ -219,7 +221,11 @@ func (set wireDeclSet) init(entity zcore.DeclEntity) *wireDecl {
 			Injects: make(zcore.KeySet),
 			Aops:    make(zcore.KeySet),
 		}
-		set[entity.AnnotatedDecl] = decl
+		if set.m == nil {
+			set.m = make(map[*zcore.AnnotatedDecl]*wireDecl)
+		}
+		set.m[entity.AnnotatedDecl] = decl
+		set.keys = append(set.keys, entity.AnnotatedDecl)
 
 		if entity.TypeSpec != nil {
 			typename := entity.Name()
@@ -247,12 +253,12 @@ func (set wireDeclSet) init(entity zcore.DeclEntity) *wireDecl {
 
 func (w Wire) Run(es zcore.DeclEntities) (err error) {
 	injectFiles := make(map[string]map[string]zcore.AnnotatedDecls)
-	setFiles := make(map[string]map[string]wireDeclSet)
+	setFiles := make(map[string]map[string]*wireDeclSet)
 
 	// parse sets entities
 	for set, decls := range w.parseEntities(es) {
-		for obj, decl := range decls {
-			for _, inject := range decl.Injects.Keys() {
+		for _, obj := range decls.keys {
+			for _, inject := range decls.m[obj].Injects.Keys() {
 				// group by inject file
 				inject = obj.RelFilename(inject, wireInjectFile)
 				if injectFiles[inject] == nil {
@@ -263,7 +269,7 @@ func (w Wire) Run(es zcore.DeclEntities) (err error) {
 				// group by inject set directory
 				setFile := filepath.Dir(inject)
 				if setFiles[setFile] == nil {
-					setFiles[setFile] = make(map[string]wireDeclSet)
+					setFiles[setFile] = make(map[string]*wireDeclSet)
 				}
 				setFiles[setFile][set] = decls
 			}
@@ -297,7 +303,7 @@ func (w Wire) Run(es zcore.DeclEntities) (err error) {
 	return
 }
 
-func (w Wire) generateInjects(setFiles map[string]map[string]wireDeclSet, injectFiles map[string]map[string]zcore.AnnotatedDecls) (err error) {
+func (w Wire) generateInjects(setFiles map[string]map[string]*wireDeclSet, injectFiles map[string]map[string]zcore.AnnotatedDecls) (err error) {
 	eg := new(zcore.ErrGroup)
 	for key := range injectFiles {
 		filename := key
@@ -308,7 +314,7 @@ func (w Wire) generateInjects(setFiles map[string]map[string]wireDeclSet, inject
 	return eg.Wait()
 }
 
-func (w Wire) generateInject(dirSetFiles map[string]wireDeclSet, filename string, injects map[string]zcore.AnnotatedDecls) (err error) {
+func (w Wire) generateInject(dirSetFiles map[string]*wireDeclSet, filename string, injects map[string]zcore.AnnotatedDecls) (err error) {
 	type WireInject struct {
 		Set      string
 		Path     string
@@ -335,7 +341,7 @@ func (w Wire) generateInject(dirSetFiles map[string]wireDeclSet, filename string
 				return zcore.FixPackage(name, srcImportPath, dstImportPath, srcImports, dstImports)
 			}
 
-			wd, ok := dirSetFiles[set][decl]
+			wd, ok := dirSetFiles[set].m[decl]
 			if !ok {
 				continue
 			}
@@ -390,7 +396,7 @@ func (w Wire) generateInject(dirSetFiles map[string]wireDeclSet, filename string
 	}, wireInjectTemplate, filename, dstImportName, false, wireBuildFlag)
 }
 
-func (w Wire) generateSets(setFiles map[string]map[string]wireDeclSet) (err error) {
+func (w Wire) generateSets(setFiles map[string]map[string]*wireDeclSet) (err error) {
 	eg := new(zcore.ErrGroup)
 	for key := range setFiles {
 		dir := key
@@ -481,7 +487,7 @@ func getInterfaceFields(name, dir, pkgPath string) (fl *ast.FieldList, srcFile *
 	return
 }
 
-func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
+func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) {
 	var (
 		wireSets      = make([]WireSet, 0, len(sets))
 		dstImports    = zcore.Imports{"github.com/google/wire": "wire"}
@@ -494,8 +500,13 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	for set, decls := range sets {
 		ws := WireSet{Name: set}
 
-		for decl, wd := range decls {
+		for _, decl := range decls.keys {
+			wd := decls.m[decl]
 			el := WireSetElement{Path: zcore.GetImportPath(decl.File.Path), Name: decl.Name()}
+			if len(el.Name) == 0 {
+				continue
+			}
+
 			srcImports := decl.File.Imports()
 			// fix name import package selector
 			fp := func(name string) string {
@@ -507,14 +518,23 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 				el.Decls = append(el.Decls, fp(wd.Provider))
 			}
 
+			name := fp(el.Name)
+
 			// add binds with aop
 			for _, bind := range wd.Binds.Keys() {
 				bindType := fp(bind)
-				implType := fp(el.Name)
+				bindTemplate := wireStructBindTemplate
+
+				switch decl.Type {
+				case zcore.DeclTypeInterface:
+					bindTemplate = `wire.Bind(new(%s), new(%s))`
+				case zcore.DeclValue:
+					bindTemplate = `wire.InterfaceValue(new(%s), %s)`
+				}
 
 				if _, aop := wd.Aops[bind]; !aop {
 					// direct interface type binding
-					zcore.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, bindType, implType)
+					zcore.Appendf(&el.Decls, bindTemplate, bindType, name)
 					continue
 				}
 
@@ -537,30 +557,35 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 				}
 
 				// aop type bindings
-				zcore.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, aopTypename, implType)
+				zcore.Appendf(&el.Decls, bindTemplate, aopTypename, name)
 				zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, aopType.Implement)
-				zcore.Appendf(&el.Decls, `wire.Bind(new(%s), new(*%s))`, bindType, aopType.Implement)
+				zcore.Appendf(&el.Decls, wireStructBindTemplate, bindType, aopType.Implement)
 			}
 
 			switch decl.Type {
+			case zcore.DeclValue:
+				if len(wd.Binds) == 0 {
+					zcore.Appendf(&el.Decls, `wire.Value(%s)`, name)
+				}
+
 			case zcore.DeclFunc:
-				el.Decls = append(el.Decls, fp(el.Name))
+				el.Decls = append(el.Decls, name)
 
 			case zcore.DeclTypeRefer:
 				// struct refer type
 				if wd.ReferStruct && len(wd.Provider) == 0 {
-					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
+					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
 				}
 
 			case zcore.DeclTypeStruct:
 				// struct type
 				if len(wd.Provider) == 0 {
-					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, fp(el.Name))
+					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
 				}
 
 				// add fields of
 				if fields := strings.Join(wd.Fields.Keys(), `","`); len(fields) > 0 {
-					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(%s), "%s")`, fp(el.Name), fields)
+					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(%s), "%s")`, name, fields)
 				}
 			}
 
@@ -570,10 +595,6 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 		}
 
 		if len(ws.Elements) > 0 {
-			// sort by declaration package path and name
-			sort.Slice(ws.Elements, func(i, j int) bool {
-				return ws.Elements[i].Path+"."+ws.Elements[i].Name < ws.Elements[j].Path+"."+ws.Elements[j].Name
-			})
 			wireSets = append(wireSets, ws)
 		}
 	}
@@ -588,6 +609,8 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	// sort by sets name
 	sort.Slice(wireSets, func(i, j int) bool { return wireSets[i].Name < wireSets[j].Name })
 
+	_ = os.Remove(filepath.Join(dir, wireAopFile))
+
 	// render wire sets
 	if err = zcore.RenderWrite(Wire{
 		Imports: dstImports.List(),
@@ -597,17 +620,10 @@ func (w Wire) generateSet(dir string, sets map[string]wireDeclSet) (err error) {
 	}
 
 	// write aop file
-	if len(aopSets) > 0 {
-		if err = w.generateAops(dir, pkg, aopSets, aopImports); err != nil {
-			return
-		}
-	}
-	return
+	return w.generateAops(dir, pkg, aopSets, aopImports)
 }
 
 func (w Wire) generateAops(dir, pkg string, sets map[string]*WireAop, aopImports zcore.Imports) (err error) {
-	aopFilename := filepath.Join(dir, wireAopFile)
-	_ = os.Remove(aopFilename)
 	if len(sets) == 0 {
 		return
 	}
@@ -624,10 +640,10 @@ func (w Wire) generateAops(dir, pkg string, sets map[string]*WireAop, aopImports
 	return zcore.RenderWithDefaultTemplate(Wire{
 		Imports: aopImports.List(),
 		Aops:    wireAops,
-	}, wireAopTemplate, aopFilename, pkg, false)
+	}, wireAopTemplate, filepath.Join(dir, wireAopFile), pkg, false)
 }
 
-func (w Wire) parseEntities(entities zcore.DeclEntities) map[string]wireDeclSet {
+func (w Wire) parseEntities(entities zcore.DeclEntities) map[string]*wireDeclSet {
 	// parse entities set
 	includes := make(map[string]map[int]struct{})
 	excludes := make(map[int]map[string]struct{})
@@ -670,7 +686,7 @@ func (w Wire) parseEntities(entities zcore.DeclEntities) map[string]wireDeclSet 
 	}
 
 	// parse grouped entities to wire declaration set
-	decls := make(map[string]wireDeclSet, len(groups))
+	decls := make(map[string]*wireDeclSet, len(groups))
 	for set, es := range groups {
 		decls[set] = w.parseEntitiesDeclSet(es)
 	}
