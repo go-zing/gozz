@@ -180,7 +180,16 @@ func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEnt
 				Name:     funcName,
 				Method:   field.Args[0],
 				Resource: field.Args[1],
-				Options:  field.Options,
+				Options:  make(map[string]string),
+			}
+
+			for k, v := range field.Options {
+				if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct{ Name, FieldName string }{
+					FieldName: funcName,
+					Name:      api.Type,
+				}, v, str) == nil {
+					handler.Options[k] = str.String()
+				}
 			}
 
 			// try parse method invoke function

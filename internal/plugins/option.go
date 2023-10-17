@@ -75,10 +75,10 @@ const optionTemplate = `import  (
 )
 
 {{ range .Types }} {{ $n  := .Name }} {{ $t := .Type }} {{ if .Typename }} 
-// functional options type for *{{ $n }}
+// functional options type for {{ $n }}
 type {{ .Typename }} func(*{{ $n }})
 {{ end }}
-// apply functional options for *{{ $n }}
+// apply functional options for {{ $n }}
 func (o *{{ $n }}) applyOptions(opts ...{{ $t }}){ for _,opt :=range opts{	opt(o) } }
 
 {{ range .Fields }} {{ if .Doc }}
