@@ -415,7 +415,7 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Impor
 		pkgPath = dstImportPath
 	}
 
-	expr, srcFile := lookupTypSpec(name, dir, pkgPath)
+	expr, srcFile := zcore.LookupTypSpec(name, dir, pkgPath)
 	it, ok := expr.(*ast.InterfaceType)
 	if !ok {
 		return
@@ -449,40 +449,6 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Impor
 		appendField(ft.Results, &m.Results)
 		methods = append(methods, m)
 	}
-	return
-}
-
-func lookupTypSpec(name, dir, pkgPath string) (expr ast.Expr, srcFile *zcore.File) {
-	pkgDir, err := zcore.ExecCommand(`go list -f "{{ .Dir }} " `+pkgPath, dir)
-	if err != nil {
-		return
-	}
-
-	_, _ = zcore.WalkPackage(pkgDir, func(file *zcore.File) (err error) {
-		object := file.Lookup(name)
-		if object == nil || object.Decl == nil {
-			return
-		}
-
-		spec, ok := object.Decl.(*ast.TypeSpec)
-		if !ok {
-			return filepath.SkipDir
-		}
-
-		switch typ := spec.Type.(type) {
-		default:
-			expr = typ
-			srcFile = file
-		case *ast.SelectorExpr:
-			if pkgPath = file.Imports().Which(zcore.UnsafeBytes2String(file.Node(typ.X))); len(pkgPath) > 0 {
-				expr, srcFile = lookupTypSpec(typ.Sel.Name, dir, pkgPath)
-			}
-		case *ast.Ident:
-			expr, srcFile = lookupTypSpec(typ.Name, dir, pkgPath)
-		}
-
-		return filepath.SkipDir
-	})
 	return
 }
 
@@ -572,7 +538,7 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 			case zcore.DeclTypeRefer:
 				// referenced type
 				if len(wd.Provider) == 0 {
-					expr, _ := lookupTypSpec(name, filepath.Dir(decl.File.Path), el.Path)
+					expr, _ := zcore.LookupTypSpec(el.Name, filepath.Dir(decl.File.Path), el.Path)
 					if _, ok := expr.(*ast.StructType); ok {
 						zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
 					}
