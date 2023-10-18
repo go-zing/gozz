@@ -19,7 +19,6 @@ package plugins
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	zcore "github.com/go-zing/gozz-core"
@@ -106,12 +105,8 @@ func (o Orm) Args() ([]string, map[string]string) {
 			"driver":   "specify databases schema driver. default: mysql.",
 			"type":     `specify database schema datatype binding to golang typing. example: varchar=string. add "*" prefix for nullable type. example: [ *timestamp=*time.Time ]`,
 			"table":    `specify table names to load. default: * (load all tables).use "," to split if multi. example: [ table=user,book,order ]`,
-			"network":  "network in sql default format dsn. default: tcp",
-			"user":     "user in sql default format dsn. default: root",
-			"address":  "host in sql default format dsn. default: localhost",
-			"port":     "port in sql default format dns. default: 3306",
-			"password": "password in default format sql dsn",
-			"dsn":      "specify sql dsn to load schema. other options to format dsn would be ignored if provide. default: [ ${user}:${password}@tpc(${host}:${port})/ ]",
+			"dsn":      "specify sql dsn to load driver schema.",
+			"password": "specify password for default dsn from driver provided.",
 		}
 }
 
@@ -159,25 +154,41 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zcore.OrmTable, err 
 	// commands or annotations defined types
 	// extract types from options
 	extTypes := make(map[string]string)
-	zcore.SplitKVSlice2Map(strings.Split(entity.Options["type"], ","), "=", extTypes)
+
+	if typeStr := entity.Options.Get("type", ""); len(typeStr) > 0 {
+		zcore.SplitKVSlice2Map(strings.Split(typeStr, ","), "=", extTypes)
+	}
+
 	for key, value := range extTypes {
 		types[key] = value
 	}
 
 	dsn := opt.Get("dsn", "")
+
 	if len(dsn) == 0 {
-		dsn = fmt.Sprintf(
-			"%s:%s@%s(%s:%s)/",
-			opt.Get("user", "root"),
-			opt.Get("password", ""),
-			opt.Get("network", "tcp"),
-			opt.Get("host", "localhost"),
-			opt.Get("port", "3306"),
-		)
+		if dsn = driver.Dsn(opt.Get("password", "")); len(dsn) == 0 {
+			err = errors.New("invalid schema driver dsn")
+			return
+		}
 	}
 
+	schemas := entity.Args[0]
+	if str := (&strings.Builder{}); zcore.ExecuteTemplate(entity, schemas, str) == nil {
+		schemas = str.String()
+	}
+
+	var tmp []zcore.OrmTable
 	// parse dsn and get tables
-	return driver.Parse(dsn, entity.Args[0], opt.Get("table", "*"), types)
+	for _, schema := range strings.Split(schemas, ",") {
+		if schema = strings.TrimSpace(schema); len(schema) == 0 {
+			continue
+		}
+		if tmp, err = driver.Parse(dsn, schema, opt.Get("table", "*"), types); err != nil {
+			return
+		}
+		tables = append(tables, tmp...)
+	}
+	return
 }
 
 func (o Orm) group(entities zcore.DeclEntities) (map[string][]zcore.OrmTable, error) {

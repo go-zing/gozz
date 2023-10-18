@@ -43,6 +43,10 @@ type (
 	SliceMysqlColumn []MysqlColumn
 )
 
+func (m Mysql) Dsn(password string) (dsn string) {
+	return fmt.Sprintf("root:%s@tcp(localhost:3306)/", password)
+}
+
 func (s *SliceMysqlColumn) Range(f func(interface{}, bool) bool) {
 	for i := 0; ; i++ {
 		if c := i >= len(*s); !c {

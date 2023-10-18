@@ -71,7 +71,8 @@ func Run(args []string) (err error) {
 		// split plugin name and options string
 		// options would add to each comments annotation options
 		// Example: name:option1=value1:option2=value2
-		commands := strings.Split(plugin, ":")
+
+		commands := strings.Split(zcore.EscapeAnnotation(plugin), ":")
 		name := commands[0]
 
 		// get registry plugin entity
@@ -86,8 +87,14 @@ func Run(args []string) (err error) {
 			Options: make(map[string]string, len(commands)-1),
 		})
 
+		option := entities[i].Options
+
 		// parse entity options
-		zcore.SplitKVSlice2Map(commands[1:], "=", entities[i].Options)
+		zcore.SplitKVSlice2Map(commands[1:], "=", option)
+
+		for k, v := range option {
+			option[k] = zcore.UnescapeAnnotation(v)
+		}
 	}
 
 	return entities.Run(filename)

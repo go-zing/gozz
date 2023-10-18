@@ -135,8 +135,8 @@ func (a Api) Run(entities zcore.DeclEntities) (err error) {
 	return eg.Wait()
 }
 
-func (a Api) group(entities zcore.DeclEntities) (group map[string]map[*ast.TypeSpec]zcore.FieldEntities, err error) {
-	group = make(map[string]map[*ast.TypeSpec]zcore.FieldEntities)
+func (a Api) group(entities zcore.DeclEntities) (group map[string]map[*zcore.AnnotatedDecl]zcore.FieldEntities, err error) {
+	group = make(map[string]map[*zcore.AnnotatedDecl]zcore.FieldEntities)
 
 	for _, entity := range entities {
 		if entity.Type != zcore.DeclTypeInterface {
@@ -146,15 +146,15 @@ func (a Api) group(entities zcore.DeclEntities) (group map[string]map[*ast.TypeS
 		filename := entity.RelFilename(entity.Args[0], apiDefaultFilename)
 
 		if group[filename] == nil {
-			group[filename] = make(map[*ast.TypeSpec]zcore.FieldEntities)
+			group[filename] = make(map[*zcore.AnnotatedDecl]zcore.FieldEntities)
 		}
 
-		group[filename][entity.TypeSpec] = append(group[filename][entity.TypeSpec], entity.ParseFields(2, entity.Options)...)
+		group[filename][entity.AnnotatedDecl] = append(group[filename][entity.AnnotatedDecl], entity.ParseFields(2, entity.Options)...)
 	}
 	return
 }
 
-func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEntities) (err error) {
+func (Api) generateApi(filename string, typeMap map[*zcore.AnnotatedDecl]zcore.FieldEntities) (err error) {
 	var (
 		imports       = zcore.Imports{"context": "context"}
 		dstImportPath = zcore.GetImportPath(filename)
@@ -162,7 +162,7 @@ func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEnt
 	)
 
 	for typ, fields := range typeMap {
-		api := ApiInterface{Type: typ.Name.Name}
+		api := ApiInterface{Type: typ.Name()}
 
 		for i, field := range fields {
 			if i == 0 {
@@ -184,9 +184,12 @@ func (Api) generateApi(filename string, typeMap map[*ast.TypeSpec]zcore.FieldEnt
 			}
 
 			for k, v := range field.Options {
-				if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct{ Name, FieldName string }{
+				if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
+					Name, FieldName, Package string
+				}{
 					FieldName: funcName,
 					Name:      api.Type,
+					Package:   typ.Package(),
 				}, v, str) == nil {
 					handler.Options[k] = str.String()
 				}

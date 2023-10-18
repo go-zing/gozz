@@ -139,7 +139,11 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 		if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
 			FieldName string
 			Docs      string
+			Name      string
+			Package   string
 		}{
+			Package:   t.Decl.Package(),
+			Name:      t.Decl.Name(),
 			FieldName: name,
 			Docs:      zcore.JoinDocs(docs),
 		}, value, str) == nil {
