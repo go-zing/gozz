@@ -8,8 +8,6 @@
 
 [English](https://go-zing.github.io/gozz) | [简体中文](https://go-zing.github.io/gozz/zh)
 
-
-
 ## Showcase
 
 - [Gozz-Core](https://github.com/go-zing/gozz-core)
