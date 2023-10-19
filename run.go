@@ -37,7 +37,7 @@ var (
 		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := Run(args); err != nil {
-				_, _ = fmt.Fprint(os.Stderr, err.Error()+"\n")
+				_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 				os.Exit(2)
 			}
 		},
@@ -52,6 +52,10 @@ func init() {
 }
 
 func Run(args []string) (err error) {
+	if err = loadPlugins(); err != nil {
+		return
+	}
+
 	//  get analysis path absolute
 	filename, err := filepath.Abs(args[0])
 	if err != nil {

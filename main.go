@@ -20,7 +20,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 
 	"github.com/spf13/cobra"
@@ -33,31 +32,10 @@ import (
 var (
 	extensions []string
 
-	pluginDir = func() string {
-		if dir := os.Getenv("GOZZ_PLUGINS_DIR"); len(dir) > 0 {
-			return dir
-		} else if homeDir, _ := os.UserHomeDir(); len(homeDir) > 0 {
-			return filepath.Join(homeDir, ".gozz", "extensions")
-		}
-		return ""
-	}()
+	pluginDir = getPluginDir()
 
 	cmd = cobra.Command{
 		Use: zcore.ExecName,
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
-			for _, name := range extensions {
-				if _, err = zcore.LoadExtension(name); err != nil {
-					return
-				}
-			}
-			if len(pluginDir) > 0 {
-				_ = zcore.WalkDir(pluginDir, func(name string) error {
-					_, _ = zcore.LoadExtension(name)
-					return nil
-				})
-			}
-			return
-		},
 	}
 
 	version = &cobra.Command{

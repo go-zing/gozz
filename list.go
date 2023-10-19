@@ -19,6 +19,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -31,6 +32,11 @@ var list = &cobra.Command{
 	Use:   "list",
 	Short: "list all registered plugins",
 	Run: func(cmd *cobra.Command, args []string) {
+		if err := loadPlugins(); err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(2)
+		}
+
 		registry := zcore.PluginRegistry()
 		names := make([]string, 0)
 		for name := range registry {

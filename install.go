@@ -24,8 +24,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
-	"runtime/debug"
-	"strconv"
 	"strings"
 	"time"
 
@@ -45,7 +43,7 @@ var (
 		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := Install(args[0]); err != nil {
-				_, _ = fmt.Fprint(os.Stderr, err.Error()+"\n")
+				_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 				os.Exit(2)
 			}
 		},
@@ -101,36 +99,6 @@ func doInstallRemote(repository string) (err error) {
 		return
 	}
 	return doInstall(dir)
-}
-
-func getGoenv(dir string) (env map[string]string, err error) {
-	goenv, err := zcore.ExecCommand("go env", dir)
-	if err != nil {
-		return
-	}
-	env = make(map[string]string)
-	for _, line := range strings.Split(goenv, "\n") {
-		if line = strings.TrimSpace(line); len(line) == 0 {
-			continue
-		}
-		if kv := strings.SplitN(line, "=", 2); len(kv) >= 2 {
-			env[kv[0]], _ = strconv.Unquote(kv[1])
-		}
-	}
-	return
-}
-
-func getCoreVersion() string {
-	bi, ok := debug.ReadBuildInfo()
-	if !ok {
-		return ""
-	}
-	for _, m := range bi.Deps {
-		if m.Path == coreDepPath {
-			return m.Version
-		}
-	}
-	return ""
 }
 
 func doInstall(dir string) (err error) {
