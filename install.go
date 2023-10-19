@@ -64,8 +64,12 @@ func init() {
 }
 
 func Install(repository string) (err error) {
-	f, e := os.Stat(repository)
-	if e == nil {
+	if strings.Contains(repository, "://") {
+		return doInstallRemote(repository)
+	}
+
+	// local path
+	if f, e := os.Stat(repository); e == nil {
 		if repository, err = filepath.Abs(repository); err != nil {
 			return
 		}
@@ -80,6 +84,10 @@ func Install(repository string) (err error) {
 		return doInstall(repository)
 	}
 
+	return doInstallRemote(repository)
+}
+
+func doInstallRemote(repository string) (err error) {
 	t := time.Now().Format("060102150405")
 	dir := filepath.Join(installBuildDir, t)
 	_ = os.MkdirAll(installBuildDir, 0o775)
@@ -137,12 +145,11 @@ func doInstall(dir string) (err error) {
 	if len(installFilepath) == 0 {
 		args = append(args, "./")
 	} else {
+		// computed relative directory
 		installFilepath, err = filepath.Abs(filepath.Join(dir, installFilepath))
 		if err != nil {
 			return
-		}
-
-		if info, e := os.Stat(installFilepath); e != nil {
+		} else if info, e := os.Stat(installFilepath); e != nil {
 			return e
 		} else if info.IsDir() {
 			dir = installFilepath
@@ -153,16 +160,19 @@ func doInstall(dir string) (err error) {
 		}
 	}
 
+	// get env
 	goenv, err := getGoenv(dir)
 	if err != nil {
 		return
 	}
 
+	// validate runtime
 	runtimeVersion := runtime.Version()
 	if v := goenv["GOVERSION"]; runtimeVersion != v {
 		return fmt.Errorf("gozz runtime GOVERSION %s mismatch: %s", runtimeVersion, v)
 	}
 
+	// replace core mod version
 	if cv := getCoreVersion(); len(cv) > 0 {
 		if _, err = zcore.ExecCommand(
 			fmt.Sprintf("go mod edit -replace=%s=%s@%s && go mod tidy", coreDepPath, coreDepPath, cv),
