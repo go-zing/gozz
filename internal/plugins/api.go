@@ -34,7 +34,8 @@ const (
 	apiDefaultFilename = "zzgen.api.go"
 
 	paramDecode        = "var in {{ .Param }};if err:=dec(&in);err!=nil{return nil,err};"
-	invokeBaseTemplate = `func(ctx context.Context, dec func(interface{}) error) (interface{},error) {%s%s t.{{ .Name }}(%s)%s}`
+	invokeBaseTemplate = `func(ctx context.Context, dec func(interface{}) error) (interface{},error) {
+%s%s t.{{ .Name }}(%s)%s}`
 )
 
 func init() {
