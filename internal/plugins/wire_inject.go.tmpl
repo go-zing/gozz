@@ -1,0 +1,10 @@
+import (
+    {{ range .Imports }}{{ .Name }} "{{ .Path }}"
+    {{ end }}
+)
+
+{{ range .Injects }} // {{ .Path }}.{{ .Name }}
+func {{ .Function }}({{ .Params }}) ({{ .Object }},func(),error) {
+	panic(wire.Build(_{{.Set}}Set))
+}
+{{end}}

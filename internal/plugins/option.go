@@ -18,6 +18,7 @@
 package plugins
 
 import (
+	_ "embed"
 	"fmt"
 	"go/ast"
 	"path/filepath"
@@ -26,6 +27,9 @@ import (
 
 	zcore "github.com/go-zing/gozz-core"
 )
+
+//go:embed option.go.tmpl
+var optionTemplate string
 
 func init() {
 	zcore.RegisterPlugin(Option{})
@@ -68,24 +72,6 @@ func (o Option) Args() ([]string, map[string]string) {
 func (o Option) Description() string {
 	return "generate functional options from option struct."
 }
-
-const optionTemplate = `import  (
-	{{ range .Imports }} {{ .Name }} "{{ .Path }}"
-	{{ end }}
-)
-
-{{ range .Types }} {{ $n  := .Name }} {{ $t := .Type }} {{ if .Typename }} 
-// functional options type for {{ $n }}
-type {{ .Typename }} func(*{{ $n }})
-{{ end }}
-// apply functional options for {{ $n }}
-func (o *{{ $n }}) applyOptions(opts ...{{ $t }}){ for _,opt :=range opts{	opt(o) } }
-
-{{ range .Fields }} {{ if .Doc }}
-{{ comment .Doc }} {{ end }}
-func {{ .Func }}(v {{ .Type }}) {{ $t }} { return func(o *{{ $n }}){ o.{{ .Name }} = v	} }
-{{ end }} {{ end }}
-`
 
 func (o Option) Run(es zcore.DeclEntities) (err error) {
 	for dir, entities := range es.GroupByDir() {

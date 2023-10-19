@@ -1,0 +1,16 @@
+import  (
+	{{ range .Imports }} {{ .Name }} "{{ .Path }}"
+	{{ end }}
+)
+
+{{ range .Types }} {{ $n  := .Name }} {{ $t := .Type }} {{ if .Typename }}
+// functional options type for {{ $n }}
+type {{ .Typename }} func(*{{ $n }})
+{{ end }}
+// apply functional options for {{ $n }}
+func (o *{{ $n }}) applyOptions(opts ...{{ $t }}){ for _,opt :=range opts{	opt(o) } }
+
+{{ range .Fields }} {{ if .Doc }}
+{{ comment .Doc }} {{ end }}
+func {{ .Func }}(v {{ .Type }}) {{ $t }} { return func(o *{{ $n }}){ o.{{ .Name }} = v	} }
+{{ end }} {{ end }}

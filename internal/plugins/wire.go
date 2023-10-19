@@ -18,6 +18,7 @@
 package plugins
 
 import (
+	_ "embed"
 	"fmt"
 	"go/ast"
 	"os"
@@ -81,6 +82,15 @@ type (
 	}
 )
 
+//go:embed wire_set.go.tmpl
+var wireSetTemplate string
+
+//go:embed wire_inject.go.tmpl
+var wireInjectTemplate string
+
+//go:embed wire_aop.go.tmpl
+var wireAopTemplate string
+
 const (
 	wireName               = "wire"
 	wireInjectFile         = "wire_zinject.go"
@@ -89,57 +99,6 @@ const (
 	wireImportPath         = "github.com/google/wire"
 	wireBuildFlag          = "//go:build wireinject\n// +build wireinject"
 	wireStructBindTemplate = "wire.Bind(new(%s), new(*%s))"
-
-	wireImportTemplate = `import  (
-	{{ range .Imports }} {{ .Name }} "{{ .Path }}"
-	{{ end }}
-)`
-
-	wireSetTemplate = wireImportTemplate + `
-var (
-	{{ range .Sets }} _{{ .Name }}Set = wire.NewSet(
-		{{ range .Elements }} // {{ .Path }}.{{ .Name }}
-		{{ range $decl := .Decls }} {{ $decl }}, 
-		{{ end }}
-		{{ end }}
-	)
-
-	{{end}}
-)`
-
-	wireInjectTemplate = wireImportTemplate + `
-{{ range .Injects }} // {{ .Path }}.{{ .Name }}
-func {{ .Function }}({{ .Params }}) ({{ .Object }},func(),error) {
-	panic(wire.Build(_{{.Set}}Set))
-}
-{{end}}`
-
-	wireAopTemplate = wireImportTemplate + `
-
-type _aop_interceptor interface{ Intercept(v interface{},name string,params,results []interface{}) (func(),bool) }
-
-{{ range .Aops }} {{ $n := .Name }} // {{ .Interface }} 
-type (
-	{{ $n }} {{ .Interface }}
-	_impl{{ $n }} struct{ {{ $n }} }
-)
-
-{{ range .Methods }} {{ $p := .Params }} {{ $r := .Results }}
-func(i _impl{{ $n }}){{ .Name }}({{ range $i,$v := $p }}p{{ $i }} {{ $v }},{{ end }})({{ range $i,$v := $r }}r{{ $i }} {{ $v }},{{ end }}){
-	if t,x:= i.{{ $n }}.(_aop_interceptor);x{
-		if up,ok:=t.Intercept( i.{{ $n }},{{ quote .Name }},
-		{{ if $p }}[]interface{}{ {{ range $i,$v := $p }}&p{{ $i }},{{ end }} }{{ else }}nil{{ end }},
-		{{ if $r }}[]interface{}{ {{ range $i,$v := $r }}&r{{ $i }},{{ end }} }{{ else }}nil{{ end }},
-		);up!=nil{
-			defer up()
-		}else if !ok{
-			return
-		}
-	}
-	{{ if $r }}return{{ end }} i.{{ $n }}.{{ .Name }}({{ range $i,$v := $p }}p{{ $i }},{{ end }}) 
-}
-
-{{ end }} {{ end }}`
 )
 
 func (w Wire) Name() string { return wireName }

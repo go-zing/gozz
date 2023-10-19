@@ -18,12 +18,23 @@
 package plugins
 
 import (
+	_ "embed"
 	"fmt"
 	"go/ast"
 	"sort"
 	"strings"
 
 	zcore "github.com/go-zing/gozz-core"
+)
+
+//go:embed api.go.tmpl
+var apiTemplateText string
+
+const (
+	apiDefaultFilename = "zzgen.api.go"
+
+	paramDecode        = "var in {{ .Param }};if err:=dec(&in);err!=nil{return nil,err};"
+	invokeBaseTemplate = `func(ctx context.Context, dec func(interface{}) error) (interface{},error) {%s%s t.{{ .Name }}(%s)%s}`
 )
 
 func init() {
@@ -64,51 +75,6 @@ func (i ApiInterface) TypeName() string {
 	}
 	return i.Name
 }
-
-const (
-	apiDefaultFilename = "zzgen.api.go"
-
-	apiTemplateText = `import (
-	{{ range .Imports }} {{ .Name }} "{{ .Path }}" 
-	{{ end }}
-)
-
-var _  = context.Context(nil)
-
-type Apis struct {
-    {{ range .Interfaces }} {{ .FieldName }} {{ .TypeName }}
-    {{ end }}
-}
-
-func (s Apis) Range(fn func(interface{},[]map[string]interface{})){
-	for _,f:=range []func()(interface{},[]map[string]interface{}){
-		{{ range .Interfaces }} s._{{ .FieldName }},
-		{{ end }}
-	}{
-		fn(f())
-	}
-}
-
-{{ range .Interfaces }} 
-func (s Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
-	t := s.{{ .FieldName }}
-	return &t,[]map[string]interface{}{	{{ range  .Handlers }}
-		{
-			"name": "{{ .Name }}",
-			"resource": "{{ .Resource }}",
-			"options": map[string]string{ {{ range $key,$value := .Options }}
-			{{ quote $key }} : {{ quote $value }}, {{ end }}
-			},  {{ if .Invoke }} 
-			"invoke": {{ .Invoke }}, {{ end }}
-		},	{{ end }}
-	}
-}
-{{ end }}
-`
-
-	paramDecode        = "var in {{ .Param }};if err:=dec(&in);err!=nil{return nil,err};"
-	invokeBaseTemplate = `func(ctx context.Context, dec func(interface{}) error) (interface{},error) {%s%s t.{{ .Name }}(%s)%s}`
-)
 
 func (a Api) Name() string { return "api" }
 

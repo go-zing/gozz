@@ -1,0 +1,29 @@
+import (
+    {{ range .Imports }}{{ .Name }} "{{ .Path }}"
+    {{ end }}
+)
+
+type _aop_interceptor interface{ Intercept(v interface{},name string,params,results []interface{}) (func(),bool) }
+
+{{ range .Aops }} {{ $n := .Name }} // {{ .Interface }}
+type (
+	{{ $n }} {{ .Interface }}
+	_impl{{ $n }} struct{ {{ $n }} }
+)
+
+{{ range .Methods }} {{ $p := .Params }} {{ $r := .Results }}
+func(i _impl{{ $n }}){{ .Name }}({{ range $i,$v := $p }}p{{ $i }} {{ $v }},{{ end }})({{ range $i,$v := $r }}r{{ $i }} {{ $v }},{{ end }}){
+	if t,x:= i.{{ $n }}.(_aop_interceptor);x{
+		if up,ok:=t.Intercept( i.{{ $n }},{{ quote .Name }},
+		{{ if $p }}[]interface{}{ {{ range $i,$v := $p }}&p{{ $i }},{{ end }} }{{ else }}nil{{ end }},
+		{{ if $r }}[]interface{}{ {{ range $i,$v := $r }}&r{{ $i }},{{ end }} }{{ else }}nil{{ end }},
+		);up!=nil{
+			defer up()
+		}else if !ok{
+			return
+		}
+	}
+	{{ if $r }}return{{ end }} i.{{ $n }}.{{ .Name }}({{ range $i,$v := $p }}p{{ $i }},{{ end }})
+}
+
+{{ end }} {{ end }}

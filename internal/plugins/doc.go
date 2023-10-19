@@ -18,6 +18,7 @@
 package plugins
 
 import (
+	_ "embed"
 	"go/ast"
 	"path/filepath"
 
@@ -27,6 +28,13 @@ import (
 func init() {
 	zcore.RegisterPlugin(Doc{})
 }
+
+//go:embed doc.go.tmpl
+var docTemplate string
+
+const (
+	docDefaultFilename = "zzgen.doc.go"
+)
 
 type (
 	DocType struct {
@@ -44,31 +52,6 @@ type (
 		Types  []DocType
 		Values []DocType
 	}
-)
-
-const (
-	docDefaultFilename = "zzgen.doc.go"
-
-	docTemplate = `var ( {{ if .Types }}
-	_types_doc = map[interface{}]map[string]string{ {{ range .Types }} 
-		(*{{ .Name }})(nil) : _doc_{{ .Name }}, {{ end }}
-	}  
-	{{ end }} {{ if .Values }}
-	_values_doc = map[string]map[interface{}]string{
-		{{ range .Values }} {{ quote .Name }} : map[interface{}]string{  {{ range .Fields }} 
-			{{ .Name }} : {{ quote .Docs }}, {{ end }}
-		},
-		{{ end }}
-	} {{ end }}
-	{{ range .Types }}
-	_doc_{{ .Name }} = map[string]string{ {{ range .Fields }} 
-		"{{ .Name }}" : {{ quote .Docs }},	{{ end }}
-	} 
-	{{ end }}
-) {{ range .Types }} {{ if .Data }}
-
-func ({{ .Name }}) FieldDoc(f string) string { return _doc_{{ .Name }}[f] } {{ end }} {{ end }}
-`
 )
 
 func (d Doc) Name() string { return "doc" }

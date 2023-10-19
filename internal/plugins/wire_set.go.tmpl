@@ -1,0 +1,15 @@
+import (
+    {{ range .Imports }}{{ .Name }} "{{ .Path }}"
+    {{ end }}
+)
+
+var (
+	{{ range .Sets }} _{{ .Name }}Set = wire.NewSet(
+		{{ range .Elements }} // {{ .Path }}.{{ .Name }}
+		{{ range $decl := .Decls }} {{ $decl }},
+		{{ end }}
+		{{ end }}
+	)
+
+	{{end}}
+)
