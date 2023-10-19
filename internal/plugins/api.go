@@ -38,7 +38,6 @@ type (
 
 	ApiHandler struct {
 		Name     string
-		Method   string
 		Resource string
 		Options  map[string]string
 		Invoke   string
@@ -46,13 +45,13 @@ type (
 
 	ApiInterface struct {
 		Package  string
-		Type     string
+		Name     string
 		Handlers []ApiHandler
 	}
 )
 
 func (i ApiInterface) FieldName() string {
-	s := i.Type
+	s := i.Name
 	if len(i.Package) > 0 {
 		s = i.Package + "_" + s
 	}
@@ -61,9 +60,9 @@ func (i ApiInterface) FieldName() string {
 
 func (i ApiInterface) TypeName() string {
 	if len(i.Package) > 0 {
-		return i.Package + "." + i.Type
+		return i.Package + "." + i.Name
 	}
-	return i.Type
+	return i.Name
 }
 
 const (
@@ -96,7 +95,6 @@ func (s Apis) _{{ .FieldName }}() (interface{},[]map[string]interface{}){
 	return &t,[]map[string]interface{}{	{{ range  .Handlers }}
 		{
 			"name": "{{ .Name }}",
-			"method": "{{ .Method }}",
 			"resource": "{{ .Resource }}",
 			"options": map[string]string{ {{ range $key,$value := .Options }}
 			{{ quote $key }} : {{ quote $value }}, {{ end }}
@@ -149,7 +147,7 @@ func (a Api) group(entities zcore.DeclEntities) (group map[string]map[*zcore.Ann
 			group[filename] = make(map[*zcore.AnnotatedDecl]zcore.FieldEntities)
 		}
 
-		group[filename][entity.AnnotatedDecl] = append(group[filename][entity.AnnotatedDecl], entity.ParseFields(2, entity.Options)...)
+		group[filename][entity.AnnotatedDecl] = append(group[filename][entity.AnnotatedDecl], entity.ParseFields(1, entity.Options)...)
 	}
 	return
 }
@@ -162,7 +160,7 @@ func (Api) generateApi(filename string, typeMap map[*zcore.AnnotatedDecl]zcore.F
 	)
 
 	for typ, fields := range typeMap {
-		api := ApiInterface{Type: typ.Name()}
+		api := ApiInterface{Name: typ.Name()}
 
 		for i, field := range fields {
 			if i == 0 {
@@ -176,23 +174,27 @@ func (Api) generateApi(filename string, typeMap map[*zcore.AnnotatedDecl]zcore.F
 				continue
 			}
 
-			handler := ApiHandler{
-				Name:     funcName,
-				Method:   field.Args[0],
-				Resource: field.Args[1],
-				Options:  make(map[string]string),
-			}
-
-			for k, v := range field.Options {
+			executeTemplate := func(v string) string {
 				if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
 					Name, FieldName, Package string
 				}{
 					FieldName: funcName,
-					Name:      api.Type,
+					Name:      api.Name,
 					Package:   typ.Package(),
 				}, v, str) == nil {
-					handler.Options[k] = str.String()
+					return str.String()
 				}
+				return v
+			}
+
+			handler := ApiHandler{
+				Name:     funcName,
+				Resource: executeTemplate(field.Args[0]),
+				Options:  make(map[string]string),
+			}
+
+			for k, v := range field.Options {
+				handler.Options[k] = executeTemplate(v)
 			}
 
 			// try parse method invoke function
@@ -219,7 +221,7 @@ func (Api) generateApi(filename string, typeMap map[*zcore.AnnotatedDecl]zcore.F
 	}
 
 	sort.Slice(interfaces, func(i, j int) bool {
-		return interfaces[i].Package+"."+interfaces[i].Type < interfaces[j].Package+"."+interfaces[j].Type
+		return interfaces[i].Package+"."+interfaces[i].Name < interfaces[j].Package+"."+interfaces[j].Name
 	})
 
 	return zcore.RenderWithDefaultTemplate(&Api{
