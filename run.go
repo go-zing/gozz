@@ -43,12 +43,12 @@ var (
 		},
 	}
 
-	plugins = make([]string, 0)
+	runPlugins = make([]string, 0)
 )
 
 func init() {
 	flags := run.Flags()
-	flags.StringArrayVarP(&plugins, "plugin", "p", nil, "plugins to run")
+	flags.StringArrayVarP(&runPlugins, "plugin", "p", nil, "plugins to run")
 }
 
 func Run(args []string) (err error) {
@@ -59,15 +59,15 @@ func Run(args []string) (err error) {
 	}
 
 	// validate plugins
-	if len(plugins) == 0 {
+	if len(runPlugins) == 0 {
 		return errors.New("invalid plugins list. use -p to specify plugins")
 	}
 
 	// parse plugin entity with key-value options
-	entities := make(zcore.PluginEntities, 0, len(plugins))
+	plugins := make(zcore.PluginEntities, 0, len(runPlugins))
 	registry := zcore.PluginRegistry()
 
-	for i, plugin := range plugins {
+	for i, plugin := range runPlugins {
 		// split plugin name and options string
 		// options would add to each comments annotation options
 		// Example: name:option1=value1:option2=value2
@@ -82,12 +82,12 @@ func Run(args []string) (err error) {
 		}
 
 		// append entities
-		entities = append(entities, zcore.PluginEntity{
+		plugins = append(plugins, zcore.PluginEntity{
 			Plugin:  entity,
 			Options: make(map[string]string, len(commands)-1),
 		})
 
-		option := entities[i].Options
+		option := plugins[i].Options
 
 		// parse entity options
 		zcore.SplitKVSlice2Map(commands[1:], "=", option)
@@ -97,5 +97,5 @@ func Run(args []string) (err error) {
 		}
 	}
 
-	return entities.Run(filename)
+	return plugins.Run(filename)
 }

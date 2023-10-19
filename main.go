@@ -18,8 +18,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/spf13/cobra"
 
@@ -44,24 +46,31 @@ var (
 		Use: zcore.ExecName,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
 			for _, name := range extensions {
-				if err = zcore.LoadExtension(name); err != nil {
+				if _, err = zcore.LoadExtension(name); err != nil {
 					return
 				}
 			}
-
 			if len(pluginDir) > 0 {
 				_ = zcore.WalkDir(pluginDir, func(name string) error {
-					_ = zcore.LoadExtension(name)
+					_, _ = zcore.LoadExtension(name)
 					return nil
 				})
 			}
 			return
 		},
 	}
+
+	version = &cobra.Command{
+		Use: "version",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("runtime: %s %s/%s\nzzcore: %s@%s\n",
+				runtime.Version(), runtime.GOOS, runtime.GOARCH, coreDepPath, getCoreVersion())
+		},
+	}
 )
 
 func main() {
-	cmd.AddCommand(run, list)
+	cmd.AddCommand(run, list, install, version)
 	cmd.PersistentFlags().StringArrayVarP(&extensions, "extension", "x", nil, "extra .so extensions plugin to load")
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
