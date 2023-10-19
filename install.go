@@ -53,14 +53,14 @@ var (
 
 	coreDepPath = reflect.TypeOf(zcore.AnnotatedDecl{}).PkgPath()
 
-	installOutput   string
-	installFilepath string
+	installBuildOutput string
+	installBuildTarget string
 )
 
 func init() {
 	flags := install.Flags()
-	flags.StringVarP(&installOutput, "output", "o", "", "specify install output filename")
-	flags.StringVarP(&installFilepath, "filepath", "f", "", "specify install relative filepath")
+	flags.StringVarP(&installBuildOutput, "output", "o", "", "specify install build output filename")
+	flags.StringVarP(&installBuildTarget, "filepath", "f", "", "specify install build target relative filepath")
 }
 
 func Install(repository string) (err error) {
@@ -74,11 +74,11 @@ func Install(repository string) (err error) {
 			return
 		}
 		if !f.IsDir() {
-			if len(installFilepath) == 0 {
+			if len(installBuildTarget) == 0 {
 				repository = filepath.Dir(repository)
-				installFilepath = f.Name()
+				installBuildTarget = f.Name()
 			} else {
-				return fmt.Errorf("invalid repository directory %s with filepath: %s ", repository, installFilepath)
+				return fmt.Errorf("invalid repository directory %s with filepath: %s ", repository, installBuildTarget)
 			}
 		}
 		return doInstall(repository)
@@ -139,25 +139,22 @@ func doInstall(dir string) (err error) {
 		return
 	}
 
-	tmp := filepath.Join(wd, "tmp.so")
-	args := []string{"build", "--buildmode=plugin", "-o=" + tmp}
+	buildDst := filepath.Join(wd, "tmp.so")
+	args := []string{"build", "--buildmode=plugin", "-o=" + buildDst}
 
-	if len(installFilepath) == 0 {
+	if len(installBuildTarget) == 0 {
+		args = append(args, "./")
+	} else if installBuildTarget, err = filepath.Abs(filepath.Join(dir, installBuildTarget)); err != nil {
+		return
+	} else if info, e := os.Stat(installBuildTarget); e != nil {
+		return e
+	} else if info.IsDir() {
+		dir = installBuildTarget
 		args = append(args, "./")
 	} else {
 		// computed relative directory
-		installFilepath, err = filepath.Abs(filepath.Join(dir, installFilepath))
-		if err != nil {
-			return
-		} else if info, e := os.Stat(installFilepath); e != nil {
-			return e
-		} else if info.IsDir() {
-			dir = installFilepath
-			args = append(args, "./")
-		} else {
-			dir, installFilepath = filepath.Split(installFilepath)
-			args = append(args, "./"+installFilepath)
-		}
+		dir, installBuildTarget = filepath.Split(installBuildTarget)
+		args = append(args, "./"+installBuildTarget)
 	}
 
 	// get env
@@ -182,26 +179,36 @@ func doInstall(dir string) (err error) {
 		}
 	}
 
+	// build env
+	envs := os.Environ()
+	for i := range envs {
+		if env := envs[i]; strings.HasPrefix(env, "GOOS=") {
+			envs[i] = "GOOS=" + runtime.GOOS
+		} else if strings.HasPrefix(env, "GOARCH=") {
+			envs[i] = "GOARCH=" + runtime.GOARCH
+		}
+	}
+
 	// build
 	buildCmd := exec.Command("go", args...)
 	buildCmd.Dir = dir
 	buildCmd.Stdout = os.Stdout
 	buildCmd.Stderr = os.Stderr
-	buildCmd.Env = append(os.Environ(), "GOOS="+runtime.GOOS, "GOARCH="+runtime.GOARCH)
+	buildCmd.Env = envs
 	if err = buildCmd.Run(); err != nil {
 		return
 	}
 	// validate
-	name, err := zcore.LoadExtension(tmp)
+	name, err := zcore.LoadExtension(buildDst)
 	if err != nil {
 		return
 	}
 	// install
-	if len(installOutput) > 0 {
-		return os.Rename(tmp, installOutput)
+	if len(installBuildOutput) > 0 {
+		return os.Rename(buildDst, installBuildOutput)
 	}
 	if err = os.MkdirAll(pluginDir, 0o755); err != nil {
 		return
 	}
-	return os.Rename(tmp, filepath.Join(pluginDir, name+".so"))
+	return os.Rename(buildDst, filepath.Join(pluginDir, name+".so"))
 }
