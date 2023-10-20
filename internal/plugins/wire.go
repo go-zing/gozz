@@ -132,7 +132,9 @@ func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set *wireDeclSe
 			values := strings.Split(value, ",")
 			switch key {
 			case "bind":
-				if entity.Type != zcore.DeclFunc {
+				if entity.Type != zcore.DeclTypeFunc {
+					binds = values
+				} else if r := entity.FuncDecl.Type.Results; r != nil && len(r.List) > 0 {
 					binds = values
 				}
 			case "param":
@@ -332,7 +334,11 @@ func (w Wire) generateInject(dirSetFiles map[string]*wireDeclSet, filename strin
 			// params
 			params := wd.Params.Keys()
 			for i, param := range params {
-				params[i] = fp(param)
+				typ, ptr := zcore.TrimPrefix(param, "*")
+				if param = fp(typ); ptr {
+					param = "*" + param
+				}
+				params[i] = param
 			}
 			inject.Params = strings.Join(params, ",")
 		}
@@ -446,6 +452,7 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 
 			// add binds with aop
 			for _, bind := range wd.Binds.Keys() {
+				bindSrc := name
 				bindType := fp(bind)
 				bindTemplate := wireStructBindTemplate
 
@@ -454,11 +461,17 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 					bindTemplate = `wire.Bind(new(%s), new(%s))`
 				case zcore.DeclValue:
 					bindTemplate = `wire.InterfaceValue(new(%s), %s)`
+				case zcore.DeclFunc:
+					ret, ptr := zcore.TrimPrefix(string(decl.File.Node(decl.FuncDecl.Type.Results.List[0].Type)), "*")
+					bindSrc = fp(ret)
+					if !ptr {
+						bindTemplate = `wire.Bind(new(%s), new(%s))`
+					}
 				}
 
 				if _, aop := wd.Aops[bind]; !aop {
 					// direct interface type binding
-					zcore.Appendf(&el.Decls, bindTemplate, bindType, name)
+					zcore.Appendf(&el.Decls, bindTemplate, bindType, bindSrc)
 					continue
 				}
 
@@ -481,7 +494,7 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 				}
 
 				// aop type bindings
-				zcore.Appendf(&el.Decls, bindTemplate, aopTypename, name)
+				zcore.Appendf(&el.Decls, bindTemplate, aopTypename, bindSrc)
 				zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, aopType.Implement)
 				zcore.Appendf(&el.Decls, wireStructBindTemplate, bindType, aopType.Implement)
 			}
@@ -506,7 +519,7 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 			case zcore.DeclTypeStruct:
 				// add fields of
 				if fields := strings.Join(wd.Fields.Keys(), `","`); len(fields) > 0 {
-					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(%s), "%s")`, name, fields)
+					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(*%s), "%s")`, name, fields)
 				} else if len(wd.Provider) == 0 {
 					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
 				}
