@@ -11,8 +11,8 @@
 ## Showcase
 
 - [Gozz-Core](https://github.com/go-zing/gozz-core)
+- [Gozz-Plugins](https://github.com/go-zing/gozz-plugins)
 - [Gozz-Doc](https://github.com/go-zing/gozz-doc)
-- [Gozz-Doc-Examples](https://github.com/go-zing/gozz-doc-examples)
 
 ## License
 
