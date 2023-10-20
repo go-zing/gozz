@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"runtime/debug"
 
 	"github.com/spf13/cobra"
 
@@ -41,8 +42,11 @@ var (
 	version = &cobra.Command{
 		Use: "version",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("runtime: %s %s/%s\nzzcore: %s@%s\n",
-				runtime.Version(), runtime.GOOS, runtime.GOARCH, coreDepPath, getCoreVersion())
+			if info, ok := debug.ReadBuildInfo(); ok {
+				fmt.Printf("%s\nruntime: %s %s/%s\ncore: %s@%s\n",
+					info.Main.Path,
+					runtime.Version(), runtime.GOOS, runtime.GOARCH, coreDepPath, getCoreVersion())
+			}
 		},
 	}
 )
