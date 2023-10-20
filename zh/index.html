@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GOZZ</title>
+    <meta name="generator" content="VuePress 1.9.10">
+    <link rel="icon" href="/gozz/favicon.ico">
+    <meta name="description" content="Golang 注解分析及模板化代码工具">
+    
+    <link rel="preload" href="/gozz/assets/css/0.styles.12437744.css" as="style"><link rel="preload" href="/gozz/assets/js/app.d6ecee5e.js" as="script"><link rel="preload" href="/gozz/assets/js/2.79e9d9af.js" as="script"><link rel="preload" href="/gozz/assets/js/1.c79fe803.js" as="script"><link rel="preload" href="/gozz/assets/js/36.d9bf24aa.js" as="script"><link rel="prefetch" href="/gozz/assets/js/10.8ee68f91.js"><link rel="prefetch" href="/gozz/assets/js/11.89bdfdbf.js"><link rel="prefetch" href="/gozz/assets/js/12.f06c6736.js"><link rel="prefetch" href="/gozz/assets/js/13.455e1f7b.js"><link rel="prefetch" href="/gozz/assets/js/14.f563df36.js"><link rel="prefetch" href="/gozz/assets/js/15.90f29316.js"><link rel="prefetch" href="/gozz/assets/js/16.df359f52.js"><link rel="prefetch" href="/gozz/assets/js/17.7a57509e.js"><link rel="prefetch" href="/gozz/assets/js/18.f3cc7695.js"><link rel="prefetch" href="/gozz/assets/js/19.7ba728ec.js"><link rel="prefetch" href="/gozz/assets/js/20.6c88385f.js"><link rel="prefetch" href="/gozz/assets/js/21.919cc63d.js"><link rel="prefetch" href="/gozz/assets/js/22.64f3dd87.js"><link rel="prefetch" href="/gozz/assets/js/23.68ff89ad.js"><link rel="prefetch" href="/gozz/assets/js/24.0cebf628.js"><link rel="prefetch" href="/gozz/assets/js/25.4ecdc283.js"><link rel="prefetch" href="/gozz/assets/js/26.b0a38053.js"><link rel="prefetch" href="/gozz/assets/js/27.a4ca658d.js"><link rel="prefetch" href="/gozz/assets/js/28.0e5bb968.js"><link rel="prefetch" href="/gozz/assets/js/29.c47934fb.js"><link rel="prefetch" href="/gozz/assets/js/3.85966d15.js"><link rel="prefetch" href="/gozz/assets/js/30.d6b7c3fe.js"><link rel="prefetch" href="/gozz/assets/js/31.d7d6ac25.js"><link rel="prefetch" href="/gozz/assets/js/32.ca285e80.js"><link rel="prefetch" href="/gozz/assets/js/33.c295988d.js"><link rel="prefetch" href="/gozz/assets/js/34.6ad093b5.js"><link rel="prefetch" href="/gozz/assets/js/35.0f51d0dd.js"><link rel="prefetch" href="/gozz/assets/js/37.8089508c.js"><link rel="prefetch" href="/gozz/assets/js/38.66cada23.js"><link rel="prefetch" href="/gozz/assets/js/39.9d996796.js"><link rel="prefetch" href="/gozz/assets/js/4.9164b5da.js"><link rel="prefetch" href="/gozz/assets/js/40.4300787e.js"><link rel="prefetch" href="/gozz/assets/js/41.6dd8483b.js"><link rel="prefetch" href="/gozz/assets/js/42.b766df66.js"><link rel="prefetch" href="/gozz/assets/js/43.c671fdb1.js"><link rel="prefetch" href="/gozz/assets/js/44.4054669e.js"><link rel="prefetch" href="/gozz/assets/js/45.a9d3ee95.js"><link rel="prefetch" href="/gozz/assets/js/46.ccefc5b7.js"><link rel="prefetch" href="/gozz/assets/js/47.1f9ce75a.js"><link rel="prefetch" href="/gozz/assets/js/48.87561215.js"><link rel="prefetch" href="/gozz/assets/js/5.5d3f3c23.js"><link rel="prefetch" href="/gozz/assets/js/6.d5047bad.js"><link rel="prefetch" href="/gozz/assets/js/7.614e0a25.js"><link rel="prefetch" href="/gozz/assets/js/vendors~docsearch.162bdabc.js">
+    <link rel="stylesheet" href="/gozz/assets/css/0.styles.12437744.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/gozz/zh/" aria-current="page" class="home-link router-link-exact-active router-link-active"><img src="/gozz/logo.png" alt="GOZZ" class="logo"> <span class="site-name can-hide">GOZZ</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/gozz/zh/" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  首页
+</a></div><div class="nav-item"><a href="/gozz/zh/guide/" class="nav-link">
+  指南
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="选择语言" class="dropdown-title"><span class="title">选择语言</span> <span class="arrow down"></span></button> <button type="button" aria-label="选择语言" class="mobile-dropdown-title"><span class="title">选择语言</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/gozz/" class="nav-link">
+  English
+</a></li><li class="dropdown-item"><!----> <a href="/gozz/zh/" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  简体中文
+</a></li></ul></div></div> <a href="https://github.com/go-zing/gozz" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/gozz/zh/" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  首页
+</a></div><div class="nav-item"><a href="/gozz/zh/guide/" class="nav-link">
+  指南
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="选择语言" class="dropdown-title"><span class="title">选择语言</span> <span class="arrow down"></span></button> <button type="button" aria-label="选择语言" class="mobile-dropdown-title"><span class="title">选择语言</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/gozz/" class="nav-link">
+  English
+</a></li><li class="dropdown-item"><!----> <a href="/gozz/zh/" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  简体中文
+</a></li></ul></div></div> <a href="https://github.com/go-zing/gozz" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav>  <!----> </aside> <main aria-labelledby="main-title" class="home"><header class="hero"><img src="/gozz/logo.png" alt="hero"> <h1 id="main-title">
+      Gozz
+    </h1> <p class="description">
+      Golang 注解分析及模板化代码工具
+    </p> <p class="action"><a href="/gozz/zh/guide/getting-started.html" class="nav-link action-button">
+  快速上手 →
+</a></p></header> <div class="features"><div class="feature"><h2>简洁易用无侵入</h2> <p>直观明了的注解语法，干净利落的命令行工具，以及无需添加运行时依赖就能使用的生成代码。</p></div><div class="feature"><h2>内置强大插件</h2> <p>自动化依赖注入、AOP接口代理、Interface -&gt; Implement 同步、ORM、API路由表等。</p></div><div class="feature"><h2>高拓展性</h2> <p>可自定义生成模版，提供代码分析、编辑、生成等内核库，基于 .so 快速开发和扩展外部插件。</p></div></div> <div class="theme-default-content custom content__default"><h3 id="一个从-0-到-1-的简单业务场景示例-体现-gozz-的强大"><a href="#一个从-0-到-1-的简单业务场景示例-体现-gozz-的强大" class="header-anchor">#</a> 一个从 0 到 1 的简单业务场景示例 体现 <code>Gozz</code> 的强大</h3> <p>在我们进行业务开发时，会经常遇到业务领域的接口设计</p> <div class="language- extra-class"><pre class="language-text"><code>~ % tree bookstore
+
+bookstore
+├── go.mod
+└── types
+    └── book.go
+</code></pre></div><div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// types/book.go</span>
+<span class="token keyword">package</span> types
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;context&quot;</span>
+	<span class="token string">&quot;time&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// 书籍服务接口</span>
+<span class="token keyword">type</span> BookService <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token comment">// 获取书籍</span>
+	<span class="token function">GetBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> param QueryBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>book Book<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+	<span class="token comment">// 获取书籍列表</span>
+	<span class="token function">ListBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> param QueryListBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>books ListBook<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+	<span class="token comment">// 编辑书籍</span>
+	<span class="token function">EditBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> form FormBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>book Book<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+	<span class="token comment">// 新建书籍</span>
+	<span class="token function">NewBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> form FormBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>book Book<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> <span class="token punctuation">(</span>
+	<span class="token comment">// 书籍查询参数</span>
+	QueryBook <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// 查询指定ID</span>
+		Id <span class="token builtin">int</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// 书籍列表查询参数</span>
+	QueryListBook <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// 查询关键字</span>
+		Keyword <span class="token builtin">string</span>
+		<span class="token comment">// 查询页数</span>
+		PageNo <span class="token builtin">int</span>
+		<span class="token comment">// 查询分页</span>
+		PageCount <span class="token builtin">int</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// 书籍列表</span>
+	ListBook <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// 总数</span>
+		Total <span class="token builtin">int</span>
+		<span class="token comment">// 列表</span>
+		List <span class="token punctuation">[</span><span class="token punctuation">]</span>Book
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// 书籍新建或编辑表单</span>
+	FormBook <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// ID</span>
+		Id <span class="token builtin">int</span>
+		<span class="token comment">// 标题</span>
+		Title <span class="token builtin">string</span>
+		<span class="token comment">// 作者</span>
+		Author <span class="token builtin">string</span>
+		<span class="token comment">// 描述</span>
+		Description <span class="token builtin">string</span>
+	<span class="token punctuation">}</span>
+
+	Book <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// 从表单继承</span>
+		FormBook
+		<span class="token comment">// 创建时间</span>
+		CreatedAt time<span class="token punctuation">.</span>Time
+		<span class="token comment">// 创建人</span>
+		CreatedBy <span class="token builtin">string</span>
+		<span class="token comment">// 更新时间</span>
+		UpdatedAt time<span class="token punctuation">.</span>Time
+		<span class="token comment">// 更新人</span>
+		UpdatedBt <span class="token builtin">string</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">)</span>
+
+</code></pre></div><p>在接口设计完成后 为了使设计的接口能够提供服务 我们还需要进行以下主要工作：</p> <ol><li>将 接口 进行实现，提供 <code>Implement</code> 对象</li> <li>将 接口 接口参数 接口调用 和 <code>API Controller</code> 进行耦合，以提供服务</li> <li>构造 接口实现 并作为 接口依赖 提供给 <code>API Controller</code></li> <li>填充 结构体字段标签 以在 <code>API Controller</code> 实现接口 参数值和返回值 通过反射类库快速和网络层进行编解码映射</li> <li>将 接口 和 结构体 上的注释和说明 同步到对其他职能对接的 接口文档</li></ol> <p>而这些工作，实际上并不是只需要完成一次，就能够一劳永逸</p> <p>随着生产业务需求的变更和迭代发展，接口也会不断地进行迭代和更新， 这些变更同时也会导致我们需要重新进行上述工作</p> <hr> <h4 id="通过注释注解使用-gozz"><a href="#通过注释注解使用-gozz" class="header-anchor">#</a> 通过注释注解使用 <code>gozz</code></h4> <p>注释注解的语法规则 借鉴了 <code>Python</code> 和 <code>K8s</code> 部分相关工具</p> <p><code>+zz:${plugin}:${args_1}:...:${args_n}:${key_a=value_1}:...:${key_n=value_n}</code></p> <p>固定以 <code>+zz:${plugin}</code> 开头 然后 以 <code>:</code> 间隔若干参数</p> <p>插件会指定必填的 <code>args</code> 参数顺序数量  <em>如 <code>+zz:api:${filename}</code> 即固定第一个参数用作 <code>filename</code></em></p> <p>达不到插件指定的 <code>args</code> 数量的注解会被视为无效注解  <em>如 <code>+zz:api</code></em></p> <p>指定数量后的参数 会被判定为 <code>key-value</code> 参数  <em>如 <code>+zz:api:/:auth=required:public</code></em></p> <p>具体的插件和参数说明可以执行 <code>gozz list</code> 查看</p> <hr> <p>在上述的接口定义文件中 我们添加一些注解</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// types/book.go</span>
+<span class="token keyword">package</span> types
+
+<span class="token comment">// 书籍服务接口</span>
+<span class="token comment">// +zz:impl:/impls:wire</span>
+<span class="token comment">// +zz:api:/apis:prefix=books</span>
+<span class="token comment">// +zz:doc</span>
+<span class="token keyword">type</span> BookService <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token comment">// 获取指定书籍</span>
+	<span class="token comment">// +zz:api:get:{id}</span>
+	<span class="token function">GetBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> param QueryBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>book Book<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+	<span class="token comment">// 获取书籍列表</span>
+	<span class="token comment">// +zz:api:get</span>
+	<span class="token function">ListBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> param QueryListBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>books ListBook<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+	<span class="token comment">// 编辑书籍</span>
+	<span class="token comment">// +zz:api:put:{id}</span>
+	<span class="token function">EditBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> form FormBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>book Book<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+	<span class="token comment">// 新建书籍</span>
+	<span class="token comment">// +zz:api:post</span>
+	<span class="token function">NewBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> form FormBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>book Book<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// +zz:doc</span>
+<span class="token comment">// +zz:tag:json:{{ snake .FieldName }}</span>
+<span class="token keyword">type</span> <span class="token punctuation">(</span>
+	<span class="token comment">// 书籍查询参数</span>
+	QueryBook <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// 查询指定ID</span>
+		Id <span class="token builtin">int</span>
+	<span class="token punctuation">}</span>
+<span class="token operator">...</span>
+
+</code></pre></div><h5 id="注-为节约篇幅-部分代码会使用-省略-下同"><a href="#注-为节约篇幅-部分代码会使用-省略-下同" class="header-anchor">#</a> 注: <em>为节约篇幅 部分代码会使用 <code>...</code> 省略 下同</em></h5> <p>再使用 <code>gozz</code> 略施魔法</p> <div class="language-shell extra-class"><pre class="language-shell"><code>gozz run <span class="token parameter variable">-p</span> <span class="token string">&quot;impl&quot;</span> <span class="token parameter variable">-p</span> <span class="token string">&quot;doc&quot;</span> <span class="token parameter variable">-p</span> <span class="token string">&quot;tag&quot;</span> <span class="token parameter variable">-p</span> <span class="token string">&quot;api&quot;</span> ./
+</code></pre></div><p>项目目录会生成一些文件</p> <div class="language- extra-class"><pre class="language-text"><code>~ % tree bookstore
+
+bookstore
+├── apis
+│   ├── zzgen.api.go
+│   └── zzgen.api.go.tmpl
+├── go.mod
+├── impls
+│   └── impl.go
+└── types
+    ├── book.go
+    ├── zzgen.doc.go
+    └── zzgen.doc.go.tmpl
+
+</code></pre></div><hr> <h4 id="结构体字段标签"><a href="#结构体字段标签" class="header-anchor">#</a> 结构体字段标签</h4> <p>在原接口定义文件内 结构体字段的标签 已经按照注解 模版格式全部添加</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// types/book.go</span>
+
+<span class="token keyword">package</span> types
+
+<span class="token operator">...</span>
+
+<span class="token comment">// +zz:tag:json:{{ snake .FieldName }}</span>
+<span class="token keyword">type</span> <span class="token punctuation">(</span>
+	<span class="token comment">// 书籍查询参数</span>
+	QueryBook <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// 查询指定ID</span>
+		Id <span class="token builtin">int</span> <span class="token string">`json:&quot;id&quot;`</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// 书籍列表查询参数</span>
+	QueryListBook <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		<span class="token comment">// 查询关键字</span>
+		Keyword <span class="token builtin">string</span> <span class="token string">`json:&quot;keyword&quot;`</span>
+		<span class="token comment">// 查询页数</span>
+		PageNo <span class="token builtin">int</span> <span class="token string">`json:&quot;page_no&quot;`</span>
+		<span class="token comment">// 查询分页</span>
+		PageCount <span class="token builtin">int</span> <span class="token string">`json:&quot;page_count&quot;`</span>
+	<span class="token punctuation">}</span>
+<span class="token operator">...</span>
+
+</code></pre></div><p><code>gozz</code> 同时提供 <code>snake</code> <code>camel</code> <code>kebab</code> <code>upper</code> ... 等模版方法 进行其他格式的生成 也支持对部分 结构体 或 字段 进行额外定制化</p> <p>例:</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token keyword">package</span> x
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;time&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// +zz:tag:json:{{ camel .FieldName }}</span>
+<span class="token keyword">type</span> <span class="token punctuation">(</span>
+	T1 <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		CreatedBy <span class="token builtin">string</span>    <span class="token string">`json:&quot;createdBy&quot;`</span>
+		CreatedAt time<span class="token punctuation">.</span>Time <span class="token string">`json:&quot;createdAt&quot;`</span>
+	<span class="token punctuation">}</span>
+
+	T2 <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		CreatedBy <span class="token builtin">string</span> <span class="token string">`json:&quot;createdBy&quot;`</span>
+		<span class="token comment">// +zz:tag:json:{{ kebab .FieldName }}</span>
+		CreatedAt time<span class="token punctuation">.</span>Time <span class="token string">`json:&quot;created-at&quot;`</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token comment">// +zz:tag:json:{{ snake .FieldName }}</span>
+	T3 <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+		CreatedBy <span class="token builtin">string</span> <span class="token string">`json:&quot;created_by&quot;`</span>
+		<span class="token comment">// +zz:tag:+json:,omitempty</span>
+		CreatedAt time<span class="token punctuation">.</span>Time <span class="token string">`json:&quot;created_at,omitempty&quot;`</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// +zz:tag:json,form:{{ .FieldName }}</span>
+<span class="token keyword">type</span> T4 <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	CreatedBy <span class="token builtin">string</span>    <span class="token string">`json:&quot;CreatedBy&quot; form:&quot;CreatedBy&quot;`</span>
+	CreatedAt time<span class="token punctuation">.</span>Time <span class="token string">`json:&quot;CreatedAt&quot; form:&quot;CreatedAt&quot;`</span>
+<span class="token punctuation">}</span>
+
+</code></pre></div><hr> <h4 id="interface-implement-生成-及-签名同步"><a href="#interface-implement-生成-及-签名同步" class="header-anchor">#</a> Interface -&gt; Implement 生成 及 签名同步</h4> <p>在 <code>impls/impl.go</code> 可以看到由 <code>+zz:impl:/impls:wire</code> 注解生成的 接口实现定义 和 接口方法</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// impls/impl.go</span>
+
+<span class="token keyword">package</span> impls
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;context&quot;</span>
+
+	<span class="token string">&quot;github.com/go-zing/gozz-doc-examples/bookstore/types&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">var</span> <span class="token punctuation">(</span>
+	<span class="token boolean">_</span> types<span class="token punctuation">.</span>BookService <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>BookServiceImpl<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// +zz:wire:bind=types.BookService</span>
+<span class="token keyword">type</span> BookServiceImpl <span class="token keyword">struct</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token operator">...</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>impl <span class="token operator">*</span>BookServiceImpl<span class="token punctuation">)</span> <span class="token function">NewBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> form types<span class="token punctuation">.</span>FormBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>book types<span class="token punctuation">.</span>Book<span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token function">panic</span><span class="token punctuation">(</span><span class="token string">&quot;not implemented&quot;</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token operator">...</span>
+
+</code></pre></div><p>假设我们在需求发生变更后，对接口的方法签名进行了一定修改，如:</p> <ol><li>修改 <code>NewBook</code> 的参数为 <code>FormNewBook</code> 修改返回值 为 <code>id</code> 整数</li> <li>添加新方法 <code>DeleteBook</code></li></ol> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// types/book.go</span>
+<span class="token keyword">package</span> types
+
+<span class="token keyword">type</span> BookService <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token comment">// ...</span>
+
+	<span class="token comment">// 新建书籍</span>
+	<span class="token comment">// +zz:api:post:</span>
+	<span class="token function">NewBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> form FormNewBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>id <span class="token builtin">int</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+	<span class="token comment">// 删除书籍</span>
+	<span class="token comment">// +zz:api:delete:{id}</span>
+	<span class="token function">Delete</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> query QueryBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>updated <span class="token builtin">bool</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+</code></pre></div><p>再次运行 <code>gozz run -p &quot;impl&quot; ./</code></p> <p>可以看到 在 <code>impls/impl.go</code> 文件内 原 <code>BookServiceImpl.NewBook</code> 方法签名 被自动同步为最新的接口定义 且不对原函数人工补充内容产生影响</p> <p>另外 缺少的 <code>BookServiceImpl.Delete</code> 方法 也会在文件下方补充生成实现</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// impls/impl.go </span>
+
+<span class="token keyword">package</span> impls
+
+<span class="token operator">...</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>impl <span class="token operator">*</span>BookServiceImpl<span class="token punctuation">)</span> <span class="token function">NewBook</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> form types<span class="token punctuation">.</span>FormNewBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>id <span class="token builtin">int</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token comment">// 一些人工添加的实现逻辑 不应该被覆盖或删除</span>
+	<span class="token operator">...</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>impl <span class="token operator">*</span>BookServiceImpl<span class="token punctuation">)</span> <span class="token function">Delete</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> query types<span class="token punctuation">.</span>QueryBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>updated <span class="token builtin">bool</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token function">panic</span><span class="token punctuation">(</span><span class="token string">&quot;not implemented&quot;</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+</code></pre></div><hr> <h4 id="api-路由表-及-api-调起接口方法绑定"><a href="#api-路由表-及-api-调起接口方法绑定" class="header-anchor">#</a> API 路由表 及 API 调起接口方法绑定</h4> <p>在 <code>apis/zzgen.api.go</code> 文件 可以看到由 <code>+zz:api:/apis:prefix=books</code> 注解生成的 API 路由表 及 API 调起接口方法绑定</p> <p>对 Golang 类型和类型 有一定深入了解的 Gopher 应该可以敏锐地发现</p> <p>使用以下生成的内容 只需要提供一个 Web框架 和 <code>Apis.Range</code> 的适配层 可以快速地完成所有 API路由 和 服务实现层 绑定</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// apis/zzgen.api.go</span>
+
+<span class="token comment">// Code generated by gozz:api github.com/go-zing/gozz. DO NOT EDIT.</span>
+
+<span class="token keyword">package</span> apis
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;context&quot;</span>
+
+	<span class="token string">&quot;github.com/go-zing/gozz-doc-examples/bookstore/types&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">var</span> <span class="token boolean">_</span> <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">Context</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+
+<span class="token keyword">type</span> Apis <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	Types_BookService types<span class="token punctuation">.</span>BookService
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s Apis<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>fn <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> f <span class="token operator">:=</span> <span class="token keyword">range</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+		s<span class="token punctuation">.</span>_Types_BookService<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span> <span class="token punctuation">{</span>
+		<span class="token function">fn</span><span class="token punctuation">(</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s Apis<span class="token punctuation">)</span> <span class="token function">_Types_BookService</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	t <span class="token operator">:=</span> s<span class="token punctuation">.</span>Types_BookService
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>t<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token punctuation">{</span>
+			<span class="token string">&quot;name&quot;</span><span class="token punctuation">:</span>     <span class="token string">&quot;GetBook&quot;</span><span class="token punctuation">,</span>
+			<span class="token string">&quot;method&quot;</span><span class="token punctuation">:</span>   <span class="token string">&quot;get&quot;</span><span class="token punctuation">,</span>
+			<span class="token string">&quot;resource&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;{id}&quot;</span><span class="token punctuation">,</span>
+			<span class="token string">&quot;options&quot;</span><span class="token punctuation">:</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span>
+				<span class="token string">&quot;prefix&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;books&quot;</span><span class="token punctuation">,</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token string">&quot;invoke&quot;</span><span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> dec <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">var</span> in types<span class="token punctuation">.</span>QueryBook
+				<span class="token keyword">if</span> err <span class="token operator">:=</span> <span class="token function">dec</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>in<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+					<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> err
+				<span class="token punctuation">}</span>
+				<span class="token keyword">return</span> t<span class="token punctuation">.</span><span class="token function">GetBook</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> in<span class="token punctuation">)</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+		<span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+		<span class="token operator">...</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+</code></pre></div><hr> <h4 id="类型-字段-变量-常量-注释表"><a href="#类型-字段-变量-常量-注释表" class="header-anchor">#</a> 类型 / 字段 / 变量 / 常量 注释表</h4> <p>在 <code>types/zzgen.doc.go</code> 可以看到由 <code>+zz:doc</code> 注解生成的 类型 及 类型字段 注释表</p> <p>在代码中的 非注解注释 都被收集和整理 提供了一种在运行时通过类型和反射获取代码注释的能力</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// types/zzgen.doc.go</span>
+
+<span class="token comment">// Code generated by gozz:doc github.com/go-zing/gozz. DO NOT EDIT.</span>
+
+<span class="token keyword">package</span> types
+
+<span class="token keyword">var</span> <span class="token punctuation">(</span>
+	_types_doc <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span>
+		<span class="token punctuation">(</span><span class="token operator">*</span>BookService<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">:</span> _doc_BookService<span class="token punctuation">,</span>
+
+		<span class="token punctuation">(</span><span class="token operator">*</span>QueryBook<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">:</span>     _doc_QueryBook<span class="token punctuation">,</span>
+		<span class="token punctuation">(</span><span class="token operator">*</span>QueryListBook<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">:</span> _doc_QueryListBook<span class="token punctuation">,</span>
+		<span class="token punctuation">(</span><span class="token operator">*</span>ListBook<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">:</span>      _doc_ListBook<span class="token punctuation">,</span>
+		<span class="token punctuation">(</span><span class="token operator">*</span>FormBook<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">:</span>      _doc_FormBook<span class="token punctuation">,</span>
+		<span class="token punctuation">(</span><span class="token operator">*</span>Book<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">:</span>          _doc_Book<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+
+	_values_doc <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">var</span> _doc_BookService <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span>
+	<span class="token string">&quot;&quot;</span><span class="token punctuation">:</span>         <span class="token string">&quot;书籍服务接口&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;GetBook&quot;</span><span class="token punctuation">:</span>  <span class="token string">&quot;获取指定书籍&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;ListBook&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;获取书籍列表&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;EditBook&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;编辑书籍&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;NewBook&quot;</span><span class="token punctuation">:</span>  <span class="token string">&quot;新建书籍&quot;</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> _doc_QueryBook <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span>
+	<span class="token string">&quot;&quot;</span><span class="token punctuation">:</span>   <span class="token string">&quot;书籍查询参数&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;Id&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;查询指定ID&quot;</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>QueryBook<span class="token punctuation">)</span> <span class="token function">FieldDoc</span><span class="token punctuation">(</span>f <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> _doc_QueryBook<span class="token punctuation">[</span>f<span class="token punctuation">]</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> _doc_QueryListBook <span class="token operator">=</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">{</span>
+	<span class="token string">&quot;&quot;</span><span class="token punctuation">:</span>          <span class="token string">&quot;书籍列表查询参数&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;Keyword&quot;</span><span class="token punctuation">:</span>   <span class="token string">&quot;查询关键字&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;PageNo&quot;</span><span class="token punctuation">:</span>    <span class="token string">&quot;查询页数&quot;</span><span class="token punctuation">,</span>
+	<span class="token string">&quot;PageCount&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;查询分页&quot;</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>QueryListBook<span class="token punctuation">)</span> <span class="token function">FieldDoc</span><span class="token punctuation">(</span>f <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> _doc_QueryListBook<span class="token punctuation">[</span>f<span class="token punctuation">]</span> <span class="token punctuation">}</span>
+
+<span class="token operator">...</span>
+
+</code></pre></div><hr> <h4 id="类型表-路由表-联动"><a href="#类型表-路由表-联动" class="header-anchor">#</a> 类型表 路由表 联动</h4> <p>相信敏锐的 Gopher 已经察觉到</p> <p><code>/apis/zzgen.api.go</code> 和 <code>/types/zzgen.doc.go</code> 两文件 已经包含了解释 项目内所有API接口 的基本要素</p> <p>利用 <code>reflect</code> 和 <code>interface</code> 机制 只要添加部分全局规则 就可以自动化生成输出 <code>OpenAPI</code> 或 <code>Swagger</code> 接口文档。</p> <p>并且通过此方式生成的代码 会达到和代码注释的深度绑定 实现 <code>一处收敛变更 多处同步生效</code></p> <h4 id="自定义模版"><a href="#自定义模版" class="header-anchor">#</a> 自定义模版</h4> <p><code>gozz</code> 会上述代码文件同目录下 生成 <code>/apis/zzgen.api.go.tmpl</code> 和 <code>/types/zzgen.doc.go.tmpl</code> 两模版文件</p> <p>若用户希望对生成的 <code>/apis/zzgen.api.go</code> 和 <code>/types/zzgen.doc.go</code> 添加额外的生成内容 或 修改生成代码的命名或可见性</p> <p>都可以自定义修改模版文件，然后重新进行生成</p> <h5 id="注-gozz-在生成目标文件目录已有-filename-tmpl-文件时-会优先使用-模版文件进行生成"><a href="#注-gozz-在生成目标文件目录已有-filename-tmpl-文件时-会优先使用-模版文件进行生成" class="header-anchor">#</a> 注: <em><code>gozz</code> 在生成目标文件目录已有 <code>${filename}.tmpl</code> 文件时 会优先使用 模版文件进行生成</em></h5> <hr> <h4 id="基于-wire-的自动化依赖注入"><a href="#基于-wire-的自动化依赖注入" class="header-anchor">#</a> 基于 <a href="https://github.com/google/wire" target="_blank" rel="noopener noreferrer">wire<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a> 的自动化依赖注入</h4> <p>最后需要将 <code>/apis/zzgen.api.go</code> 中的 <code>Apis</code> 和 <code>HTTP控制器</code> 以及 <code>HTTP服务器</code> 进行绑定以提供 HTTP服务</p> <p>在项目根目录 创建 <code>app.go</code></p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// app.go</span>
+
+<span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;net/http&quot;</span>
+
+	<span class="token string">&quot;github.com/go-zing/gozz-doc-examples/bookstore/apis&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// 根应用入口</span>
+<span class="token keyword">type</span> Application <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	ApisProvider
+	HttpController
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 对 apis.Apis 的类型引用</span>
+<span class="token keyword">type</span> Apis <span class="token operator">=</span> apis<span class="token punctuation">.</span>Apis
+
+<span class="token comment">// 作为 apis.Apis 的抽象 提供给 HttpController 进行 API路由服务绑定</span>
+<span class="token keyword">type</span> ApisProvider <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token function">Range</span><span class="token punctuation">(</span>fn <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 作为 HTTP控制器 的抽象 将 apis.Apis 解析提供为 http.Handler</span>
+<span class="token keyword">type</span> HttpController <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token function">Handle</span><span class="token punctuation">(</span>ApisProvider<span class="token punctuation">)</span> http<span class="token punctuation">.</span>Handler
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">ProvideHttpController</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>controller HttpController<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token comment">// ... 此处省略实现</span>
+	<span class="token keyword">return</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 组装并挂载 http.Handler 监听端口 提供服务</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>app <span class="token operator">*</span>Application<span class="token punctuation">)</span> <span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	handler <span class="token operator">:=</span> app<span class="token punctuation">.</span><span class="token function">Handle</span><span class="token punctuation">(</span>app<span class="token punctuation">.</span>ApisProvider<span class="token punctuation">)</span>
+	server <span class="token operator">:=</span> <span class="token operator">&amp;</span>http<span class="token punctuation">.</span>Server<span class="token punctuation">{</span>
+		Addr<span class="token punctuation">:</span>    <span class="token string">&quot;:8080&quot;</span><span class="token punctuation">,</span>
+		Handler<span class="token punctuation">:</span> handler<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> server<span class="token punctuation">.</span><span class="token function">ListenAndServe</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token comment">// TODO: new Application and Run</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>需要做的剩余工作 是将之前生成的各种类型 通过依赖关系进行构造和接口实现绑定</p> <p>最终得到一个 <code>Application</code> 根应用入口对象 在 <code>main</code> 里 <code>Run</code> 起来</p> <p>在上述文件里加上一点点注解</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;net/http&quot;</span>
+
+	<span class="token string">&quot;github.com/go-zing/gozz-doc-examples/bookstore/apis&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// +zz:wire:inject=/</span>
+<span class="token keyword">type</span> Application <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	ApisProvider
+	HttpController
+<span class="token punctuation">}</span>
+
+<span class="token comment">// +zz:wire:bind=ApisProvider:struct</span>
+<span class="token keyword">type</span> Apis <span class="token operator">=</span> apis<span class="token punctuation">.</span>Apis
+
+<span class="token keyword">type</span> ApisProvider <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token function">Range</span><span class="token punctuation">(</span>fn <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// +zz:wire</span>
+<span class="token keyword">type</span> HttpController <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token function">Handle</span><span class="token punctuation">(</span>ApisProvider<span class="token punctuation">)</span> http<span class="token punctuation">.</span>Handler
+<span class="token punctuation">}</span>
+
+<span class="token comment">// impls.BookServiceImpl 接口实现类型 在生成时 自动被添加了 `+zz:wire:bind=types.BookService`</span>
+<span class="token operator">...</span>
+</code></pre></div><p>执行 <code>gozz run -p &quot;wire&quot; ./</code></p> <p>可以看到项目根目录下生成了 前缀 <code>wire_*</code> 的若干文件</p> <div class="language- extra-class"><pre class="language-text"><code>├── apis
+│   ├── zzgen.api.go
+│   └── zzgen.api.go.tmpl
+├── app.go
+├── go.mod
+├── go.sum
+├── impls
+│   └── impl.go
+├── types
+│   ├── book.go
+│   ├── zzgen.doc.go
+│   └── zzgen.doc.go.tmpl
+├── wire_gen.go
+├── wire_zinject.go
+└── wire_zset.go
+</code></pre></div><p>其中：</p> <ul><li><code>wire_zset.go</code> 包含了 使用 <code>wire</code> 进行依赖注入的对象 <code>Set</code></li> <li><code>wire_zinject.go</code> 包含了 使用 <code>wire</code> 进行目标对象构造 的 <code>Initialize</code> 定义</li> <li><code>wire_gen.go</code> 包含了实例化 <code>Application</code> 最终的目标应用入口</li></ul> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// wire_gen.go</span>
+<span class="token keyword">package</span> main
+
+<span class="token keyword">func</span> <span class="token function">Initialize_Application</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>Application<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	bookServiceImpl <span class="token operator">:=</span> <span class="token operator">&amp;</span>impls<span class="token punctuation">.</span>BookServiceImpl<span class="token punctuation">{</span><span class="token punctuation">}</span>
+	apis <span class="token operator">:=</span> <span class="token operator">&amp;</span>Apis<span class="token punctuation">{</span>
+		Types_BookService<span class="token punctuation">:</span> bookServiceImpl<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+	httpController <span class="token operator">:=</span> <span class="token function">ProvideHttpController</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	application <span class="token operator">:=</span> <span class="token operator">&amp;</span>Application<span class="token punctuation">{</span>
+		ApisProvider<span class="token punctuation">:</span>   apis<span class="token punctuation">,</span>
+		HttpController<span class="token punctuation">:</span> httpController<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> application<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
+
+</code></pre></div><h4 id="gozz-wire-和原生-wire-的区别"><a href="#gozz-wire-和原生-wire-的区别" class="header-anchor">#</a> <code>gozz:wire</code> 和原生 <code>wire</code> 的区别</h4> <p>使用原生 <code>wire</code> 进行依赖注入时 需要用户显式地在代码中维护 各种 <code>Set</code> 以及 类型提供声明</p> <p>如 上述例子中 <code>wire_zset.go</code> 中的自动生成内容 实际在使用 原生 <code>wire</code> 时 是需要用户自己维护的</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// wire_zset.go</span>
+
+<span class="token keyword">package</span> main
+
+<span class="token keyword">var</span> <span class="token punctuation">(</span>
+	_Set <span class="token operator">=</span> wire<span class="token punctuation">.</span><span class="token function">NewSet</span><span class="token punctuation">(</span>
+		<span class="token comment">// github.com/go-zing/gozz-doc-examples/bookstore.Apis</span>
+		wire<span class="token punctuation">.</span><span class="token function">Bind</span><span class="token punctuation">(</span><span class="token function">new</span><span class="token punctuation">(</span>ApisProvider<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">new</span><span class="token punctuation">(</span><span class="token operator">*</span>Apis<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		wire<span class="token punctuation">.</span><span class="token function">Struct</span><span class="token punctuation">(</span><span class="token function">new</span><span class="token punctuation">(</span>Apis<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;*&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+
+		<span class="token comment">// github.com/go-zing/gozz-doc-examples/bookstore.Application</span>
+		wire<span class="token punctuation">.</span><span class="token function">Struct</span><span class="token punctuation">(</span><span class="token function">new</span><span class="token punctuation">(</span>Application<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;*&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+
+		<span class="token comment">// github.com/go-zing/gozz-doc-examples/bookstore.HttpController</span>
+		ProvideHttpController<span class="token punctuation">,</span>
+
+		<span class="token comment">// github.com/go-zing/gozz-doc-examples/bookstore/impls.BookServiceImpl</span>
+		wire<span class="token punctuation">.</span><span class="token function">Bind</span><span class="token punctuation">(</span><span class="token function">new</span><span class="token punctuation">(</span>types<span class="token punctuation">.</span>BookService<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">new</span><span class="token punctuation">(</span><span class="token operator">*</span>impls<span class="token punctuation">.</span>BookServiceImpl<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		wire<span class="token punctuation">.</span><span class="token function">Struct</span><span class="token punctuation">(</span><span class="token function">new</span><span class="token punctuation">(</span>impls<span class="token punctuation">.</span>BookServiceImpl<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;*&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+
+</code></pre></div><p>而 <code>gozz:wire</code> 使用注解 让用户免于学习和维护这些声明 自动化地收集所有相关注解类型</p> <p>根据类型定义 提供自动化代码生成的依赖注入 达到更快捷、更简约、更低心智成本的实践</p> <hr> <h4 id="给接口加上aop"><a href="#给接口加上aop" class="header-anchor">#</a> 给接口加上AOP</h4> <p>在从 <code>types/book.go</code> 生成 <code>impls/impl.go</code> 接口文件时 由于使用 <code>wire</code> 选项</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// +zz:impl:/impls:wire</span>
+<span class="token keyword">type</span> BookService <span class="token keyword">interface</span><span class="token punctuation">{</span>
+<span class="token operator">...</span>
+</code></pre></div><p>生成实现类型时 会自动添加 <code>wire</code> 模块的 接口实现绑定注解</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// +zz:wire:bind=types.BookService</span>
+<span class="token keyword">type</span> BookServiceImpl <span class="token keyword">struct</span><span class="token punctuation">{</span>
+<span class="token operator">...</span>
+</code></pre></div><p>在实现类型的 <code>wire</code> 注解上添加 <code>aop</code> 选项 重新运行 <code>gozz run -p &quot;wire&quot; ./</code></p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// +zz:wire:bind=types.BookService:aop</span>
+<span class="token keyword">type</span> BookServiceImpl <span class="token keyword">struct</span><span class="token punctuation">{</span>
+<span class="token operator">...</span>
+</code></pre></div><p>可见 生成的 <code>wire_gen.go</code> 对于 <code>bookServiceImpl</code> 的注入发生了变化 注意看代码块中添加的注释</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// wire_gen.go</span>
+
+<span class="token keyword">package</span> main
+
+<span class="token keyword">func</span> <span class="token function">Initialize_Application</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>Application<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	bookServiceImpl <span class="token operator">:=</span> <span class="token operator">&amp;</span>impls<span class="token punctuation">.</span>BookServiceImpl<span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+	<span class="token comment">// impls.BookServiceImpl 不会直接绑定到 types.BookService</span>
+	<span class="token comment">// 而是经过了一层 _impl_aop_types_BookService (在 wire_zzaop.go 中自动生成)</span>
+	<span class="token comment">// </span>
+	<span class="token comment">// 即由 impls.BookServiceImpl -&gt; types.BookService</span>
+	<span class="token comment">// 变为 impls.BookServiceImpl -&gt; _impl_aop_types_BookService -&gt; types.BookService</span>
+	main_impl_aop_types_BookService <span class="token operator">:=</span> <span class="token operator">&amp;</span>_impl_aop_types_BookService<span class="token punctuation">{</span>
+		_aop_types_BookService<span class="token punctuation">:</span> bookServiceImpl<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+
+	apis <span class="token operator">:=</span> <span class="token operator">&amp;</span>Apis<span class="token punctuation">{</span>
+		Types_BookService<span class="token punctuation">:</span> main_impl_aop_types_BookService<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+	httpController <span class="token operator">:=</span> <span class="token function">ProvideHttpController</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	application <span class="token operator">:=</span> <span class="token operator">&amp;</span>Application<span class="token punctuation">{</span>
+		ApisProvider<span class="token punctuation">:</span>   apis<span class="token punctuation">,</span>
+		HttpController<span class="token punctuation">:</span> httpController<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> application<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
+
+</code></pre></div><p>在项目目录下 可以看到 额外生成了 <code>wire_zzaop.go</code> 以及 它的模版文件 <code>wire_zzaop.go.tmpl</code></p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// wire_zzaop.go</span>
+
+<span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;context&quot;</span>
+
+	<span class="token string">&quot;github.com/go-zing/gozz-doc-examples/bookstore/types&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">type</span> _aop_interceptor <span class="token keyword">interface</span> <span class="token punctuation">{</span>
+	<span class="token function">Intercept</span><span class="token punctuation">(</span>v <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> name <span class="token builtin">string</span><span class="token punctuation">,</span> params<span class="token punctuation">,</span> results <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// types.BookService</span>
+<span class="token keyword">type</span> <span class="token punctuation">(</span>
+	_aop_types_BookService      types<span class="token punctuation">.</span>BookService
+	_impl_aop_types_BookService <span class="token keyword">struct</span><span class="token punctuation">{</span> _aop_types_BookService <span class="token punctuation">}</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>i _impl_aop_types_BookService<span class="token punctuation">)</span> <span class="token function">GetBook</span><span class="token punctuation">(</span>p0 context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> p1 types<span class="token punctuation">.</span>QueryBook<span class="token punctuation">)</span> <span class="token punctuation">(</span>r0 types<span class="token punctuation">.</span>Book<span class="token punctuation">,</span> r1 <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">if</span> t<span class="token punctuation">,</span> x <span class="token operator">:=</span> i<span class="token punctuation">.</span>_aop_types_BookService<span class="token punctuation">.</span><span class="token punctuation">(</span>_aop_interceptor<span class="token punctuation">)</span><span class="token punctuation">;</span> x <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> up<span class="token punctuation">,</span> ok <span class="token operator">:=</span> t<span class="token punctuation">.</span><span class="token function">Intercept</span><span class="token punctuation">(</span>i<span class="token punctuation">.</span>_aop_types_BookService<span class="token punctuation">,</span> <span class="token string">&quot;GetBook&quot;</span><span class="token punctuation">,</span>
+			<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">&amp;</span>p0<span class="token punctuation">,</span> <span class="token operator">&amp;</span>p1<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">&amp;</span>r0<span class="token punctuation">,</span> <span class="token operator">&amp;</span>r1<span class="token punctuation">}</span><span class="token punctuation">,</span>
+		<span class="token punctuation">)</span><span class="token punctuation">;</span> up <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+			<span class="token keyword">defer</span> <span class="token function">up</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token operator">!</span>ok <span class="token punctuation">{</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> i<span class="token punctuation">.</span>_aop_types_BookService<span class="token punctuation">.</span><span class="token function">GetBook</span><span class="token punctuation">(</span>p0<span class="token punctuation">,</span> p1<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token operator">...</span>
+
+</code></pre></div><p>可以看到 <code>gozz:wire</code> 为 <code>types.BookService</code> 生成了 一个对象调用代理类型 并在 <code>gozz:wire</code> 过程中
+进行 <code>自动化接口注入实现替换</code></p> <p>并支持用户通过实现 <code>_aop_interceptor</code></p> <p>对调用的 前置 / 后置 / 参数 / 返回值 等 进行切面化的处理 从而实现功能强大 <code>AOP</code> 编程</p> <hr> <h4 id="小结"><a href="#小结" class="header-anchor">#</a> 小结</h4> <p>至此 这个简单业务场景核心代码设计 从 0 到 1 的系统化集成 已经展现了 <code>gozz</code> 最基本和常用的一些功能</p> <p>而 <code>gozz</code> 在这个过程提供了强大的 标准化编程 和 快速累加集成 代码的能力</p> <p>同时也会更有利于开发者去思考 如何去优化架构和分层的设计</p></div> <div class="footer content__footer"><p><a href="https://github.com/go-zing/gozz/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Apache-2.0 Licensed<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a> | Copyright © 2023-present Maple Wu</p></div></main></div><div class="global-ui"><!----></div></div>
+    <script src="/gozz/assets/js/app.d6ecee5e.js" defer></script><script src="/gozz/assets/js/2.79e9d9af.js" defer></script><script src="/gozz/assets/js/1.c79fe803.js" defer></script><script src="/gozz/assets/js/36.d9bf24aa.js" defer></script>
+  </body>
+</html>

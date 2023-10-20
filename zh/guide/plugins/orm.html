@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Orm | GOZZ</title>
+    <meta name="generator" content="VuePress 1.9.10">
+    <link rel="icon" href="/gozz/favicon.ico">
+    <meta name="description" content="Golang 注解分析及模板化代码工具">
+    
+    <link rel="preload" href="/gozz/assets/css/0.styles.12437744.css" as="style"><link rel="preload" href="/gozz/assets/js/app.d6ecee5e.js" as="script"><link rel="preload" href="/gozz/assets/js/2.79e9d9af.js" as="script"><link rel="preload" href="/gozz/assets/js/1.c79fe803.js" as="script"><link rel="preload" href="/gozz/assets/js/45.a9d3ee95.js" as="script"><link rel="prefetch" href="/gozz/assets/js/10.8ee68f91.js"><link rel="prefetch" href="/gozz/assets/js/11.89bdfdbf.js"><link rel="prefetch" href="/gozz/assets/js/12.f06c6736.js"><link rel="prefetch" href="/gozz/assets/js/13.455e1f7b.js"><link rel="prefetch" href="/gozz/assets/js/14.f563df36.js"><link rel="prefetch" href="/gozz/assets/js/15.90f29316.js"><link rel="prefetch" href="/gozz/assets/js/16.df359f52.js"><link rel="prefetch" href="/gozz/assets/js/17.7a57509e.js"><link rel="prefetch" href="/gozz/assets/js/18.f3cc7695.js"><link rel="prefetch" href="/gozz/assets/js/19.7ba728ec.js"><link rel="prefetch" href="/gozz/assets/js/20.6c88385f.js"><link rel="prefetch" href="/gozz/assets/js/21.919cc63d.js"><link rel="prefetch" href="/gozz/assets/js/22.64f3dd87.js"><link rel="prefetch" href="/gozz/assets/js/23.68ff89ad.js"><link rel="prefetch" href="/gozz/assets/js/24.0cebf628.js"><link rel="prefetch" href="/gozz/assets/js/25.4ecdc283.js"><link rel="prefetch" href="/gozz/assets/js/26.b0a38053.js"><link rel="prefetch" href="/gozz/assets/js/27.a4ca658d.js"><link rel="prefetch" href="/gozz/assets/js/28.0e5bb968.js"><link rel="prefetch" href="/gozz/assets/js/29.c47934fb.js"><link rel="prefetch" href="/gozz/assets/js/3.85966d15.js"><link rel="prefetch" href="/gozz/assets/js/30.d6b7c3fe.js"><link rel="prefetch" href="/gozz/assets/js/31.d7d6ac25.js"><link rel="prefetch" href="/gozz/assets/js/32.ca285e80.js"><link rel="prefetch" href="/gozz/assets/js/33.c295988d.js"><link rel="prefetch" href="/gozz/assets/js/34.6ad093b5.js"><link rel="prefetch" href="/gozz/assets/js/35.0f51d0dd.js"><link rel="prefetch" href="/gozz/assets/js/36.d9bf24aa.js"><link rel="prefetch" href="/gozz/assets/js/37.8089508c.js"><link rel="prefetch" href="/gozz/assets/js/38.66cada23.js"><link rel="prefetch" href="/gozz/assets/js/39.9d996796.js"><link rel="prefetch" href="/gozz/assets/js/4.9164b5da.js"><link rel="prefetch" href="/gozz/assets/js/40.4300787e.js"><link rel="prefetch" href="/gozz/assets/js/41.6dd8483b.js"><link rel="prefetch" href="/gozz/assets/js/42.b766df66.js"><link rel="prefetch" href="/gozz/assets/js/43.c671fdb1.js"><link rel="prefetch" href="/gozz/assets/js/44.4054669e.js"><link rel="prefetch" href="/gozz/assets/js/46.ccefc5b7.js"><link rel="prefetch" href="/gozz/assets/js/47.1f9ce75a.js"><link rel="prefetch" href="/gozz/assets/js/48.87561215.js"><link rel="prefetch" href="/gozz/assets/js/5.5d3f3c23.js"><link rel="prefetch" href="/gozz/assets/js/6.d5047bad.js"><link rel="prefetch" href="/gozz/assets/js/7.614e0a25.js"><link rel="prefetch" href="/gozz/assets/js/vendors~docsearch.162bdabc.js">
+    <link rel="stylesheet" href="/gozz/assets/css/0.styles.12437744.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/gozz/zh/" class="home-link router-link-active"><img src="/gozz/logo.png" alt="GOZZ" class="logo"> <span class="site-name can-hide">GOZZ</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/gozz/zh/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><a href="/gozz/zh/guide/" class="nav-link router-link-active">
+  指南
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="选择语言" class="dropdown-title"><span class="title">选择语言</span> <span class="arrow down"></span></button> <button type="button" aria-label="选择语言" class="mobile-dropdown-title"><span class="title">选择语言</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/gozz/guide/plugins/orm.html" class="nav-link">
+  English
+</a></li><li class="dropdown-item"><!----> <a href="/gozz/zh/guide/plugins/orm.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  简体中文
+</a></li></ul></div></div> <a href="https://github.com/go-zing/gozz" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/gozz/zh/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><a href="/gozz/zh/guide/" class="nav-link router-link-active">
+  指南
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="选择语言" class="dropdown-title"><span class="title">选择语言</span> <span class="arrow down"></span></button> <button type="button" aria-label="选择语言" class="mobile-dropdown-title"><span class="title">选择语言</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/gozz/guide/plugins/orm.html" class="nav-link">
+  English
+</a></li><li class="dropdown-item"><!----> <a href="/gozz/zh/guide/plugins/orm.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  简体中文
+</a></li></ul></div></div> <a href="https://github.com/go-zing/gozz" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>指南</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/gozz/zh/guide/" aria-current="page" class="sidebar-link">介绍</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/#愿景" class="sidebar-link">愿景</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/#设计理念" class="sidebar-link">设计理念</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/#适用场景" class="sidebar-link">适用场景</a></li></ul></li><li><a href="/gozz/zh/guide/getting-started.html" class="sidebar-link">快速上手</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/getting-started.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/getting-started.html#指令" class="sidebar-link">指令</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/getting-started.html#注解语法" class="sidebar-link">注解语法</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/getting-started.html#其他约定" class="sidebar-link">其他约定</a></li></ul></li><li><a href="/gozz/zh/guide/how-it-works.html" class="sidebar-link">原理</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/how-it-works.html#ast-是什么" class="sidebar-link">AST 是什么</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/how-it-works.html#golang-ast-简介" class="sidebar-link">Golang AST 简介</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/how-it-works.html#注解分析" class="sidebar-link">注解分析</a></li></ul></li><li><section class="sidebar-group is-sub-group depth-1"><a href="/gozz/zh/guide/plugins/" class="sidebar-heading clickable router-link-active open"><span>插件</span> <!----></a> <ul class="sidebar-links sidebar-group-items"><li><a href="/gozz/zh/guide/plugins/api.html" class="sidebar-link">Api</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/api.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/api.html#示例" class="sidebar-link">示例</a></li></ul></li><li><a href="/gozz/zh/guide/plugins/doc.html" class="sidebar-link">Doc</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/doc.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/doc.html#示例" class="sidebar-link">示例</a></li></ul></li><li><a href="/gozz/zh/guide/plugins/impl.html" class="sidebar-link">Impl</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/impl.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/impl.html#示例" class="sidebar-link">示例</a></li></ul></li><li><a href="/gozz/zh/guide/plugins/option.html" class="sidebar-link">Option</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/option.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/option.html#示例" class="sidebar-link">示例</a></li></ul></li><li><a href="/gozz/zh/guide/plugins/orm.html" aria-current="page" class="active sidebar-link">Orm</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/orm.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/orm.html#示例" class="sidebar-link">示例</a></li></ul></li><li><a href="/gozz/zh/guide/plugins/tag.html" class="sidebar-link">Tag</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/tag.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/tag.html#示例" class="sidebar-link">示例</a></li></ul></li><li><a href="/gozz/zh/guide/plugins/wire.html" class="sidebar-link">Wire</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/wire.html#使用" class="sidebar-link">使用</a></li><li class="sidebar-sub-header"><a href="/gozz/zh/guide/plugins/wire.html#示例" class="sidebar-link">示例</a></li></ul></li></ul></section></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="orm"><a href="#orm" class="header-anchor">#</a> Orm</h1> <p>通过 <code>dsn</code> 连接数据库 <code>driver</code> ，读取 <code>schema</code> 信息生成 <code>ORM</code> 结构体定义及相关辅助代码。</p> <h2 id="使用"><a href="#使用" class="header-anchor">#</a> 使用</h2> <h3 id="注解"><a href="#注解" class="header-anchor">#</a> 注解</h3> <p><code>+zz:orm:[schema]:[...options]</code></p> <h3 id="注解对象"><a href="#注解对象" class="header-anchor">#</a> 注解对象</h3> <p>所有对象</p> <h3 id="必填参数"><a href="#必填参数" class="header-anchor">#</a> 必填参数</h3> <h4 id="schema"><a href="#schema" class="header-anchor">#</a> <code>schema</code></h4> <p>要读取的数据库 <code>schema</code> 名，多个可用 <code>,</code> 分隔。</p> <p>示例： <code>+zz:orm:my_database</code></p> <h3 id="可选参数"><a href="#可选参数" class="header-anchor">#</a> 可选参数</h3> <h4 id="filename"><a href="#filename" class="header-anchor">#</a> <code>filename</code></h4> <p>指定生成的文件路径，默认 <code>./zzgen.orm.go</code></p> <p>示例： <code>+zz:orm:schema:filename=./models/</code></p> <h4 id="driver"><a href="#driver" class="header-anchor">#</a> <code>driver</code></h4> <p>指定使用生成 <code>schemadriver</code>，此 <code>driver</code> 不同于 <code>sql.Driver</code>，为本工具独立维护对不同数据库种类的不同类型的生成器。</p> <p>外部生成器可通过 <code>.so</code> 插件形式加载。</p> <p>默认 <code>mysql</code>。</p> <p>示例： <code>+zz:orm:schema:driver=sqlite</code></p> <h4 id="type"><a href="#type" class="header-anchor">#</a> <code>type</code></h4> <p>指定生成时的数据类型映射。 格式 <code>${数据库DATA_TYPE}=${Golang类型}</code></p> <p>示例： <code>+zz:orm:schema:type=varchar=MyString</code></p> <p>可以使用 <code>,</code> 连接多个指定类型。</p> <p>示例： <code>+zz:orm:schema:type=varchar=MyString,varchar(255)=string,int unsign=uint</code></p> <p>数据库格式匹配的优先级由不同 <code>schemadriver</code> 自行控制。</p> <p>若要指定 <code>Nullable</code> 类型，可使用 <code>*</code> 前缀。</p> <p>示例： <code>+zz:orm:schema:type=*varchar=sql.NullString,*json=*json.RawMessage</code></p> <h4 id="table"><a href="#table" class="header-anchor">#</a> <code>table</code></h4> <p>指定生成的数据表，默认 <code>*</code> 即选取全部数据表进行生成。</p> <p>可以使用 <code>,</code> 连接多个表。</p> <p>示例： <code>+zz:orm:schema:table=user,car,order</code></p> <h4 id="password"><a href="#password" class="header-anchor">#</a> <code>password</code></h4> <p>通常开发者都是在本地开发环境进行 <code>orm</code> 的生成和基于生成内容进行开发。</p> <p>因此 <code>driver</code> 会提供一个对应数据库类型默认安装本地连接的 <code>dsn</code> 模版。</p> <p>如 <code>mysql</code> 通常为 <code>root:${pwd}@tcp(localhost:3306)/</code></p> <p>使用者可以只提供 <code>password</code>，就能通过默认安装地址和用户完成访问。</p> <p>建议通过以以下方式使用，示例：</p> <div class="language-shell extra-class"><pre class="language-shell"><code><span class="token builtin class-name">read</span> <span class="token parameter variable">-s</span> <span class="token builtin class-name">pwd</span> <span class="token operator">&amp;&amp;</span> gozz run <span class="token parameter variable">-p</span> <span class="token string">&quot;orm:password=<span class="token variable">${pwd}</span>&quot;</span> ./
+</code></pre></div><h4 id="dsn"><a href="#dsn" class="header-anchor">#</a> <code>dsn</code></h4> <p>如果对数据库连接地址有额外需求，可通过提供完整 <code>dsn</code> 进行访问。</p> <p>涉及 <code>:</code> 时要使用 <code>\</code> 进行<a href="/gozz/zh/guide/getting-started.html#参数转义">参数转义</a></p> <p>示例：</p> <div class="language-shell extra-class"><pre class="language-shell"><code><span class="token builtin class-name">read</span> <span class="token parameter variable">-s</span> <span class="token builtin class-name">pwd</span> <span class="token operator">&amp;&amp;</span> gozz run <span class="token parameter variable">-p</span> <span class="token string">&quot;orm:dsn=dev_user\:<span class="token variable">${pwd}</span>@tcp(192.168.1.2\:3306)/&quot;</span> ./
+</code></pre></div><h2 id="示例"><a href="#示例" class="header-anchor">#</a> 示例</h2> <p><a href="https://github.com/go-zing/gozz-doc-examples/tree/main/orm01" target="_blank" rel="noopener noreferrer">示例项目<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a> <a href="https://github.com/datacharmer/test_db/blob/master/employees.sql" target="_blank" rel="noopener noreferrer">示例SQL<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token keyword">package</span> orm01
+
+<span class="token comment">// +zz:orm:{{ .Name }}</span>
+<span class="token keyword">type</span> employees <span class="token keyword">struct</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+</code></pre></div><p>执行 <code>gozz run -p &quot;orm:password=***&quot; ./</code> 生成 <code>zzgen.orm.go</code> 和模版文件。</p> <div class="language-go extra-class"><pre class="language-go"><code><span class="token comment">// Code generated by gozz:orm github.com/go-zing/gozz. DO NOT EDIT.</span>
+
+<span class="token keyword">package</span> orm01
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">&quot;context&quot;</span>
+	<span class="token string">&quot;database/sql&quot;</span>
+	<span class="token string">&quot;encoding/json&quot;</span>
+	<span class="token string">&quot;time&quot;</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">var</span> <span class="token punctuation">(</span>
+	<span class="token boolean">_</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>context<span class="token punctuation">.</span>Context<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+	<span class="token boolean">_</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>json<span class="token punctuation">.</span>RawMessage<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+	<span class="token boolean">_</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>time<span class="token punctuation">.</span>Time<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+	<span class="token boolean">_</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>sql<span class="token punctuation">.</span>NullString<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">var</span> tables <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+	CurrentDeptEmp<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+	Departments<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+	DeptEmp<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+	DeptEmpLatestDate<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+	DeptManager<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+	Employees<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+	Salaries<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+	Titles<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.current_dept_emp</span>
+<span class="token comment">// VIEW</span>
+<span class="token keyword">const</span> TableCurrentDeptEmp <span class="token operator">=</span> <span class="token string">&quot;current_dept_emp&quot;</span>
+
+<span class="token keyword">type</span> CurrentDeptEmp <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// emp_no : int</span>
+	EmpNo <span class="token builtin">int</span>
+	<span class="token comment">// dept_no : char(4)</span>
+	DeptNo <span class="token builtin">string</span>
+	<span class="token comment">// from_date : NULLABLE date</span>
+	FromDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+	<span class="token comment">// to_date : NULLABLE date</span>
+	ToDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>CurrentDeptEmp<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableCurrentDeptEmp <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>CurrentDeptEmp<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;emp_no&quot;</span><span class="token punctuation">:</span>    <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>EmpNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;dept_no&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>DeptNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;from_date&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>FromDate<span class="token punctuation">,</span>
+		<span class="token string">&quot;to_date&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>ToDate<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceCurrentDeptEmp <span class="token punctuation">[</span><span class="token punctuation">]</span>CurrentDeptEmp
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceCurrentDeptEmp<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> CurrentDeptEmp<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.departments</span>
+<span class="token keyword">const</span> TableDepartments <span class="token operator">=</span> <span class="token string">&quot;departments&quot;</span>
+
+<span class="token keyword">type</span> Departments <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// dept_no : char(4)</span>
+	DeptNo <span class="token builtin">string</span>
+	<span class="token comment">// dept_name : varchar(40)</span>
+	DeptName <span class="token builtin">string</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>Departments<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableDepartments <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Departments<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;dept_no&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>DeptNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;dept_name&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>DeptName<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceDepartments <span class="token punctuation">[</span><span class="token punctuation">]</span>Departments
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceDepartments<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> Departments<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.dept_emp</span>
+<span class="token keyword">const</span> TableDeptEmp <span class="token operator">=</span> <span class="token string">&quot;dept_emp&quot;</span>
+
+<span class="token keyword">type</span> DeptEmp <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// emp_no : int</span>
+	EmpNo <span class="token builtin">int</span>
+	<span class="token comment">// dept_no : char(4)</span>
+	DeptNo <span class="token builtin">string</span>
+	<span class="token comment">// from_date : date</span>
+	FromDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+	<span class="token comment">// to_date : date</span>
+	ToDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>DeptEmp<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableDeptEmp <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>DeptEmp<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;emp_no&quot;</span><span class="token punctuation">:</span>    <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>EmpNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;dept_no&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>DeptNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;from_date&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>FromDate<span class="token punctuation">,</span>
+		<span class="token string">&quot;to_date&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>ToDate<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceDeptEmp <span class="token punctuation">[</span><span class="token punctuation">]</span>DeptEmp
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceDeptEmp<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> DeptEmp<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.dept_emp_latest_date</span>
+<span class="token comment">// VIEW</span>
+<span class="token keyword">const</span> TableDeptEmpLatestDate <span class="token operator">=</span> <span class="token string">&quot;dept_emp_latest_date&quot;</span>
+
+<span class="token keyword">type</span> DeptEmpLatestDate <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// emp_no : int</span>
+	EmpNo <span class="token builtin">int</span>
+	<span class="token comment">// from_date : NULLABLE date</span>
+	FromDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+	<span class="token comment">// to_date : NULLABLE date</span>
+	ToDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>DeptEmpLatestDate<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableDeptEmpLatestDate <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>DeptEmpLatestDate<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;emp_no&quot;</span><span class="token punctuation">:</span>    <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>EmpNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;from_date&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>FromDate<span class="token punctuation">,</span>
+		<span class="token string">&quot;to_date&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>ToDate<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceDeptEmpLatestDate <span class="token punctuation">[</span><span class="token punctuation">]</span>DeptEmpLatestDate
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceDeptEmpLatestDate<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> DeptEmpLatestDate<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.dept_manager</span>
+<span class="token keyword">const</span> TableDeptManager <span class="token operator">=</span> <span class="token string">&quot;dept_manager&quot;</span>
+
+<span class="token keyword">type</span> DeptManager <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// emp_no : int</span>
+	EmpNo <span class="token builtin">int</span>
+	<span class="token comment">// dept_no : char(4)</span>
+	DeptNo <span class="token builtin">string</span>
+	<span class="token comment">// from_date : date</span>
+	FromDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+	<span class="token comment">// to_date : date</span>
+	ToDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>DeptManager<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableDeptManager <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>DeptManager<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;emp_no&quot;</span><span class="token punctuation">:</span>    <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>EmpNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;dept_no&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>DeptNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;from_date&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>FromDate<span class="token punctuation">,</span>
+		<span class="token string">&quot;to_date&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>ToDate<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceDeptManager <span class="token punctuation">[</span><span class="token punctuation">]</span>DeptManager
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceDeptManager<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> DeptManager<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.employees</span>
+<span class="token keyword">const</span> TableEmployees <span class="token operator">=</span> <span class="token string">&quot;employees&quot;</span>
+
+<span class="token keyword">type</span> Employees <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// emp_no : int</span>
+	EmpNo <span class="token builtin">int</span>
+	<span class="token comment">// birth_date : date</span>
+	BirthDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+	<span class="token comment">// first_name : varchar(14)</span>
+	FirstName <span class="token builtin">string</span>
+	<span class="token comment">// last_name : varchar(16)</span>
+	LastName <span class="token builtin">string</span>
+	<span class="token comment">// gender : enum('M','F')</span>
+	Gender <span class="token builtin">string</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>Employees<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableEmployees <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Employees<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;emp_no&quot;</span><span class="token punctuation">:</span>     <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>EmpNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;birth_date&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>BirthDate<span class="token punctuation">,</span>
+		<span class="token string">&quot;first_name&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>FirstName<span class="token punctuation">,</span>
+		<span class="token string">&quot;last_name&quot;</span><span class="token punctuation">:</span>  <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>LastName<span class="token punctuation">,</span>
+		<span class="token string">&quot;gender&quot;</span><span class="token punctuation">:</span>     <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>Gender<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceEmployees <span class="token punctuation">[</span><span class="token punctuation">]</span>Employees
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceEmployees<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> Employees<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.salaries</span>
+<span class="token keyword">const</span> TableSalaries <span class="token operator">=</span> <span class="token string">&quot;salaries&quot;</span>
+
+<span class="token keyword">type</span> Salaries <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// emp_no : int</span>
+	EmpNo <span class="token builtin">int</span>
+	<span class="token comment">// salary : int</span>
+	Salary <span class="token builtin">int</span>
+	<span class="token comment">// from_date : date</span>
+	FromDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+	<span class="token comment">// to_date : date</span>
+	ToDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>Salaries<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableSalaries <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Salaries<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;emp_no&quot;</span><span class="token punctuation">:</span>    <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>EmpNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;salary&quot;</span><span class="token punctuation">:</span>    <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>Salary<span class="token punctuation">,</span>
+		<span class="token string">&quot;from_date&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>FromDate<span class="token punctuation">,</span>
+		<span class="token string">&quot;to_date&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>ToDate<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceSalaries <span class="token punctuation">[</span><span class="token punctuation">]</span>Salaries
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceSalaries<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> Salaries<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// employees.titles</span>
+<span class="token keyword">const</span> TableTitles <span class="token operator">=</span> <span class="token string">&quot;titles&quot;</span>
+
+<span class="token keyword">type</span> Titles <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	<span class="token comment">// emp_no : int</span>
+	EmpNo <span class="token builtin">int</span>
+	<span class="token comment">// title : varchar(50)</span>
+	Title <span class="token builtin">string</span>
+	<span class="token comment">// from_date : date</span>
+	FromDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+	<span class="token comment">// to_date : NULLABLE date</span>
+	ToDate <span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>Titles<span class="token punctuation">)</span> <span class="token function">TableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> TableTitles <span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Titles<span class="token punctuation">)</span> <span class="token function">FieldMapping</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token punctuation">{</span>
+	<span class="token keyword">return</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">{</span>
+		<span class="token string">&quot;emp_no&quot;</span><span class="token punctuation">:</span>    <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>EmpNo<span class="token punctuation">,</span>
+		<span class="token string">&quot;title&quot;</span><span class="token punctuation">:</span>     <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>Title<span class="token punctuation">,</span>
+		<span class="token string">&quot;from_date&quot;</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>FromDate<span class="token punctuation">,</span>
+		<span class="token string">&quot;to_date&quot;</span><span class="token punctuation">:</span>   <span class="token operator">&amp;</span>m<span class="token punctuation">.</span>ToDate<span class="token punctuation">,</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> SliceTitles <span class="token punctuation">[</span><span class="token punctuation">]</span>Titles
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>SliceTitles<span class="token punctuation">)</span> <span class="token function">Range</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		<span class="token keyword">if</span> c <span class="token operator">:=</span> i <span class="token operator">&gt;=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>c <span class="token punctuation">{</span>
+			<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> n <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">,</span> Titles<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>n<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n
+		<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+			<span class="token operator">*</span>s <span class="token operator">=</span> n<span class="token punctuation">[</span><span class="token punctuation">:</span>i<span class="token punctuation">]</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/go-zing/gozz-doc/edit/main/docs/zh/guide/plugins/orm.md" target="_blank" rel="noopener noreferrer">在 GitHub 上编辑此页</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/10/20 06:34:42</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/gozz/zh/guide/plugins/option.html" class="prev">
+        Option
+      </a></span> <span class="next"><a href="/gozz/zh/guide/plugins/tag.html">
+        Tag
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"><!----></div></div>
+    <script src="/gozz/assets/js/app.d6ecee5e.js" defer></script><script src="/gozz/assets/js/2.79e9d9af.js" defer></script><script src="/gozz/assets/js/1.c79fe803.js" defer></script><script src="/gozz/assets/js/45.a9d3ee95.js" defer></script>
+  </body>
+</html>
