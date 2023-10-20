@@ -334,11 +334,7 @@ func (w Wire) generateInject(dirSetFiles map[string]*wireDeclSet, filename strin
 			// params
 			params := wd.Params.Keys()
 			for i, param := range params {
-				typ, ptr := zcore.TrimPrefix(param, "*")
-				if param = fp(typ); ptr {
-					param = "*" + param
-				}
-				params[i] = param
+				params[i] = fp(param)
 			}
 			inject.Params = strings.Join(params, ",")
 		}
@@ -462,11 +458,8 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 				case zcore.DeclValue:
 					bindTemplate = `wire.InterfaceValue(new(%s), %s)`
 				case zcore.DeclFunc:
-					ret, ptr := zcore.TrimPrefix(string(decl.File.Node(decl.FuncDecl.Type.Results.List[0].Type)), "*")
-					bindSrc = fp(ret)
-					if !ptr {
-						bindTemplate = `wire.Bind(new(%s), new(%s))`
-					}
+					bindSrc = fp(string(decl.File.Node(decl.FuncDecl.Type.Results.List[0].Type)))
+					bindTemplate = `wire.Bind(new(%s), new(%s))`
 				}
 
 				if _, aop := wd.Aops[bind]; !aop {
