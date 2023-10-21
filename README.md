@@ -19,7 +19,7 @@ runtime-dependencies-free generated codes.
 go install github.com/go-zing/gozz@latest
 ```
 
-#### CLI
+#### Usage
 
 `Gozz` CLI is built with [cobra](https://github.com/spf13/cobra), command syntax as follows:
 
