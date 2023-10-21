@@ -28,10 +28,8 @@ type {{ .Name }} struct{ {{ range .Columns }}
 
 func ({{ .Name }}) TableName() string { return Table{{ .Name }} }
 
-func (m *{{ .Name }}) FieldMapping() (map[string]interface{}){
-    return map[string]interface{}{
-		{{ range .Columns }} {{ quote .Column }}: &m.{{ .Name }},
-		{{ end }} }
+func (m *{{ .Name }}) FieldMapping(dst map[string]interface{}){ {{ range .Columns }}
+    dst[{{ quote .Column }}] =  &m.{{ .Name }} {{ end }}
 }
 
 type Slice{{ .Name }} []{{ .Name }}

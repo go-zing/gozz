@@ -18,6 +18,7 @@
 package plugins
 
 import (
+	_ "embed"
 	"errors"
 	"strings"
 
@@ -26,6 +27,7 @@ import (
 	_ "github.com/go-zing/gozz/internal/ormdrivers"
 )
 
+//go:embed orm.go.tmpl
 var ormTemplateText string
 
 func init() {
