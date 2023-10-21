@@ -34,7 +34,7 @@ func (m *{{ .Name }}) FieldMapping(dst map[string]interface{}){ {{ range .Column
 
 type Slice{{ .Name }} []{{ .Name }}
 
-func (s *Slice{{ .Name }}) Range(f func(interface{}, bool) bool) {
+func (s *Slice{{ .Name }}) Iterate(f func(interface{}, bool) bool) {
 	for i := 0; ; i++ {
 		if c := i >= len(*s); !c {
 			if !f(&(*s)[i], c) {

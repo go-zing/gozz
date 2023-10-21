@@ -90,7 +90,7 @@ func (m *Columns) FieldMapping(dst map[string]interface{}) {
 
 type SliceColumns []Columns
 
-func (s *SliceColumns) Range(f func(interface{}, bool) bool) {
+func (s *SliceColumns) Iterate(f func(interface{}, bool) bool) {
 	for i := 0; ; i++ {
 		if c := i >= len(*s); !c {
 			if !f(&(*s)[i], c) {
