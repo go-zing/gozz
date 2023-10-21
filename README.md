@@ -18,6 +18,8 @@
 
 ## Introduction
 
+### Documentation
+
 [English](https://go-zing.github.io/gozz) | [简体中文](https://go-zing.github.io/gozz/zh)
 
 ### Fast and Simple
