@@ -27,12 +27,19 @@ go install github.com/go-zing/gozz@latest
 gozz [--GLOBAL-FLAGS] [COMMAND] [--COMMAND-FLAGS] [ARGS]
 ```
 
+The main plugin execute command would be:
+
+```shell
+gozz run -p "[PLUGIN][:OPTIONS]" filename
+```
+
+
 #### Annotation
 
 Annotations are comments that stick with object, and match syntax as follows:
 
 ```go
-// +zz:[PLUGIN]:[ARGS]:[OPTIONS]
+// +zz:[PLUGIN][:ARGS][:OPTIONS]
 type T interface{}
 ```
 
