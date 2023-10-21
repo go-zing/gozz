@@ -33,10 +33,9 @@ The main plugin execute command would be:
 gozz run -p "[PLUGIN][:OPTIONS]" filename
 ```
 
-
 #### Annotation
 
-Annotations are comments that stick with object, and match syntax as follows:
+Annotations are comments that stick with declaration object, and match syntax as follows:
 
 ```go
 // +zz:[PLUGIN][:ARGS][:OPTIONS]
