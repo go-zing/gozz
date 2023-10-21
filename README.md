@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/go-zing/gozz" target="_blank">
-    <img src="https://raw.githubusercontent.com/go-zing/gozz-doc/main/docs/.vuepress/public/logo.png" alt="logo">
+    <img width="200" src="https://raw.githubusercontent.com/go-zing/gozz-doc/main/docs/.vuepress/public/logo.png" alt="logo">
   </a>
 </p>
 
