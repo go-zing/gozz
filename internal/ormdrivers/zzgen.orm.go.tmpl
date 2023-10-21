@@ -12,10 +12,6 @@ var (
     _ = (*sql.NullString)(nil)
 )
 
-var tables = []interface{}{
-{{ range .Tables }} {{ .Name }}{},
-{{ end }} }
-
 {{ range .Tables }} // {{ .Schema }}.{{ .Table }} {{ if .Comment }}
 {{ comment .Comment }} {{ end }}
 const Table{{ .Name }} = "{{ .Table }}"

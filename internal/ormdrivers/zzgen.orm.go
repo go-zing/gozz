@@ -16,10 +16,6 @@ var (
 	_ = (*sql.NullString)(nil)
 )
 
-var tables = []interface{}{
-	Columns{},
-}
-
 // information_schema.COLUMNS
 const TableColumns = "COLUMNS"
 

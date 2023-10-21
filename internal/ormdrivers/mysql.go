@@ -58,39 +58,49 @@ const (
 	sqlStatementSelectTableComment = "SELECT `table_comment` FROM `information_schema`.`TABLES` WHERE `TABLE_NAME` = ? AND `TABLE_SCHEMA` = ?"
 )
 
-func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns SliceColumns, err error) {
-	fields := make([]string, 0)
+func getColumnKeys(columns SliceColumns) (fields []string) {
 	mapping := make(map[string]interface{})
 	zcore.IterateOrmFieldMapper(&columns, func(m zcore.OrmFieldMapper, b bool) bool {
 		m.FieldMapping(mapping)
+		fields = make([]string, 0, len(mapping))
 		for key := range mapping {
 			fields = append(fields, key)
 		}
 		return false
 	})
 	sort.Strings(fields)
+	return
+}
 
+func (m Mysql) queryColumns(db *sql.DB, schema string, table string) (columns SliceColumns, err error) {
+	fields := getColumnKeys(columns)
 	args := []interface{}{schema}
 	statement := &strings.Builder{}
+
+	// build query sql
 	_, _ = fmt.Fprintf(statement, sqlStatementSelectColumns, strings.Join(fields, "`,`"))
 	if tables := strings.Split(table, ","); table != "*" {
 		statement.WriteString(" AND `TABLE_NAME` in (")
 		for i, tb := range tables {
-			if statement.WriteRune('?'); len(tables)-1 == i {
-				statement.WriteRune(')')
-			} else {
+			statement.WriteRune('?')
+			if len(tables)-1 != i {
 				statement.WriteRune(',')
+			} else {
+				statement.WriteRune(')')
 			}
 			args = append(args, tb)
 		}
 	}
 	statement.WriteString(" ORDER BY `ordinal_position` ASC")
 
+	// do query
 	rows, err := db.Query(statement.String(), args...)
 	if err != nil {
 		return
 	}
 	defer rows.Close()
+
+	// scan rows values
 	err = zcore.ScanSqlRows(rows, fields, &columns)
 	return
 }
@@ -104,19 +114,26 @@ func (m Mysql) parseTables(db *sql.DB, columns []Columns, types map[string]strin
 	tbs := make(map[string]int)
 
 	for _, column := range columns {
-		// init table
+		if !column.TableName.Valid || !column.ColumnName.Valid {
+			continue
+		}
+
 		tableName := column.TableName.String
+		tableSchema := column.TableSchema.String
+		columnName := column.ColumnName.String
+
+		// init table
 		index, ok := tbs[tableName]
 		if !ok {
 			table := zcore.OrmTable{
 				Name:   zcore.UpperCamelCase(tableName),
 				Table:  tableName,
-				Schema: column.TableSchema.String,
+				Schema: tableSchema,
 			}
 
 			// get table comment
 			if stmt != nil {
-				_ = stmt.QueryRow(column.TableName, column.TableSchema).Scan(&table.Comment)
+				_ = stmt.QueryRow(tableName, tableSchema).Scan(&table.Comment)
 			}
 
 			tables = append(tables, table)
@@ -125,7 +142,6 @@ func (m Mysql) parseTables(db *sql.DB, columns []Columns, types map[string]strin
 		}
 
 		table := &tables[index]
-		columnName := column.ColumnName.String
 
 		// table primary key
 		if column.ColumnKey == "PRI" {
