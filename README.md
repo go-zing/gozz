@@ -4,6 +4,16 @@
   </a>
 </p>
 
+<div align=center>
+
+[![Go](https://github.com/go-zing/gozz/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/go-zing/gozz/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/go-zing/gozz/branch/main/graph/badge.svg)](https://codecov.io/gh/go-zing/gozz)
+[![Go Report Card](https://goreportcard.com/badge/github.com/go-zing/gozz)](https://goreportcard.com/report/github.com/go-zing/gozz)
+[![Go Reference](https://pkg.go.dev/badge/github.com/go-zing/gozz.svg)](https://pkg.go.dev/github.com/go-zing/gozz)
+[![License: MIT](https://img.shields.io/github/license/go-zing/gozz)](https://github.com/go-zing/gozz/blob/master/LICENSE)
+
+</div>
+
 ## Introduction
 
 [English](https://go-zing.github.io/gozz) | [简体中文](https://go-zing.github.io/gozz/zh)
