@@ -494,9 +494,12 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 
 			switch decl.Type {
 			case zcore.DeclValue:
-				if wd.Value {
+				if len(decl.ValueSpec.Values) == 1 && isCallWireSet(decl.ValueSpec.Values[0], srcImports) {
+					zcore.Appendf(&el.Decls, name)
+				} else if wd.Value {
 					zcore.Appendf(&el.Decls, `wire.Value(%s)`, name)
 				}
+
 			case zcore.DeclFunc:
 				el.Decls = append(el.Decls, name)
 
@@ -550,6 +553,19 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 
 	// write aop file
 	return w.generateAops(dir, pkg, aopSets, aopImports)
+}
+
+func isCallWireSet(node ast.Node, imports zcore.Imports) (is bool) {
+	call, ok := node.(*ast.CallExpr)
+	if !ok {
+		return
+	}
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok || sel.Sel.Name != "NewSet" {
+		return
+	}
+	name, ok := sel.X.(*ast.Ident)
+	return ok && imports.Which(name.Name) == wireImportPath
 }
 
 func (w Wire) generateAops(dir, pkg string, sets map[string]*WireAop, aopImports zcore.Imports) (err error) {
