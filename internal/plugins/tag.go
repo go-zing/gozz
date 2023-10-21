@@ -131,12 +131,8 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 
 	// render fields
 	for key, value := range t.FieldTags {
-		if len(key) == 0 {
-			continue
-		}
-
 		// render tag template string
-		if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
+		if zcore.TryExecuteTemplate(struct {
 			FieldName string
 			Docs      string
 			Name      string
@@ -146,12 +142,8 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 			Name:      t.Decl.Name(),
 			FieldName: name,
 			Docs:      zcore.JoinDocs(docs),
-		}, value, str) == nil {
-			value = str.String()
+		}, value, &value); len(value) > 0 && len(key) == 0 {
 			t.FieldTags[key] = value
-		}
-
-		if len(value) > 0 {
 			t.Keys = append(t.Keys, key)
 		}
 	}

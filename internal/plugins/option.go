@@ -23,7 +23,6 @@ import (
 	"go/ast"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	zcore "github.com/go-zing/gozz-core"
 )
@@ -112,9 +111,7 @@ func (o Option) run(dir string, entities zcore.DeclEntities) (err error) {
 		for _, index := range group[decl] {
 			entity := entities[index]
 			if typename := entities[index].Options.Get("type", ""); len(typename) > 0 {
-				if str := (&strings.Builder{}); zcore.ExecuteTemplate(entity, typename, str) == nil {
-					option.Typename = str.String()
-				}
+				zcore.TryExecuteTemplate(entity, typename, &option.Typename)
 			}
 		}
 

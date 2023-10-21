@@ -119,9 +119,7 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zcore.OrmTable, err 
 	}
 
 	schemas := entity.Args[0]
-	if str := (&strings.Builder{}); zcore.ExecuteTemplate(entity, schemas, str) == nil {
-		schemas = str.String()
-	}
+	zcore.TryExecuteTemplate(entity, schemas, &schemas)
 
 	var tmp []zcore.OrmTable
 	// parse dsn and get tables

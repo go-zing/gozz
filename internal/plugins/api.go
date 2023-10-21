@@ -142,15 +142,13 @@ func (Api) generateApi(filename string, typeMap map[*zcore.AnnotatedDecl]zcore.F
 			}
 
 			executeTemplate := func(v string) string {
-				if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct {
+				zcore.TryExecuteTemplate(struct {
 					Name, FieldName, Package string
 				}{
 					FieldName: funcName,
 					Name:      api.Name,
 					Package:   typ.Package(),
-				}, v, str) == nil {
-					return str.String()
-				}
+				}, v, &v)
 				return v
 			}
 
@@ -167,12 +165,10 @@ func (Api) generateApi(filename string, typeMap map[*zcore.AnnotatedDecl]zcore.F
 			// try parse method invoke function
 			if pt, tmpl := (*funcType)(ft).InvokeTemplate(); len(tmpl) > 0 {
 				// render invoke template
-				if str := (&strings.Builder{}); zcore.ExecuteTemplate(struct{ Name, Param string }{
+				zcore.TryExecuteTemplate(struct{ Name, Param string }{
 					Name:  funcName,
 					Param: zcore.UnsafeBytes2String(field.Decl.File.ReplacePackages(pt, filename, imports)),
-				}, tmpl, str) == nil {
-					handler.Invoke = str.String()
-				}
+				}, tmpl, &handler.Invoke)
 			}
 
 			api.Handlers = append(api.Handlers, handler)
