@@ -142,6 +142,13 @@ func parseFieldsDocs(fields *ast.FieldList) (fs []DocField) {
 		if len(content) == 0 {
 			continue
 		}
+
+		if len(field.Names) == 0 {
+			if typ := zcore.ExtractAnonymousName(field.Type); typ != nil {
+				fs = append(fs, DocField{Name: typ.Name, Docs: content})
+			}
+		}
+
 		for _, name := range field.Names {
 			fs = append(fs, DocField{Name: name.String(), Docs: content})
 		}
