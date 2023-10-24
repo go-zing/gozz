@@ -142,7 +142,7 @@ func (t *Tag) modifyField(field *ast.Field, name string) {
 			Name:      t.Decl.Name(),
 			FieldName: name,
 			Docs:      zcore.JoinDocs(docs),
-		}, value, &value); len(value) > 0 && len(key) == 0 {
+		}, value, &value); len(value) > 0 && len(key) > 0 {
 			t.FieldTags[key] = value
 			t.Keys = append(t.Keys, key)
 		}
