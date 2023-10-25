@@ -23,6 +23,7 @@ import (
 	"go/ast"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	zcore "github.com/go-zing/gozz-core"
 )
@@ -123,7 +124,7 @@ func (o Option) run(dir string, entities zcore.DeclEntities) (err error) {
 				of := optionField{
 					Doc:  doc,
 					Name: name.Name,
-					Func: "With" + name.Name,
+					Func: "With" + strings.Title(name.Name),
 					Type: typ,
 				}
 				named[of.Func] += 1
