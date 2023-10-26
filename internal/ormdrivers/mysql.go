@@ -38,7 +38,7 @@ func (m Mysql) Dsn(password string) (dsn string) {
 	return fmt.Sprintf("root:%s@tcp(localhost:3306)/", password)
 }
 
-func (m Mysql) Parse(dsn, schema, table string, types map[string]string) (tables []zcore.OrmTable, err error) {
+func (m Mysql) Parse(dsn, schema, table string, types map[string]string, options zcore.Options) (tables []zcore.OrmTable, err error) {
 	db, err := sql.Open(m.Name(), dsn)
 	if err != nil {
 		return

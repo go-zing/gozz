@@ -127,7 +127,7 @@ func (o Orm) parseTables(entity zcore.DeclEntity) (tables []zcore.OrmTable, err 
 		if schema = strings.TrimSpace(schema); len(schema) == 0 {
 			continue
 		}
-		if tmp, err = driver.Parse(dsn, schema, opt.Get("table", "*"), types); err != nil {
+		if tmp, err = driver.Parse(dsn, schema, opt.Get("table", "*"), types, opt); err != nil {
 			return
 		}
 		tables = append(tables, tmp...)
