@@ -62,7 +62,7 @@ type (
 
 	WireSet struct {
 		Name     string
-		Elements []WireSetElement
+		Elements []*WireSetElement
 	}
 
 	wireDecl struct {
@@ -423,110 +423,116 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 		aopSets    = make(map[string]*WireAop)
 	)
 
-	for set, decls := range sets {
-		ws := WireSet{Name: set}
+	parseDecl := func(decl *zcore.AnnotatedDecl, wd *wireDecl) (el *WireSetElement) {
+		name := decl.Name()
+		if len(name) == 0 {
+			return
+		}
+		el = &WireSetElement{Path: zcore.GetImportPath(decl.File.Path), Name: name}
 
-		for _, decl := range decls.keys {
-			wd := decls.m[decl]
-			el := WireSetElement{Path: zcore.GetImportPath(decl.File.Path), Name: decl.Name()}
-			if len(el.Name) == 0 {
+		srcImports := decl.File.Imports()
+
+		// fix name import package selector
+		fp := func(name string) string {
+			return zcore.FixPackage(name, el.Path, dstImportPath, srcImports, dstImports)
+		}
+
+		// has provider
+		if len(wd.Provider) > 0 {
+			el.Decls = append(el.Decls, fp(wd.Provider))
+		}
+
+		name = fp(el.Name)
+
+		// add binds with aop
+		for _, bind := range wd.Binds.Keys() {
+			bindSrc := name
+			bindType := fp(bind)
+			bindTemplate := wireStructBindTemplate
+
+			switch decl.Type {
+			case zcore.DeclTypeInterface:
+				bindTemplate = `wire.Bind(new(%s), new(%s))`
+			case zcore.DeclValue:
+				bindTemplate = `wire.InterfaceValue(new(%s), %s)`
+			case zcore.DeclFunc:
+				bindSrc = fp(string(decl.File.Node(decl.FuncDecl.Type.Results.List[0].Type)))
+				bindTemplate = `wire.Bind(new(%s), new(%s))`
+			}
+
+			if _, aop := wd.Aops[bind]; !aop {
+				// direct interface type binding
+				zcore.Appendf(&el.Decls, bindTemplate, bindType, bindSrc)
 				continue
 			}
 
-			srcImports := decl.File.Imports()
-			// fix name import package selector
-			fp := func(name string) string {
-				return zcore.FixPackage(name, el.Path, dstImportPath, srcImports, dstImports)
+			// aop interface name
+			aopTypename := "_aop_" + strings.Replace(bindType, ".", "_", -1)
+
+			// register aop interface type
+			aopType, ok := aopSets[aopTypename]
+			if !ok {
+				// aop interface type
+				interfaceName := zcore.FixPackage(bind, el.Path, dstImportPath, srcImports, aopImports)
+
+				// add aop generate entry
+				aopType = &WireAop{
+					Name:      aopTypename,
+					Interface: interfaceName,
+					Implement: "_impl" + aopTypename,
+				}
+				aopSets[aopTypename] = aopType
 			}
 
-			// has provider
-			if len(wd.Provider) > 0 {
-				el.Decls = append(el.Decls, fp(wd.Provider))
+			// aop type bindings
+			zcore.Appendf(&el.Decls, bindTemplate, aopTypename, bindSrc)
+			zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, aopType.Implement)
+			zcore.Appendf(&el.Decls, wireStructBindTemplate, bindType, aopType.Implement)
+		}
+
+		switch decl.Type {
+		case zcore.DeclValue:
+			if len(decl.ValueSpec.Values) == 1 && isCallWireSet(decl.ValueSpec.Values[0], srcImports) {
+				zcore.Appendf(&el.Decls, name)
+			} else if wd.Value {
+				zcore.Appendf(&el.Decls, `wire.Value(%s)`, name)
 			}
 
-			name := fp(el.Name)
+		case zcore.DeclFunc:
+			el.Decls = append(el.Decls, name)
 
-			// add binds with aop
-			for _, bind := range wd.Binds.Keys() {
-				bindSrc := name
-				bindType := fp(bind)
-				bindTemplate := wireStructBindTemplate
-
-				switch decl.Type {
-				case zcore.DeclTypeInterface:
-					bindTemplate = `wire.Bind(new(%s), new(%s))`
-				case zcore.DeclValue:
-					bindTemplate = `wire.InterfaceValue(new(%s), %s)`
-				case zcore.DeclFunc:
-					bindSrc = fp(string(decl.File.Node(decl.FuncDecl.Type.Results.List[0].Type)))
-					bindTemplate = `wire.Bind(new(%s), new(%s))`
-				}
-
-				if _, aop := wd.Aops[bind]; !aop {
-					// direct interface type binding
-					zcore.Appendf(&el.Decls, bindTemplate, bindType, bindSrc)
-					continue
-				}
-
-				// aop interface name
-				aopTypename := "_aop_" + strings.Replace(bindType, ".", "_", -1)
-
-				// register aop interface type
-				aopType, ok := aopSets[aopTypename]
-				if !ok {
-					// aop interface type
-					interfaceName := zcore.FixPackage(bind, el.Path, dstImportPath, srcImports, aopImports)
-
-					// add aop generate entry
-					aopType = &WireAop{
-						Name:      aopTypename,
-						Interface: interfaceName,
-						Implement: "_impl" + aopTypename,
-					}
-					aopSets[aopTypename] = aopType
-				}
-
-				// aop type bindings
-				zcore.Appendf(&el.Decls, bindTemplate, aopTypename, bindSrc)
-				zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, aopType.Implement)
-				zcore.Appendf(&el.Decls, wireStructBindTemplate, bindType, aopType.Implement)
-			}
-
-			switch decl.Type {
-			case zcore.DeclValue:
-				if len(decl.ValueSpec.Values) == 1 && isCallWireSet(decl.ValueSpec.Values[0], srcImports) {
-					zcore.Appendf(&el.Decls, name)
-				} else if wd.Value {
-					zcore.Appendf(&el.Decls, `wire.Value(%s)`, name)
-				}
-
-			case zcore.DeclFunc:
-				el.Decls = append(el.Decls, name)
-
-			case zcore.DeclTypeRefer:
-				// referenced type
-				if len(wd.Provider) == 0 {
-					expr, _ := zcore.LookupTypSpec(el.Name, filepath.Dir(decl.File.Path), el.Path)
-					if _, ok := expr.(*ast.StructType); ok {
-						zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
-					}
-				}
-
-			case zcore.DeclTypeStruct:
-				// add fields of
-				if fields := strings.Join(wd.Fields.Keys(), `","`); len(fields) > 0 {
-					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(*%s), "%s")`, name, fields)
-				} else if len(wd.Provider) == 0 {
+		case zcore.DeclTypeRefer:
+			// referenced type
+			if len(wd.Provider) == 0 {
+				expr, _ := zcore.LookupTypSpec(el.Name, filepath.Dir(decl.File.Path), el.Path)
+				if _, ok := expr.(*ast.StructType); ok {
 					zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
 				}
 			}
 
-			if len(el.Decls) > 0 {
+		case zcore.DeclTypeStruct:
+			// add fields of
+			if fields := strings.Join(wd.Fields.Keys(), `","`); len(fields) > 0 {
+				zcore.Appendf(&el.Decls, `wire.FieldsOf(new(*%s), "%s")`, name, fields)
+			} else if len(wd.Provider) == 0 {
+				zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
+			}
+		}
+		return
+	}
+
+	handleSet := func(decls *wireDeclSet) (ws WireSet) {
+		for _, decl := range decls.keys {
+			if el := parseDecl(decl, decls.m[decl]); el != nil && len(el.Decls) > 0 {
 				ws.Elements = append(ws.Elements, el)
 			}
 		}
+		return
+	}
 
-		if len(ws.Elements) > 0 {
+	for set, decls := range sets {
+		if ws := handleSet(decls); len(ws.Elements) > 0 {
+			ws.Name = set
 			wireSets = append(wireSets, ws)
 		}
 	}

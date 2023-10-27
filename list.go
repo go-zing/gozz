@@ -46,7 +46,7 @@ func runList() {
 		names = append(names, name)
 	}
 	sort.Strings(names)
-	fmt.Printf("totally %d plugins avaiable:\n", len(names))
+	fmt.Printf("totally %d plugins available:\n", len(names))
 
 	for _, name := range names {
 		p := registry[name]
