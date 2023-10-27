@@ -22,11 +22,11 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
           cache-dependency-path: subdir/go.sum
+      - name: Install dependencies
+        run: go mod tidy
       - name: Test
         run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
       - name: Codecov
         uses: codecov/codecov-action@v3
-      - name: Install dependencies
-        run: go mod tidy
       - name: Build
         run: go build -v ./
