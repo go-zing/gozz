@@ -50,6 +50,10 @@ type (
 
 	Impls string
 )
+
+func (impls *T3Impl) Int2() {
+	panic("not implemented")
+}
 `
 
 const testImplRetData = `package x
@@ -77,6 +81,10 @@ type (
 	Impls string
 )
 
+func (impls *T3Impl) Int2(context.Context) map[context.Context]int {
+	panic("not implemented")
+}
+
 func (impls *Impls) Int() int {
 	panic("not implemented")
 }
@@ -90,10 +98,6 @@ var (
 )
 
 type T3Impl struct{}
-
-func (t3impl *T3Impl) Int2(context.Context) map[context.Context]int {
-	panic("not implemented")
-}
 
 var (
 	_ T4 = (*T4Impl)(nil)
