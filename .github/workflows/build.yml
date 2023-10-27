@@ -24,6 +24,8 @@ jobs:
           cache-dependency-path: subdir/go.sum
       - name: Install dependencies
         run: go mod tidy
+      - name: Install Wire
+        run: go install github.com/google/wire/cmd/wire@latest
       - name: Test
         run: go test -coverprofile=coverage.txt -covermode=atomic ./...
       - name: Codecov
