@@ -53,7 +53,7 @@ func getGoenv(dir string) (env map[string]string, err error) {
 			continue
 		}
 		if kv := strings.SplitN(line, "=", 2); len(kv) >= 2 {
-			env[kv[0]], _ = strconv.Unquote(kv[1])
+			env[kv[0]], _ = strconv.Unquote(strings.Trim(kv[1], "'"))
 		}
 	}
 	return

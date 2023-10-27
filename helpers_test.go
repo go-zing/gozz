@@ -19,15 +19,22 @@ package main
 
 import (
 	"os"
+	"runtime"
 	"testing"
 
 	zcore "github.com/go-zing/gozz-core"
 )
 
 func TestGetGoEnv(t *testing.T) {
-	_, err := getGoenv("./")
+	env, err := getGoenv("./")
 	if err != nil {
 		t.Fatal(err)
+	}
+	if env["GOARCH"] != runtime.GOARCH {
+		t.Fatalf("get value unexpected: %v != %v ", env["GOARCH"], runtime.GOARCH)
+	}
+	if env["GOOS"] != runtime.GOOS {
+		t.Fatalf("get value unexpected: %v != %v ", env["GOOS"], runtime.GOOS)
 	}
 }
 
