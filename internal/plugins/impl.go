@@ -218,19 +218,20 @@ func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) 
 func (i Impl) Run(entities zcore.DeclEntities) (err error) {
 	group := i.group(entities)
 	set := new(zcore.ModifySet)
-	eg := new(zcore.ErrGroup)
-
-	for k := range group {
-		key := k
+	keys := make([]implDstKey, 0)
+	for key := range group {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i].Package+keys[i].Typename < keys[j].Package+keys[j].Typename
+	})
+	for _, key := range keys {
 		if dst := group[key]; len(dst.Methods) > 0 {
-			eg.Go(func() error { return dst.apply(set, key) })
+			if err = dst.apply(set, key); err != nil {
+				return
+			}
 		}
 	}
-
-	if err = eg.Wait(); err != nil {
-		return
-	}
-
 	return set.Apply()
 }
 
