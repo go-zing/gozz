@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 /*
  * Copyright (c) 2023 Maple Wu <justmaplewu@gmail.com>
  *   National Electronics and Computer Technology Center, Thailand
@@ -19,8 +22,22 @@ package main
 
 import (
 	"os"
+	"runtime"
 	"testing"
 )
+
+func TestGetGoEnv(t *testing.T) {
+	env, err := getGoenv("./")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if env["GOARCH"] != runtime.GOARCH {
+		t.Fatalf("get value unexpected: %v != %v ", env["GOARCH"], runtime.GOARCH)
+	}
+	if env["GOOS"] != runtime.GOOS {
+		t.Fatalf("get value unexpected: %v != %v ", env["GOOS"], runtime.GOOS)
+	}
+}
 
 func TestInstall(t *testing.T) {
 	defer os.Remove("tmp.so")
