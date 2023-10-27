@@ -23,62 +23,63 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/spf13/cobra"
-
 	zcore "github.com/go-zing/gozz-core"
+	"github.com/spf13/cobra"
 )
 
 var list = &cobra.Command{
 	Use:   "list",
 	Short: "list all registered plugins",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		if err := loadPlugins(); err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(2)
 		}
-
-		registry := zcore.PluginRegistry()
-		names := make([]string, 0)
-		for name := range registry {
-			names = append(names, name)
-		}
-		sort.Strings(names)
-		fmt.Printf("totally %d plugins avaiable:\n", len(names))
-
-		for _, name := range names {
-			p := registry[name]
-			name := p.Name()
-			desc := p.Description()
-			args, options := p.Args()
-
-			usage := zcore.AnnotationPrefix + name
-			argsHelp := &strings.Builder{}
-
-			for i, arg := range args {
-				arg, help := zcore.SplitKV(arg, ":")
-				if i == 0 {
-					argsHelp.WriteString("\n\targs:")
-				}
-				usage += ":[" + arg + "]"
-				argsHelp.WriteString("\n\t\t" + arg + ": " + help)
-			}
-
-			var keys []string
-			for k := range options {
-				keys = append(keys, k)
-			}
-			sort.Strings(keys)
-
-			for i, key := range keys {
-				if i == 0 {
-					argsHelp.WriteString("\n\toptions:")
-					usage += ":[options...]"
-				}
-				argsHelp.WriteString("\n\t\t" + key + ": " + options[key])
-			}
-
-			str := fmt.Sprintf("\n%s: %s\n\t%s%s\n", name, usage, desc, argsHelp)
-			fmt.Print(strings.Replace(str, "\t", "    ", -1))
-		}
+		runList()
 	},
+}
+
+func runList() {
+	registry := zcore.PluginRegistry()
+	names := make([]string, 0)
+	for name := range registry {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	fmt.Printf("totally %d plugins avaiable:\n", len(names))
+
+	for _, name := range names {
+		p := registry[name]
+		desc := p.Description()
+		args, options := p.Args()
+
+		usage := zcore.AnnotationPrefix + name
+		argsHelp := &strings.Builder{}
+
+		for i, arg := range args {
+			arg, help := zcore.SplitKV(arg, ":")
+			if i == 0 {
+				argsHelp.WriteString("\n\targs:")
+			}
+			usage += ":[" + arg + "]"
+			argsHelp.WriteString("\n\t\t" + arg + ": " + help)
+		}
+
+		var keys []string
+		for k := range options {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		for i, key := range keys {
+			if i == 0 {
+				argsHelp.WriteString("\n\toptions:")
+				usage += ":[options...]"
+			}
+			argsHelp.WriteString("\n\t\t" + key + ": " + options[key])
+		}
+
+		str := fmt.Sprintf("\n%s: %s\n\t%s%s\n", name, usage, desc, argsHelp)
+		fmt.Print(strings.Replace(str, "\t", "    ", -1))
+	}
 }
