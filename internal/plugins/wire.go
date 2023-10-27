@@ -118,55 +118,56 @@ func (w Wire) Description() string {
 	return "collect and generate wire sets / injectors / aop proxy stubs files."
 }
 
+func (w Wire) parseEntityDecl(entity *zcore.DeclEntity, decl *wireDecl) {
+	var aop bool
+	var binds []string
+
+	for key, value := range entity.Options {
+		values := strings.Split(value, ",")
+		switch key {
+		case "bind":
+			if entity.Type != zcore.DeclTypeFunc {
+				binds = values
+			} else if r := entity.FuncDecl.Type.Results; r != nil && len(r.List) > 0 {
+				binds = values
+			}
+		case "param":
+			decl.Params.Add(values)
+		case "inject":
+			if entity.TypeSpec != nil {
+				decl.Injects.Add(values)
+			}
+		case "field":
+			if entity.Type != zcore.DeclTypeStruct {
+				continue
+			} else if value == "*" {
+				decl.Fields.Add(zcore.ExtractStructFieldsNames(entity.TypeSpec.Type.(*ast.StructType)))
+			} else {
+				decl.Fields.Add(values)
+			}
+		case "aop":
+			aop = true
+		case "set":
+			continue
+		}
+	}
+
+	if len(binds) > 0 {
+		// add binds and aop
+		if decl.Binds.Add(binds); aop {
+			decl.Aops.Add(binds)
+		}
+	} else if entity.ValueSpec != nil {
+		// add as value
+		decl.Value = true
+	}
+}
+
 func (w Wire) parseEntitiesDeclSet(entities zcore.DeclEntities) (set *wireDeclSet) {
 	set = new(wireDeclSet)
 
 	for _, entity := range entities {
-		var (
-			decl  = set.init(entity)
-			aop   bool
-			binds []string
-		)
-
-		for key, value := range entity.Options {
-			values := strings.Split(value, ",")
-			switch key {
-			case "bind":
-				if entity.Type != zcore.DeclTypeFunc {
-					binds = values
-				} else if r := entity.FuncDecl.Type.Results; r != nil && len(r.List) > 0 {
-					binds = values
-				}
-			case "param":
-				decl.Params.Add(values)
-			case "inject":
-				if entity.TypeSpec != nil {
-					decl.Injects.Add(values)
-				}
-			case "field":
-				if entity.Type != zcore.DeclTypeStruct {
-					continue
-				} else if value == "*" {
-					decl.Fields.Add(zcore.ExtractStructFieldsNames(entity.TypeSpec.Type.(*ast.StructType)))
-				} else {
-					decl.Fields.Add(values)
-				}
-			case "aop":
-				aop = true
-			case "set":
-				continue
-			}
-		}
-
-		if len(binds) > 0 {
-			// add binds and aop
-			if decl.Binds.Add(binds); aop {
-				decl.Aops.Add(binds)
-			}
-		} else if entity.ValueSpec != nil {
-			// add as value
-			decl.Value = true
-		}
+		w.parseEntityDecl(&entity, set.init(entity))
 	}
 	return
 }
