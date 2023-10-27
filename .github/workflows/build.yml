@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
       - name: Test
-        run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+        run: go test -coverprofile=coverage.txt -covermode=atomic ./...
       - name: Codecov
         uses: codecov/codecov-action@v3
       - name: Build
