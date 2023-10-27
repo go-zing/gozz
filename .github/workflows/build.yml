@@ -25,9 +25,9 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
       - name: Install Wire
-        run: go install github.com/google/wire/cmd/wire@latest
+        run: go install "github.com/google/wire/cmd/wire@latest"
       - name: Test
-        run: go test -coverprofile=coverage.txt -covermode=atomic ./...
+        run: go test -coverprofile="coverage.txt" -covermode="atomic" ./...
       - name: Codecov
         uses: codecov/codecov-action@v3
       - name: Build
