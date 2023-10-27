@@ -22,7 +22,7 @@ import (
 	"testing"
 )
 
-func TestName(t *testing.T) {
+func TestInstall(t *testing.T) {
 	defer os.Remove("tmp.so")
 	installBuildOutput = "tmp.so"
 	installBuildTarget = "./ormdrivers/mysql"
