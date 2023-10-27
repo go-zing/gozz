@@ -1,8 +1,8 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrtU8EI=
 github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
-github.com/go-zing/gozz-core v0.0.0-20231027055904-11aa038e44db h1:7m9iSFqV3Iq1kYIZFK8zI2JH9mohXvng/Ke7zKQ/9XM=
-github.com/go-zing/gozz-core v0.0.0-20231027055904-11aa038e44db/go.mod h1:SAulUrU1emuMCixZXSm7LD++3SN/tgG0ex51zaBbqdA=
+github.com/go-zing/gozz-core v0.0.0-20231027083631-91340a79f2c1 h1:5Mp4+ZYJmle4VXVYItkh0eiu8W0cH67W8pHAGmLg0PE=
+github.com/go-zing/gozz-core v0.0.0-20231027083631-91340a79f2c1/go.mod h1:SAulUrU1emuMCixZXSm7LD++3SN/tgG0ex51zaBbqdA=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
