@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	zcore "github.com/go-zing/gozz-core"
@@ -113,10 +114,10 @@ func (t4impl *T4Impl) Int2(context.Context) map[context.Context]int {
 func TestImpl(t *testing.T) {
 	_ = os.MkdirAll("test", 0o775)
 	defer os.RemoveAll("test")
-	if err := os.WriteFile("test/types.go", []byte(testImplData), 0o664); err != nil {
+	if err := os.WriteFile(filepath.Join("test", "types.go"), []byte(testImplData), 0o664); err != nil {
 		t.Fatal(err)
 	}
-	decls, err := zcore.ParseFileOrDirectory("test/types.go", zcore.AnnotationPrefix)
+	decls, err := zcore.ParseFileOrDirectory(filepath.Join("test", "types.go"), zcore.AnnotationPrefix)
 	if err != nil {
 		return
 	}
@@ -124,7 +125,7 @@ func TestImpl(t *testing.T) {
 	if err = plugin.Run(decls.Parse(plugin, nil)); err != nil {
 		t.Fatal(err)
 	}
-	data, err := ioutil.ReadFile("test/types.go")
+	data, err := ioutil.ReadFile(filepath.Join("test", "types.go"))
 	if err != nil {
 		t.Fatal(err)
 	}

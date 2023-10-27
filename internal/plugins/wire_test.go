@@ -19,6 +19,7 @@ package plugins
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	zcore "github.com/go-zing/gozz-core"
@@ -111,10 +112,10 @@ var MockConfigValue = &MockConfig{Bool: true}
 func TestWire(t *testing.T) {
 	_ = os.MkdirAll("test", 0o775)
 	defer os.RemoveAll("test")
-	if err := os.WriteFile("test/types.go", []byte(testWireData), 0o664); err != nil {
+	if err := os.WriteFile(filepath.Join("test", "types.go"), []byte(testWireData), 0o664); err != nil {
 		t.Fatal(err)
 	}
-	decls, err := zcore.ParseFileOrDirectory("test/types.go", zcore.AnnotationPrefix)
+	decls, err := zcore.ParseFileOrDirectory(filepath.Join("test", "types.go"), zcore.AnnotationPrefix)
 	if err != nil {
 		return
 	}
