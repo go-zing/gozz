@@ -146,7 +146,7 @@ func (w Wire) parseEntityDecl(entity *zcore.DeclEntity, decl *wireDecl) {
 				decl.Fields.Add(values)
 			}
 		case "aop":
-			aop = true
+			aop = entity.Options.Exist("aop")
 		case "set":
 			continue
 		}
