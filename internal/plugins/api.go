@@ -173,6 +173,8 @@ func (Api) generateApi(filename string, typeMap map[*zcore.AnnotatedDecl]zcore.F
 
 			api.Handlers = append(api.Handlers, handler)
 		}
+
+		interfaces = append(interfaces, api)
 	}
 
 	if len(interfaces) == 0 {
