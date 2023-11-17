@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 
 	zcore "github.com/go-zing/gozz-core"
 )
@@ -237,13 +238,13 @@ func (w Wire) Run(es zcore.DeclEntities) (err error) {
 		}
 	}
 
+	group := zcore.ErrGroup{}
 	// generate sets files
-	if err = w.generateSets(setFiles); err != nil {
-		return
-	}
-
+	group.Go(func() error { return w.generateSets(setFiles) })
 	// generate injects files
-	if err = w.generateInjects(setFiles, injectFiles); err != nil {
+	group.Go(func() error { return w.generateInjects(setFiles, injectFiles) })
+
+	if err = group.Wait(); err != nil {
 		return
 	}
 
@@ -255,7 +256,7 @@ func (w Wire) Run(es zcore.DeclEntities) (err error) {
 		if _, err = zcore.ExecCommand(fmt.Sprintf("go list -m %s || go get %s", wireImportPath, wireImportPath), dir); err != nil {
 			return
 		}
-
+		zcore.Logger.Printf("executing wire %s\n", dir)
 		// run wire
 		if _, err = zcore.ExecCommand("wire", dir); err != nil {
 			return
@@ -416,12 +417,12 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Impor
 
 func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) {
 	var (
-		wireSets      = make([]WireSet, 0, len(sets))
 		dstImports    = zcore.Imports{"github.com/google/wire": "wire"}
 		dstImportPath = zcore.GetImportPath(dir)
 
-		aopImports = make(zcore.Imports)
-		aopSets    = make(map[string]*WireAop)
+		aopImportsMutex sync.Mutex
+		aopImports      = make(zcore.Imports)
+		aopSets         = make(map[string]*WireAop)
 	)
 
 	parseDecl := func(decl *zcore.AnnotatedDecl, wd *wireDecl) (el *WireSetElement) {
@@ -474,7 +475,9 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 			aopType, ok := aopSets[aopTypename]
 			if !ok {
 				// aop interface type
+				aopImportsMutex.Lock()
 				interfaceName := zcore.FixPackage(bind, el.Path, dstImportPath, srcImports, aopImports)
+				aopImportsMutex.Unlock()
 
 				// add aop generate entry
 				aopType = &WireAop{
@@ -523,24 +526,34 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 	}
 
 	handleSet := func(decls *wireDeclSet) (ws WireSet) {
-		for _, decl := range decls.keys {
-			if el := parseDecl(decl, decls.m[decl]); el != nil && len(el.Decls) > 0 {
+		wg := sync.WaitGroup{}
+		wg.Add(len(decls.keys))
+		els := make([]*WireSetElement, len(decls.keys))
+		for i := range decls.keys {
+			decl := decls.keys[i]
+			go func(i int) { defer wg.Done(); els[i] = parseDecl(decl, decls.m[decl]) }(i)
+		}
+		wg.Wait()
+		for _, el := range els {
+			if el != nil && len(el.Decls) > 0 {
 				ws.Elements = append(ws.Elements, el)
 			}
 		}
 		return
 	}
 
-	for set, decls := range sets {
-		if ws := handleSet(decls); len(ws.Elements) > 0 {
-			ws.Name = set
-			wireSets = append(wireSets, ws)
-		}
+	wg := sync.WaitGroup{}
+	wg.Add(len(sets))
+
+	wireSets := make([]*WireSet, 0, len(sets))
+	for set := range sets {
+		i := len(wireSets)
+		decls := sets[set]
+		wireSets = append(wireSets, &WireSet{Name: set})
+		go func() { defer wg.Done(); wireSets[i].Elements = handleSet(decls).Elements }()
 	}
 
-	if len(wireSets) == 0 {
-		return
-	}
+	wg.Wait()
 
 	// package name
 	pkg := zcore.GetImportName(dir)

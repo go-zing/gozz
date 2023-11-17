@@ -50,7 +50,9 @@ type (
 	implDstType struct {
 		Entities zcore.DeclEntities
 		Filename string
+		RecvName string
 		Methods  map[string]*ImplMethod
+		Files    map[string]*zcore.File
 	}
 
 	ImplMethod struct {
@@ -119,12 +121,11 @@ func (dst *implDstType) init(modifySet *zcore.ModifySet, key implDstKey) {
 		zcore.Bytesf(implTypeDeclaration, strings.Join(impls, ";"), strings.Join(wires, ""), key.Typename))
 }
 
-func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) {
-	recName := ""
+func (dst *implDstType) prepare(set *zcore.ModifySet, key implDstKey) (err error) {
 	typeDecl := false
 
 	// parse package type methods
-	files, err := zcore.WalkPackage(key.Package, func(file *zcore.File) (err error) {
+	dst.Files, err = zcore.WalkPackage(key.Package, func(file *zcore.File) (err error) {
 		// check implement type declared
 		typeDecl = typeDecl || file.Lookup(key.Typename) != nil
 
@@ -145,7 +146,7 @@ func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) 
 
 			// use exist receiver name
 			if len(rec.Names) > 0 && len(rec.Names[0].Name) > 0 {
-				recName = rec.Names[0].Name
+				dst.RecvName = rec.Names[0].Name
 			}
 
 			// exist method
@@ -166,11 +167,14 @@ func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) 
 	}
 
 	// no exist receiver name found use lower case typename
-	if len(recName) == 0 {
+	if len(dst.RecvName) == 0 {
 		sp := strings.Split(zcore.SnakeCase(key.Typename), "_")
-		recName = strings.ToLower(sp[len(sp)-1])
+		dst.RecvName = strings.ToLower(sp[len(sp)-1])
 	}
+	return
+}
 
+func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) {
 	// sort by order
 	names := make([]string, 0, len(dst.Methods))
 	for name := range dst.Methods {
@@ -181,7 +185,7 @@ func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) 
 	// implement methods
 	for _, name := range names {
 		method := dst.Methods[name]
-		if f, ok := files[method.Filename]; ok && method.DstFile == nil {
+		if f, ok := dst.Files[method.Filename]; ok && method.DstFile == nil {
 			method.DstFile = f
 		}
 
@@ -202,7 +206,7 @@ func (dst *implDstType) apply(set *zcore.ModifySet, key implDstKey) (err error) 
 				// pointer receiver
 				typename = "*" + typename
 			}
-			file.Appends = append(file.Appends, zcore.Bytesf(implMethodTemplate, recName, typename, name, sign))
+			file.Appends = append(file.Appends, zcore.Bytesf(implMethodTemplate, dst.RecvName, typename, name, sign))
 		} else if ft := (&ast.FuncType{
 			Func:    token.NoPos,            // must unset func position to adjust func type offset
 			Params:  method.DstType.Params,  // params types
@@ -225,8 +229,13 @@ func (i Impl) Run(entities zcore.DeclEntities) (err error) {
 	sort.Slice(keys, func(i, j int) bool {
 		return keys[i].Package+keys[i].Typename < keys[j].Package+keys[j].Typename
 	})
+
 	for _, key := range keys {
 		if dst := group[key]; len(dst.Methods) > 0 {
+			if err = dst.prepare(set, key); err != nil {
+				return
+			}
+			zcore.Logger.Printf("implement %s:%s\n", key.Package, key.Typename)
 			if err = dst.apply(set, key); err != nil {
 				return
 			}
