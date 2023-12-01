@@ -417,8 +417,9 @@ func (w Wire) parseInterfaceMethods(name string, dir string, imports zcore.Impor
 
 func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) {
 	var (
-		dstImports    = zcore.Imports{"github.com/google/wire": "wire"}
-		dstImportPath = zcore.GetImportPath(dir)
+		dstImports      = zcore.Imports{"github.com/google/wire": "wire"}
+		dstImportPath   = zcore.GetImportPath(dir)
+		dstImportsMutex sync.Mutex
 
 		aopImportsMutex sync.Mutex
 		aopImports      = make(zcore.Imports)
@@ -436,6 +437,8 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 
 		// fix name import package selector
 		fp := func(name string) string {
+			dstImportsMutex.Lock()
+			defer dstImportsMutex.Unlock()
 			return zcore.FixPackage(name, el.Path, dstImportPath, srcImports, dstImports)
 		}
 
