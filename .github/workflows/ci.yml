@@ -31,4 +31,4 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v3
       - name: Build
-        run: go build -v ./
+        run: go mod tidy && go build -v ./
