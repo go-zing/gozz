@@ -52,6 +52,12 @@ func init() {
 }
 
 func Run(args []string) (err error) {
+	if !disableCache {
+		zcore.InitCacheStore()
+	}
+
+	defer zcore.FlushCacheStore()
+
 	if err = loadPlugins(); err != nil {
 		return
 	}

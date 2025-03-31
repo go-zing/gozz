@@ -49,11 +49,15 @@ var (
 			}
 		},
 	}
+
+	disableCache = false
 )
 
 func main() {
 	cmd.AddCommand(run, list, install, version)
+	cmd.PersistentFlags().BoolVar(&disableCache, "no-cache", false, "ignore exist .gozzcache file")
 	cmd.PersistentFlags().StringArrayVarP(&extensions, "extension", "x", nil, "extra .so extensions plugin to load")
+
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
