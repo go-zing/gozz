@@ -7,5 +7,3 @@ require (
 	github.com/go-zing/gozz-core v0.0.0-20250331075341-ca4815831bba
 	github.com/spf13/cobra v1.7.0
 )
-
-replace  golang.org/x/tools => golang.org/x/tools v0.14.0
