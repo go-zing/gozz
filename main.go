@@ -28,6 +28,7 @@ import (
 	zcore "github.com/go-zing/gozz-core"
 
 	_ "github.com/go-zing/gozz/internal/plugins"
+	_ "golang.org/x/tools/go/ast/astutil"
 )
 
 var (
