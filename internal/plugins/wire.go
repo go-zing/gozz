@@ -93,13 +93,14 @@ var wireInjectTemplate string
 var wireAopTemplate string
 
 const (
-	wireName               = "wire"
-	wireInjectFile         = "wire_zinject.go"
-	wireSetFile            = "wire_zset.go"
-	wireAopFile            = "wire_zzaop.go"
-	wireImportPath         = "github.com/google/wire"
-	wireBuildFlag          = "//go:build wireinject\n// +build wireinject"
-	wireStructBindTemplate = "wire.Bind(new(%s), new(*%s))"
+	wireName                 = "wire"
+	wireInjectFile           = "wire_zinject.go"
+	wireSetFile              = "wire_zset.go"
+	wireAopFile              = "wire_zzaop.go"
+	wireImportPath           = "github.com/google/wire"
+	wireBuildFlag            = "//go:build wireinject\n// +build wireinject"
+	wireStructBindTemplate   = "wire.Bind(new(%s), new(*%s))"
+	wireStructEmptyFieldFlag = "-"
 )
 
 func (w Wire) Name() string { return wireName }
@@ -142,7 +143,11 @@ func (w Wire) parseEntityDecl(entity *zcore.DeclEntity, decl *wireDecl) {
 			if entity.Type != zcore.DeclTypeStruct {
 				continue
 			} else if value == "*" {
-				decl.Fields.Add(zcore.ExtractStructFieldsNames(entity.TypeSpec.Type.(*ast.StructType)))
+				fields := zcore.ExtractStructFieldsNames(entity.TypeSpec.Type.(*ast.StructType))
+				if len(fields) == 0 {
+					fields = append(fields, wireStructEmptyFieldFlag)
+				}
+				decl.Fields.Add(fields)
 			} else {
 				decl.Fields.Add(values)
 			}
@@ -520,7 +525,9 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 		case zcore.DeclTypeStruct:
 			// add fields of
 			if fields := strings.Join(wd.Fields.Keys(), `","`); len(fields) > 0 {
-				zcore.Appendf(&el.Decls, `wire.FieldsOf(new(*%s), "%s")`, name, fields)
+				if fields != wireStructEmptyFieldFlag {
+					zcore.Appendf(&el.Decls, `wire.FieldsOf(new(*%s), "%s")`, name, fields)
+				}
 			} else if len(wd.Provider) == 0 {
 				zcore.Appendf(&el.Decls, `wire.Struct(new(%s), "*")`, name)
 			}
