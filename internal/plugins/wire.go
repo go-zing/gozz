@@ -436,7 +436,8 @@ func (w Wire) generateSet(dir string, sets map[string]*wireDeclSet) (err error) 
 		if len(name) == 0 {
 			return
 		}
-		el = &WireSetElement{Path: zcore.GetImportPath(decl.File.Path), Name: name}
+		path := zcore.GetImportPath(decl.File.Path)
+		el = &WireSetElement{Path: path, Name: name}
 
 		srcImports := decl.File.Imports()
 
