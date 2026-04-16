@@ -4,6 +4,6 @@ go 1.16
 
 require (
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/go-zing/gozz-core v0.0.0-20260416063618-9359121fa7f0
+	github.com/go-zing/gozz-core v0.0.0-20260416064024-a71fe289d3fa
 	github.com/spf13/cobra v1.7.0
 )
